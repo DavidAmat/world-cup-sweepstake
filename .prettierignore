@@ -1,0 +1,14 @@
+node_modules
+.next
+.vercel
+out
+build
+coverage
+*.log
+.env
+.env.*
+data/
+supabase/.branches
+supabase/.temp
+context/
+public/
