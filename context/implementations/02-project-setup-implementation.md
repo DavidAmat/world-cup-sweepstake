@@ -169,22 +169,23 @@ Ambos en `master`, ya en remote (`origin/master`).
 - [x] Estructura de carpetas creada según `02-project-setup.md` §4.5.
 - [x] `.env.example` versionado con las nuevas keys de Supabase.
 - [x] `.gitignore` incluye `.env*`, `.claude/` y paths Supabase.
-- [ ] **Pendiente:** Vinculación con Vercel y verificación del primer
-      deploy. **Acción del usuario.**
+- [x] Vinculación con Vercel y verificación del primer deploy.
+      Producción en `world-cup-sweepstake-mu.vercel.app` muestra la
+      home en español verificada vía WebFetch.
 - [x] `01-plan.md` actualizado con los nuevos nombres de variables
       Supabase.
 - [x] Bitácora `02-project-setup-implementation.md` creada.
 
-## Pendiente del hito (acción manual del usuario)
+## Acciones manuales completadas por el usuario
 
-1. **Crear proyecto en Vercel** vinculado al repo `world-cup-sweepstake`.
-   - Framework preset: Next.js (auto-detectado).
-   - Variables de entorno: ninguna por ahora (las añadimos en hito 16
-     cuando tengamos Supabase de producción).
-   - Click en "Deploy".
-2. Cuando termine el primer deploy, verificar que la URL
-   `*.vercel.app` muestra la home en español "Porra Mundial 2026".
-3. Confirmar al cerrar el hito.
+1. **Proyecto Vercel creado** — `world-cup-sweepstake` enlazado al
+   repo de GitHub. Producción: `world-cup-sweepstake-mu.vercel.app`.
+   Branch source: `master @ 2377566`.
+2. **Plugin Vercel para Claude Code instalado** vía
+   `npx plugins add vercel/vercel-plugin` (sugerencia mostrada por
+   Vercel tras el primer deploy). Aporta 25 skills, 6 comandos, 3
+   agentes y un MCP. Requiere reiniciar Claude Code para activarse;
+   no afecta a la sesión actual.
 
 ## Próximo hito
 
