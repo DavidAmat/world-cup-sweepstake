@@ -21,7 +21,8 @@
   - `server.ts` (server components / server actions, publishable
     key con cookies de sesión).
   - `admin.ts` (server-only, secret key, bypass de RLS).
-- Middleware de Next.js (`src/middleware.ts`) que refresca la sesión
+- Proxy de Next.js (`src/proxy.ts` — antes `middleware.ts`, renombrado
+  en Next 16) que refresca la sesión
   en cada request usando el patrón oficial de `@supabase/ssr` y
   `auth.getClaims()`.
 - Proyecto Supabase de **producción** creado (free tier) y sus claves
@@ -148,11 +149,16 @@ service_role key:  eyJ... (secret equivalente local)
 ### 3.5 Generar tipos TypeScript
 
 ```bash
-supabase gen types typescript --local > src/lib/supabase/database.types.ts
+supabase gen types typescript --local 2>/dev/null \
+  | grep -v '^Connecting to db' \
+  > src/lib/supabase/database.types.ts
 ```
 
-Por ahora generará tipos vacíos (no hay tablas). Lo importante es
-que el comando funciona y el fichero existe para los clientes.
+El filtro elimina la línea informativa `Connecting to db 5432` que
+la CLI imprime y que rompería el TypeScript del fichero generado.
+Por ahora producirá tipos casi vacíos (no hay tablas todavía); lo
+importante es que el comando funciona y los clientes pueden importar
+`Database`.
 
 ### 3.6 Añadir scripts npm
 
@@ -167,7 +173,7 @@ Añadir a `package.json`:
     "db:reset": "supabase db reset",
     "db:diff": "supabase db diff -f",
     "db:push": "supabase db push --linked",
-    "types:gen": "supabase gen types typescript --local > src/lib/supabase/database.types.ts"
+    "types:gen": "supabase gen types typescript --local 2>/dev/null | grep -v '^Connecting to db' > src/lib/supabase/database.types.ts"
   }
 }
 ```
@@ -246,7 +252,11 @@ export function createAdminClient() {
 }
 ```
 
-### 3.10 Middleware — `src/middleware.ts`
+### 3.10 Proxy — `src/proxy.ts`
+
+> Next 16 ha renombrado el fichero `middleware.ts` a `proxy.ts` y la
+> función exportada también pasa de `middleware` a `proxy`. La API
+> es prácticamente idéntica.
 
 Patrón oficial de `@supabase/ssr` adaptado a Next 16. Refresca
 tokens en cada request y los devuelve como cookies al cliente. Usa
@@ -256,7 +266,7 @@ tokens en cada request y los devuelve como cookies al cliente. Usa
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -397,6 +407,12 @@ Verificable en Supabase Dashboard → Database → Extensions.
 
 ## 5. Riesgos / dudas conocidas
 
+- **Vector / analytics desactivado en local:** el contenedor
+  `supabase_vector_*` falla con "Listing currently running
+  containers failed... DNS error" en macOS Docker Desktop reciente
+  (no puede resolver el socket Docker para scrappear logs).
+  Solución: en `supabase/config.toml`, sección `[analytics]`,
+  `enabled = false`. La app no necesita analytics en local.
 - **Docker pesado en el portátil:** `supabase start` lanza varios
   contenedores. Si el rendimiento molesta, parar con
   `supabase stop` cuando no estemos trabajando.
