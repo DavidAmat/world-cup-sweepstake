@@ -124,6 +124,146 @@ export type Database = {
           },
         ]
       }
+      group_qualification_predictions: {
+        Row: {
+          created_at: string
+          group_code: string
+          id: string
+          predicted_position: number | null
+          team_id: string
+          tournament_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          group_code: string
+          id?: string
+          predicted_position?: number | null
+          team_id: string
+          tournament_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          group_code?: string
+          id?: string
+          predicted_position?: number | null
+          team_id?: string
+          tournament_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_qualification_predictions_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_qualification_predictions_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_qualification_predictions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      initial_predictions: {
+        Row: {
+          best_player_id: string | null
+          champion_team_id: string | null
+          created_at: string
+          id: string
+          locked_at: string | null
+          runner_up_team_id: string | null
+          submitted_at: string | null
+          top_scorer_player_id: string | null
+          tournament_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_player_id?: string | null
+          champion_team_id?: string | null
+          created_at?: string
+          id?: string
+          locked_at?: string | null
+          runner_up_team_id?: string | null
+          submitted_at?: string | null
+          top_scorer_player_id?: string | null
+          tournament_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_player_id?: string | null
+          champion_team_id?: string | null
+          created_at?: string
+          id?: string
+          locked_at?: string | null
+          runner_up_team_id?: string | null
+          submitted_at?: string | null
+          top_scorer_player_id?: string | null
+          tournament_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "initial_predictions_best_player_id_fkey"
+            columns: ["best_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "initial_predictions_champion_team_id_fkey"
+            columns: ["champion_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "initial_predictions_runner_up_team_id_fkey"
+            columns: ["runner_up_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "initial_predictions_top_scorer_player_id_fkey"
+            columns: ["top_scorer_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "initial_predictions_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "initial_predictions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       match_goals: {
         Row: {
           created_at: string
@@ -192,6 +332,96 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tournaments"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_predictions: {
+        Row: {
+          away_goals_120: number | null
+          away_goals_90: number
+          created_at: string
+          fixture_id: string
+          home_goals_120: number | null
+          home_goals_90: number
+          id: string
+          predicted_qualified_team_id: string | null
+          predicted_winner_team_id: string | null
+          predicts_extra_time: boolean
+          predicts_penalties: boolean
+          submitted_at: string
+          tournament_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          away_goals_120?: number | null
+          away_goals_90: number
+          created_at?: string
+          fixture_id: string
+          home_goals_120?: number | null
+          home_goals_90: number
+          id?: string
+          predicted_qualified_team_id?: string | null
+          predicted_winner_team_id?: string | null
+          predicts_extra_time?: boolean
+          predicts_penalties?: boolean
+          submitted_at?: string
+          tournament_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          away_goals_120?: number | null
+          away_goals_90?: number
+          created_at?: string
+          fixture_id?: string
+          home_goals_120?: number | null
+          home_goals_90?: number
+          id?: string
+          predicted_qualified_team_id?: string | null
+          predicted_winner_team_id?: string | null
+          predicts_extra_time?: boolean
+          predicts_penalties?: boolean
+          submitted_at?: string
+          tournament_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_predictions_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: false
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_predictions_predicted_qualified_team_id_fkey"
+            columns: ["predicted_qualified_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_predictions_predicted_winner_team_id_fkey"
+            columns: ["predicted_winner_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_predictions_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_predictions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
           },
         ]
       }
