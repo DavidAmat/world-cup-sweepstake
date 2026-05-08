@@ -51,3 +51,12 @@ supabase/.temp
 
 # Claude Code local settings
 .claude/
+
+# Python (parallel pipeline, not part of the Next.js app)
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Notebook checkpoints
+.ipynb_checkpoints/
