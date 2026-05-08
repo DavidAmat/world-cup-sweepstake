@@ -1,12 +1,3 @@
-# Prompt de arranque — continuar el proyecto en el hito 06
-
-> Pega este prompt completo al iniciar una conversación nueva con
-> Claude para que arranque sin perder contexto. Te ahorra que
-> tenga que re-descubrir el estado del repo.
-
----
-
-```text
 Hola. Continuamos un proyecto a mitad: una app web privada para gestionar
 una porra del Mundial de fútbol 2026 entre 10 amigos. Llevamos 4 hitos
 cerrados (02-05). Ahora toca el hito 06: seeds e importación del master
@@ -15,9 +6,7 @@ data del Mundial 2022 (que usaremos como entorno de pruebas antes del 2026).
 UI en español. Código, SQL y nombres de tabla en inglés. Comunícate
 conmigo en español.
 
-╔══════════════════════════════════════════════════════════════════════╗
-║ LEE ESTO ANTES DE NADA                                               ║
-╚══════════════════════════════════════════════════════════════════════╝
+# LEE ESTO ANTES DE NADA
 
 En este orden, hasta entender el estado actual:
 
@@ -37,17 +26,17 @@ En este orden, hasta entender el estado actual:
 
 4. Para entender el pipeline Python paralelo (entrada del seeder):
    - context/python/01-python-setup.md
-   - data/partidos/   (JSONs ya normalizados; los inspeccionas tú)
-   - data/raw/        (fuente original + scripts de normalización)
+   - Lee data/partidos/README.md
+   - Un dato importante para la implementación de todo lo que vaya a ser los partidos, los resultados, es que como estamos en fase de desarrollo, este JSON que viene del análisis con Python, que ha extraido partidos y resultados del mundial de 2022 (ya ha sucedido) y por lo tanto tenemos resultados de todos los partidos. Entonces mi idea para testear es que cojas ese JSON final y crees un script de Python que básicamente borre todos los resultados. Aquí es otro punto, ¿no? No quiero borrar los campos. Quiero que siempre estén las propiedades del JSON, pero quiero que sean nulas. Cualquier parte del código que analice estos JSON siempre tiene que tener en cuenta que las propiedades relacionadas con el marcador, quién ha ganado, si ha habido prórroga o penaltis, estos siempre estarán en nulo. Sólo estarán disponibles cuando este partido ya haya finalizado y exista un resultado oficial. En este caso, el administrador se va a conectar en la web /admin y va a añadir los resultados manualmente. Entonces, como en 2022 ya tenemos los resultados, ahora mismo lo que haremos es borrar todos estos resultados y poner todo a nulo. Obviamente, los partidos de la fase final (octavos, cuartos, semifinales y final y tercer puesto) no los vamos a poner, ya que, obviamente, al empezar una competición no sabes qué equipos van a llegar a las fases finales. Vamos a poner todos los partidos de la fase de grupos sin resultados, y así podremos probar la UI como Admin de como se añaden manualmente resultados, y la UI como usuario de como se ven como jugador los partidos para poder poner tu predicción. 
+   - Ya al final, cuando hayamos validado todas las páginas y todas las interfaces de los partidos, ¿cómo poner los resultados? ¿Cómo indicar si hay un empate en la fase de grupos o si hay prórroga o penalti, si es la fase eliminatoria... Entonces, vamos a empezar a poner los resultados reales. Entonces, se van a empezar a validar las predicciones que ya están puestas. De este modo, así simulamos un poco los timings que van a producirse en producción con el nuevo mundial. Como ahora mismo no sabemos los resultados, pues usamos lo del año 2022 para ir testeando. 
+   - Se ha creado un admin David1 (ver context/usuarios/01-fake-users.json) y un usuario normal David2.
 
 5. Cuando arranques con la implementación, escribirás:
    - context/plan/06-seed-and-import-master-data.md (plan detallado)
    - context/implementations/06-seed-and-import-master-data-implementation.md
      (bitácora, se va llenando mientras implementas)
 
-╔══════════════════════════════════════════════════════════════════════╗
-║ RESUMEN DE LOS HITOS CERRADOS                                        ║
-╚══════════════════════════════════════════════════════════════════════╝
+# RESUMEN DE LOS HITOS CERRADOS
 
 Hito 02 — Project setup
   Plan: context/plan/02-project-setup.md
@@ -94,10 +83,7 @@ Hito 05 — Auth + profiles + roles
   ESLint config extendida con globalIgnores para .venv, data, context,
   supabase, scripts y database.types.ts.
 
-╔══════════════════════════════════════════════════════════════════════╗
-║ ESTADO DE INFRAESTRUCTURA Y URLS                                     ║
-╚══════════════════════════════════════════════════════════════════════╝
-
+# ESTADO DE INFRAESTRUCTURA Y URLS
 Repo:        github.com/DavidAmat/world-cup-sweepstake (público)
 Branch:      master (commits directos, no PR)
 Vercel:      https://world-cup-sweepstake-mu.vercel.app
@@ -119,9 +105,7 @@ Usuarios actuales en producción:
   - David1 (role=admin). Promovido manualmente vía SQL Editor de
     Supabase Studio.
 
-╔══════════════════════════════════════════════════════════════════════╗
-║ COMANDOS HABITUALES                                                  ║
-╚══════════════════════════════════════════════════════════════════════╝
+# COMANDOS HABITUALES  
 
 Local dev:
   npm run dev                # Next en localhost:3000
@@ -145,9 +129,7 @@ A producción:
 psql contra local (la password es 'postgres'):
   PGPASSWORD=postgres psql -h 192.168.0.112 -p 54322 -U postgres -d postgres
 
-╔══════════════════════════════════════════════════════════════════════╗
-║ TAREA: HITO 06 — SEEDS E IMPORTACIÓN DE MASTER DATA                  ║
-╚══════════════════════════════════════════════════════════════════════╝
+# TAREA: HITO 06 — SEEDS E IMPORTACIÓN DE MASTER DATA
 
 Objetivo: que la DB de producción tenga cargado el master data del
 Mundial de Catar 2022 (torneo de pruebas), listo para que los hitos
@@ -191,9 +173,7 @@ Pasos generales:
 
 9. Documenta todo en context/implementations/06-...md.
 
-╔══════════════════════════════════════════════════════════════════════╗
-║ CÓMO TRABAJAS CONMIGO                                                ║
-╚══════════════════════════════════════════════════════════════════════╝
+# CÓMO TRABAJAS CONMIGO
 
 - Antes de implementar el hito, escribes el plan detallado en
   context/plan/06-seed-and-import-master-data.md. Yo lo reviso. Si
@@ -223,9 +203,7 @@ Pasos generales:
 - Si te encuentras editando un fichero modificado por mí o tras
   un format/lint, vuelve a leerlo antes de tocarlo.
 
-╔══════════════════════════════════════════════════════════════════════╗
-║ EMPIEZA AQUÍ                                                         ║
-╚══════════════════════════════════════════════════════════════════════╝
+# EMPIEZA AQUÍ
 
 1. Lee los ficheros de la sección "LEE ESTO ANTES DE NADA".
 2. Inspecciona los JSONs y scripts de mi pipeline Python en
@@ -234,17 +212,3 @@ Pasos generales:
 4. Pídeme aprobación.
 5. Una vez aprobado, ejecuta paso a paso siguiendo las convenciones
    de los hitos previos.
-```
-
----
-
-## Cómo usarlo
-
-1. Abre una conversación nueva en Claude Code (en el mismo
-   directorio del repo).
-2. Pega el bloque entre los `╔...╗` (o el documento entero — el
-   párrafo introductorio explica el porqué de leer este fichero).
-3. Claude va leyendo y arranca con el hito 06.
-
-Si quieres añadir/quitar algo antes de pegarlo (p.ej. no listar
-ciertos detalles), edita este fichero o copia y modifica.

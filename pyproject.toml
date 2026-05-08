@@ -1,0 +1,18 @@
+[project]
+name = "world-cup-data-tools"
+version = "0.1.0"
+description = "Utilities to convert FIFA World Cup CSV datasets into sweepstake-ready JSON files."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "ipykernel>=7.2.0",
+    "ipywidgets>=8.1.8",
+    "jupyterlab>=4.5.7",
+    "pandas>=2.2.0",
+]
+
+[project.scripts]
+convert-world-cup-csv = "convert_world_cup_csv_to_json:main"
+
+[tool.uv]
+package = false

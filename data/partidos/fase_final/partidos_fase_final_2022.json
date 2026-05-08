@@ -1,0 +1,172 @@
+{
+    "octavos": [
+    {
+      "external_id": "wc2022_octavos_001",
+      "fase": "octavos",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Países Bajos",
+      "equipo_2": "Estados Unidos",
+      "fecha": "2022-12-03 02:00:00"
+    },
+    {
+      "external_id": "wc2022_octavos_002",
+      "fase": "octavos",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Argentina",
+      "equipo_2": "Australia",
+      "fecha": "2022-12-03 02:00:00"
+    },
+    {
+      "external_id": "wc2022_octavos_003",
+      "fase": "octavos",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Francia",
+      "equipo_2": "Polonia",
+      "fecha": "2022-12-04 02:00:00"
+    },
+    {
+      "external_id": "wc2022_octavos_004",
+      "fase": "octavos",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Inglaterra",
+      "equipo_2": "Senegal",
+      "fecha": "2022-12-04 02:00:00"
+    },
+    {
+      "external_id": "wc2022_octavos_005",
+      "fase": "octavos",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Japón",
+      "equipo_2": "Croacia",
+      "fecha": "2022-12-05 02:00:00"
+    },
+    {
+      "external_id": "wc2022_octavos_006",
+      "fase": "octavos",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Brasil",
+      "equipo_2": "Corea del Sur",
+      "fecha": "2022-12-05 02:00:00"
+    },
+    {
+      "external_id": "wc2022_octavos_007",
+      "fase": "octavos",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Marruecos",
+      "equipo_2": "España",
+      "fecha": "2022-12-06 02:00:00"
+    },
+    {
+      "external_id": "wc2022_octavos_008",
+      "fase": "octavos",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Portugal",
+      "equipo_2": "Suiza",
+      "fecha": "2022-12-06 02:00:00"
+    }
+  ],
+  "cuartos": [
+    {
+      "external_id": "wc2022_cuartos_001",
+      "fase": "cuartos",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Croacia",
+      "equipo_2": "Brasil",
+      "fecha": "2022-12-09 02:00:00"
+    },
+    {
+      "external_id": "wc2022_cuartos_002",
+      "fase": "cuartos",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Países Bajos",
+      "equipo_2": "Argentina",
+      "fecha": "2022-12-09 02:00:00"
+    },
+    {
+      "external_id": "wc2022_cuartos_003",
+      "fase": "cuartos",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Marruecos",
+      "equipo_2": "Portugal",
+      "fecha": "2022-12-10 02:00:00"
+    },
+    {
+      "external_id": "wc2022_cuartos_004",
+      "fase": "cuartos",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Inglaterra",
+      "equipo_2": "Francia",
+      "fecha": "2022-12-10 02:00:00"
+    }
+  ],
+  "semis": [
+    {
+      "external_id": "wc2022_semis_001",
+      "fase": "semis",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Argentina",
+      "equipo_2": "Croacia",
+      "fecha": "2022-12-13 02:00:00"
+    },
+    {
+      "external_id": "wc2022_semis_002",
+      "fase": "semis",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Francia",
+      "equipo_2": "Marruecos",
+      "fecha": "2022-12-14 02:00:00"
+    }
+  ],
+  "tercer_puesto": [
+    {
+      "external_id": "wc2022_tercer_puesto_001",
+      "fase": "tercer_puesto",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Croacia",
+      "equipo_2": "Marruecos",
+      "fecha": "2022-12-17 02:00:00"
+    }
+  ],
+  "final": [
+    {
+      "external_id": "wc2022_final_001",
+      "fase": "final",
+      "tipo_partido": "eliminatoria",
+      "jornada": null,
+      "grupo": null,
+      "equipo_1": "Argentina",
+      "equipo_2": "Francia",
+      "fecha": "2022-12-18 02:00:00"
+    }
+  ]
+}
