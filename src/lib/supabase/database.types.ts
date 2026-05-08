@@ -28,13 +28,117 @@ export type Database = {
   };
   public: {
     Tables: {
-      [_ in never]: never;
+      profiles: {
+        Row: {
+          created_at: string;
+          display_name: string;
+          initials: string;
+          role: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          display_name: string;
+          initials: string;
+          role?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          display_name?: string;
+          initials?: string;
+          role?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      terms_acceptances: {
+        Row: {
+          accepted_at: string;
+          id: string;
+          rules_version: number;
+          tournament_id: string;
+          user_id: string;
+        };
+        Insert: {
+          accepted_at?: string;
+          id?: string;
+          rules_version: number;
+          tournament_id: string;
+          user_id: string;
+        };
+        Update: {
+          accepted_at?: string;
+          id?: string;
+          rules_version?: number;
+          tournament_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "terms_acceptances_tournament_id_fkey";
+            columns: ["tournament_id"];
+            isOneToOne: false;
+            referencedRelation: "tournaments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "terms_acceptances_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["user_id"];
+          },
+        ];
+      };
+      tournaments: {
+        Row: {
+          created_at: string;
+          group_qualifiers_per_group: number;
+          id: string;
+          is_test: boolean;
+          name: string;
+          predictions_open_until: string | null;
+          slug: string;
+          status: string;
+          updated_at: string;
+          year: number;
+        };
+        Insert: {
+          created_at?: string;
+          group_qualifiers_per_group?: number;
+          id?: string;
+          is_test?: boolean;
+          name: string;
+          predictions_open_until?: string | null;
+          slug: string;
+          status?: string;
+          updated_at?: string;
+          year: number;
+        };
+        Update: {
+          created_at?: string;
+          group_qualifiers_per_group?: number;
+          id?: string;
+          is_test?: boolean;
+          name?: string;
+          predictions_open_until?: string | null;
+          slug?: string;
+          status?: string;
+          updated_at?: string;
+          year?: number;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      is_admin: { Args: never; Returns: boolean };
     };
     Enums: {
       [_ in never]: never;
