@@ -1,0 +1,258 @@
+[
+  {
+    "external_id": "wc2022_team_qat",
+    "code": "QAT",
+    "canonical_name": "Qatar",
+    "display_name": "Qatar",
+    "aliases": ["Qatar", "Catar", "QAT"],
+    "group_code": "A"
+  },
+  {
+    "external_id": "wc2022_team_ecu",
+    "code": "ECU",
+    "canonical_name": "Ecuador",
+    "display_name": "Ecuador",
+    "aliases": ["Ecuador", "ECU"],
+    "group_code": "A"
+  },
+  {
+    "external_id": "wc2022_team_sen",
+    "code": "SEN",
+    "canonical_name": "Senegal",
+    "display_name": "Senegal",
+    "aliases": ["Senegal", "SEN"],
+    "group_code": "A"
+  },
+  {
+    "external_id": "wc2022_team_ned",
+    "code": "NED",
+    "canonical_name": "Países Bajos",
+    "display_name": "Países Bajos",
+    "aliases": ["Países Bajos", "Holanda", "Netherlands", "NED"],
+    "group_code": "A"
+  },
+  {
+    "external_id": "wc2022_team_eng",
+    "code": "ENG",
+    "canonical_name": "Inglaterra",
+    "display_name": "Inglaterra",
+    "aliases": ["Inglaterra", "England", "ENG"],
+    "group_code": "B"
+  },
+  {
+    "external_id": "wc2022_team_irn",
+    "code": "IRN",
+    "canonical_name": "Irán",
+    "display_name": "Irán",
+    "aliases": ["Irán", "Iran", "IR Iran", "IRN"],
+    "group_code": "B"
+  },
+  {
+    "external_id": "wc2022_team_usa",
+    "code": "USA",
+    "canonical_name": "Estados Unidos",
+    "display_name": "Estados Unidos",
+    "aliases": ["Estados Unidos", "EE.UU.", "United States", "USA"],
+    "group_code": "B"
+  },
+  {
+    "external_id": "wc2022_team_wal",
+    "code": "WAL",
+    "canonical_name": "Gales",
+    "display_name": "Gales",
+    "aliases": ["Gales", "Wales", "WAL"],
+    "group_code": "B"
+  },
+  {
+    "external_id": "wc2022_team_arg",
+    "code": "ARG",
+    "canonical_name": "Argentina",
+    "display_name": "Argentina",
+    "aliases": ["Argentina", "ARG"],
+    "group_code": "C"
+  },
+  {
+    "external_id": "wc2022_team_ksa",
+    "code": "KSA",
+    "canonical_name": "Arabia Saudí",
+    "display_name": "Arabia Saudí",
+    "aliases": ["Arabia Saudí", "Arabia Saudita", "Saudi Arabia", "KSA", "SAU"],
+    "group_code": "C"
+  },
+  {
+    "external_id": "wc2022_team_mex",
+    "code": "MEX",
+    "canonical_name": "México",
+    "display_name": "México",
+    "aliases": ["México", "Mexico", "MEX"],
+    "group_code": "C"
+  },
+  {
+    "external_id": "wc2022_team_pol",
+    "code": "POL",
+    "canonical_name": "Polonia",
+    "display_name": "Polonia",
+    "aliases": ["Polonia", "Poland", "POL"],
+    "group_code": "C"
+  },
+  {
+    "external_id": "wc2022_team_fra",
+    "code": "FRA",
+    "canonical_name": "Francia",
+    "display_name": "Francia",
+    "aliases": ["Francia", "France", "FRA"],
+    "group_code": "D"
+  },
+  {
+    "external_id": "wc2022_team_aus",
+    "code": "AUS",
+    "canonical_name": "Australia",
+    "display_name": "Australia",
+    "aliases": ["Australia", "AUS"],
+    "group_code": "D"
+  },
+  {
+    "external_id": "wc2022_team_den",
+    "code": "DEN",
+    "canonical_name": "Dinamarca",
+    "display_name": "Dinamarca",
+    "aliases": ["Dinamarca", "Denmark", "DEN"],
+    "group_code": "D"
+  },
+  {
+    "external_id": "wc2022_team_tun",
+    "code": "TUN",
+    "canonical_name": "Túnez",
+    "display_name": "Túnez",
+    "aliases": ["Túnez", "Tunisia", "TUN"],
+    "group_code": "D"
+  },
+  {
+    "external_id": "wc2022_team_esp",
+    "code": "ESP",
+    "canonical_name": "España",
+    "display_name": "España",
+    "aliases": ["España", "Spain", "ESP"],
+    "group_code": "E"
+  },
+  {
+    "external_id": "wc2022_team_crc",
+    "code": "CRC",
+    "canonical_name": "Costa Rica",
+    "display_name": "Costa Rica",
+    "aliases": ["Costa Rica", "CRC"],
+    "group_code": "E"
+  },
+  {
+    "external_id": "wc2022_team_ger",
+    "code": "GER",
+    "canonical_name": "Alemania",
+    "display_name": "Alemania",
+    "aliases": ["Alemania", "Germany", "GER"],
+    "group_code": "E"
+  },
+  {
+    "external_id": "wc2022_team_jpn",
+    "code": "JPN",
+    "canonical_name": "Japón",
+    "display_name": "Japón",
+    "aliases": ["Japón", "Japan", "JPN"],
+    "group_code": "E"
+  },
+  {
+    "external_id": "wc2022_team_bel",
+    "code": "BEL",
+    "canonical_name": "Bélgica",
+    "display_name": "Bélgica",
+    "aliases": ["Bélgica", "Belgium", "BEL"],
+    "group_code": "F"
+  },
+  {
+    "external_id": "wc2022_team_can",
+    "code": "CAN",
+    "canonical_name": "Canadá",
+    "display_name": "Canadá",
+    "aliases": ["Canadá", "Canada", "CAN"],
+    "group_code": "F"
+  },
+  {
+    "external_id": "wc2022_team_mar",
+    "code": "MAR",
+    "canonical_name": "Marruecos",
+    "display_name": "Marruecos",
+    "aliases": ["Marruecos", "Morocco", "MAR"],
+    "group_code": "F"
+  },
+  {
+    "external_id": "wc2022_team_cro",
+    "code": "CRO",
+    "canonical_name": "Croacia",
+    "display_name": "Croacia",
+    "aliases": ["Croacia", "Croatia", "CRO"],
+    "group_code": "F"
+  },
+  {
+    "external_id": "wc2022_team_bra",
+    "code": "BRA",
+    "canonical_name": "Brasil",
+    "display_name": "Brasil",
+    "aliases": ["Brasil", "Brazil", "BRA"],
+    "group_code": "G"
+  },
+  {
+    "external_id": "wc2022_team_srb",
+    "code": "SRB",
+    "canonical_name": "Serbia",
+    "display_name": "Serbia",
+    "aliases": ["Serbia", "SRB"],
+    "group_code": "G"
+  },
+  {
+    "external_id": "wc2022_team_sui",
+    "code": "SUI",
+    "canonical_name": "Suiza",
+    "display_name": "Suiza",
+    "aliases": ["Suiza", "Switzerland", "SUI", "SWI"],
+    "group_code": "G"
+  },
+  {
+    "external_id": "wc2022_team_cmr",
+    "code": "CMR",
+    "canonical_name": "Camerún",
+    "display_name": "Camerún",
+    "aliases": ["Camerún", "Cameroon", "CMR"],
+    "group_code": "G"
+  },
+  {
+    "external_id": "wc2022_team_por",
+    "code": "POR",
+    "canonical_name": "Portugal",
+    "display_name": "Portugal",
+    "aliases": ["Portugal", "POR"],
+    "group_code": "H"
+  },
+  {
+    "external_id": "wc2022_team_gha",
+    "code": "GHA",
+    "canonical_name": "Ghana",
+    "display_name": "Ghana",
+    "aliases": ["Ghana", "GHA"],
+    "group_code": "H"
+  },
+  {
+    "external_id": "wc2022_team_uru",
+    "code": "URU",
+    "canonical_name": "Uruguay",
+    "display_name": "Uruguay",
+    "aliases": ["Uruguay", "URU"],
+    "group_code": "H"
+  },
+  {
+    "external_id": "wc2022_team_kor",
+    "code": "KOR",
+    "canonical_name": "Corea del Sur",
+    "display_name": "Corea del Sur",
+    "aliases": ["Corea del Sur", "Korea Republic", "South Korea", "KOR"],
+    "group_code": "H"
+  }
+]

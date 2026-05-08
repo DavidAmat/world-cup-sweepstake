@@ -1,0 +1,9 @@
+{
+  "slug": "wc_2022_test",
+  "name": "Mundial Catar 2022 (test)",
+  "year": 2022,
+  "status": "active",
+  "is_test": true,
+  "predictions_open_until": null,
+  "group_qualifiers_per_group": 2
+}
