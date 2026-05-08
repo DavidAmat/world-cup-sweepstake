@@ -2,9 +2,9 @@
 
 > Hito ejecutado: ver plan en `context/plan/06-seed-and-import-master-data.md`.
 
-## Resumen ejecutivo (en progreso)
+## Resumen ejecutivo
 
-Hito 06 prácticamente cerrado. Estado actual:
+Hito 06 cerrado. Estado final:
 
 - [x] Plan aprobado (versión final tras decisiones D1, D4, D5, D6, D7).
 - [x] `strip_results_2022.py` y JSON neutro generado (48 partidos de fase
@@ -20,8 +20,8 @@ Hito 06 prácticamente cerrado. Estado actual:
 - [x] Validación local: 1 tournament, 6 stages, 8 rounds, 32 teams,
       48 fixtures, 0 match_results, 0 players. Idempotencia y diff
       del download verificados.
-- [ ] Aplicación a producción (pendiente, lo ejecuta el autor en su
-      terminal con env vars inline + `--confirm-prod`).
+- [x] Aplicación a producción ejecutada por el autor con env vars
+      inline + `--confirm-prod`. Conteos idénticos a local.
 
 ## Hallazgo previo · timezones del JSON Python
 
@@ -181,8 +181,11 @@ Roundtrip:
 
 ### 6. Producción
 
-Pendiente. El autor lo ejecutará en su terminal con env vars inline
-y flag `--confirm-prod`:
+Pre-check con `download.ts` read-only contra prod (sin `--confirm-prod`,
+sin riesgo): devolvió `Tournament with slug "wc_2022_test" not found in
+DB`, confirmando que la base de datos de producción estaba limpia.
+
+Upload ejecutado por el autor en su terminal:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://qbphxsijmqortxhxlrnr.supabase.co \
@@ -190,7 +193,119 @@ SUPABASE_SECRET_KEY=<sb_secret_de_prod> \
   npx tsx scripts/wc2022/upload.ts --confirm-prod
 ```
 
-Conteos esperados idénticos a local: 1/6/8/32/48/0/0.
+Output:
+
+```
+→ Target
+  URL: https://qbphxsijmqortxhxlrnr.supabase.co
+  Local: false
+  ! Target is NON-LOCAL. Writes will hit production.
+
+→ Loading JSONs
+  tournament: wc_2022_test
+  teams: 32
+  matches: 48
+
+→ tournament    ✓ tournament wc_2022_test
+→ stages        ✓ stages (6)
+→ rounds        ✓ rounds (8)
+→ teams         ✓ teams (32)
+→ fixtures
+  matches in JSON: 48
+  matches to upsert: 48
+  skipped: 0
+  ✓ fixtures (48)
+
+→ Done
+  tournament: wc_2022_test
+  stages: 6
+  rounds: 8
+  teams: 32
+  fixtures inserted: 48
+  fixtures skipped (no team match): 0
+```
+
+Conteos idénticos a local. La flag `--confirm-prod` y el banner de
+"Target is NON-LOCAL" funcionaron como esperado.
+
+## Acceptance criteria del hito
+
+- [x] `data/partidos/2022/partidos_2022_sin_resultados.json` existe con
+      48 partidos de fase de grupos y los 5 campos de resultado en `null`.
+- [x] `data/seeds/wc_2022/{tournament,teams}.json` validan contra los
+      Zod schemas. 32 teams, 4 por grupo, todos los `display_name`
+      cuadran con `equipo_1`/`equipo_2` del JSON Python neutro.
+- [x] `npm run wc2022:upload` completo en local sin errores.
+- [x] Conteos en local: 1 tournament, 6 stages, 8 rounds, 32 teams,
+      48 fixtures, 0 match_results, 0 players.
+- [x] Re-ejecutar el upload no cambia los conteos (idempotencia
+      verificada con dos runs consecutivos).
+- [x] `npm run wc2022:download` muestra diff cuando la DB diverge del
+      JSON local (verificado con un UPDATE manual de `kickoff_at`).
+- [x] Mismas verificaciones en producción.
+- [x] Bitácora `06-seed-and-import-master-data-implementation.md`
+      escrita en paralelo, no al final.
+
+## Estado tras el hito
+
+- **Local** (Supabase CLI): `wc_2022_test` cargado con 48 fixtures de
+  fase de grupos. Todas las jornadas con 16 partidos. Equipos
+  distribuidos en grupos A-H (4 por grupo). Sin resultados.
+- **Producción** (Supabase free tier): mismo estado.
+- **Repo**: 6 commits push a master a través del hito 06
+  (`8bfb94d` → `8d0c7df`).
+- **Vercel**: sin cambios visibles aún (ningún UI consume estos datos
+  todavía; eso vendrá en hitos 07/08/09).
+
+## Cómo trabajar con los datos a partir de aquí
+
+Comandos útiles ya operativos:
+
+```bash
+# Ver qué hay en la DB y compararlo con el JSON local (sin tocar nada)
+npm run wc2022:download
+
+# Sobreescribir el JSON local con la versión de la DB
+npx tsx scripts/wc2022/download.ts --write
+
+# Subir el JSON local a la DB (local por defecto)
+npm run wc2022:upload
+
+# Subir contra producción
+NEXT_PUBLIC_SUPABASE_URL=https://qbphxsijmqortxhxlrnr.supabase.co \
+SUPABASE_SECRET_KEY=<sb_secret_prod> \
+  npx tsx scripts/wc2022/upload.ts --confirm-prod
+```
+
+Workflow recomendado cuando el admin haya editado fixtures desde la
+web (post-hito 07):
+
+1. `npm run wc2022:download` (read-only) para ver qué cambió.
+2. Si te parece bien, `npx tsx scripts/wc2022/download.ts --write`
+   para refrescar el JSON local.
+3. Commit del JSON actualizado.
+
+Workflow para añadir eliminatorias al JSON manualmente:
+
+1. Editar `data/partidos/2022/partidos_2022_sin_resultados.json`
+   añadiendo nuevos objetos con `external_id`, `fase` (octavos /
+   cuartos / semis / tercer_puesto / final), `equipo_1`, `equipo_2`,
+   `fecha`, etc. Mantener los campos de resultado en `null`.
+2. `npm run wc2022:upload` (local) para verificar.
+3. Si todo OK, ejecutar contra producción con env vars inline.
+
+## Próximo hito
+
+Hito 07 — Admin: fixtures y jugadores. Páginas en `/admin/fixtures`
+para editar `kickoff_at`, asignar equipos a placeholders (cuando
+existan eliminatorias), y cambiar `status`. La sección de jugadores
+queda fuera de alcance porque decidimos no usar la tabla `players`
+para 2022.
+
+Importante para el siguiente desarrollo: cualquier cambio que el
+admin haga vía la UI sobre fixtures se reflejará al hacer
+`wc2022:download` — el modelo de sync bidireccional funciona en ambas
+direcciones.
 
 ## Errores y resoluciones
 

@@ -619,16 +619,17 @@ filtra fase de grupos.)
 
 ## 8. Acceptance criteria
 
-- [ ] `data/partidos/2022/partidos_2022_sin_resultados.json` existe con
-      64 partidos y los 5 campos de resultado en `null`.
-- [ ] `data/seeds/wc_2022/{tournament,teams}.json` validan contra los
+- [x] `data/partidos/2022/partidos_2022_sin_resultados.json` existe con
+      48 partidos de fase de grupos (filtrados por el strip script) y
+      los 5 campos de resultado en `null`.
+- [x] `data/seeds/wc_2022/{tournament,teams}.json` validan contra los
       Zod schemas.
-- [ ] `npm run seed:wc2022` completo en local sin errores.
-- [ ] Conteos en local: 1 tournament, 6 stages, 8 rounds, 32 teams,
+- [x] `npm run wc2022:upload` completo en local sin errores.
+- [x] Conteos en local: 1 tournament, 6 stages, 8 rounds, 32 teams,
       48 fixtures, 0 match_results, 0 players.
-- [ ] Re-ejecutar el seeder no cambia los conteos.
-- [ ] Mismas verificaciones en producción.
-- [ ] Bitácora `06-seed-and-import-master-data-implementation.md`
+- [x] Re-ejecutar el seeder no cambia los conteos.
+- [x] Mismas verificaciones en producción.
+- [x] Bitácora `06-seed-and-import-master-data-implementation.md`
       escrita en paralelo, no al final.
 
 ---
