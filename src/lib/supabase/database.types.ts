@@ -264,6 +264,58 @@ export type Database = {
           },
         ]
       }
+      leaderboard_snapshots: {
+        Row: {
+          created_at: string
+          id: string
+          rank: number
+          round_id: string
+          total_points: number
+          tournament_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rank: number
+          round_id: string
+          total_points: number
+          tournament_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rank?: number
+          round_id?: string
+          total_points?: number
+          tournament_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leaderboard_snapshots_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leaderboard_snapshots_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leaderboard_snapshots_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       match_goals: {
         Row: {
           created_at: string
@@ -653,6 +705,64 @@ export type Database = {
           },
         ]
       }
+      prediction_scores: {
+        Row: {
+          calculated_at: string
+          fixture_id: string | null
+          id: string
+          points_breakdown: Json
+          points_total: number
+          prediction_type: string
+          scoring_rules_version: number
+          tournament_id: string
+          user_id: string
+        }
+        Insert: {
+          calculated_at?: string
+          fixture_id?: string | null
+          id?: string
+          points_breakdown: Json
+          points_total: number
+          prediction_type: string
+          scoring_rules_version: number
+          tournament_id: string
+          user_id: string
+        }
+        Update: {
+          calculated_at?: string
+          fixture_id?: string | null
+          id?: string
+          points_breakdown?: Json
+          points_total?: number
+          prediction_type?: string
+          scoring_rules_version?: number
+          tournament_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prediction_scores_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: false
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prediction_scores_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prediction_scores_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -721,6 +831,44 @@ export type Database = {
           },
           {
             foreignKeyName: "rounds_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scoring_rules: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          rules: Json
+          tournament_id: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          rules: Json
+          tournament_id: string
+          updated_at?: string
+          version: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          rules?: Json
+          tournament_id?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scoring_rules_tournament_id_fkey"
             columns: ["tournament_id"]
             isOneToOne: false
             referencedRelation: "tournaments"
