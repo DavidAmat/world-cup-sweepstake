@@ -34,6 +34,341 @@ export type Database = {
   }
   public: {
     Tables: {
+      fixtures: {
+        Row: {
+          away_placeholder: string | null
+          away_team_id: string | null
+          created_at: string
+          external_id: string | null
+          group_code: string | null
+          home_placeholder: string | null
+          home_team_id: string | null
+          id: string
+          kickoff_at: string
+          round_id: string
+          stage_id: string
+          status: string
+          tournament_id: string
+          updated_at: string
+          venue: string | null
+        }
+        Insert: {
+          away_placeholder?: string | null
+          away_team_id?: string | null
+          created_at?: string
+          external_id?: string | null
+          group_code?: string | null
+          home_placeholder?: string | null
+          home_team_id?: string | null
+          id?: string
+          kickoff_at: string
+          round_id: string
+          stage_id: string
+          status?: string
+          tournament_id: string
+          updated_at?: string
+          venue?: string | null
+        }
+        Update: {
+          away_placeholder?: string | null
+          away_team_id?: string | null
+          created_at?: string
+          external_id?: string | null
+          group_code?: string | null
+          home_placeholder?: string | null
+          home_team_id?: string | null
+          id?: string
+          kickoff_at?: string
+          round_id?: string
+          stage_id?: string
+          status?: string
+          tournament_id?: string
+          updated_at?: string
+          venue?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fixtures_away_team_id_fkey"
+            columns: ["away_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fixtures_home_team_id_fkey"
+            columns: ["home_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fixtures_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fixtures_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "stages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fixtures_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_goals: {
+        Row: {
+          created_at: string
+          fixture_id: string
+          id: string
+          minute: number | null
+          own_goal: boolean
+          penalty_goal: boolean
+          period: string | null
+          player_id: string | null
+          team_id: string
+          tournament_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fixture_id: string
+          id?: string
+          minute?: number | null
+          own_goal?: boolean
+          penalty_goal?: boolean
+          period?: string | null
+          player_id?: string | null
+          team_id: string
+          tournament_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fixture_id?: string
+          id?: string
+          minute?: number | null
+          own_goal?: boolean
+          penalty_goal?: boolean
+          period?: string | null
+          player_id?: string | null
+          team_id?: string
+          tournament_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_goals_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: false
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_goals_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_goals_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_goals_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_results: {
+        Row: {
+          away_goals_120: number | null
+          away_goals_90: number
+          created_at: string
+          created_by: string | null
+          fixture_id: string
+          home_goals_120: number | null
+          home_goals_90: number
+          id: string
+          penalty_winner_team_id: string | null
+          qualified_team_id: string | null
+          result_status: string
+          tournament_id: string
+          updated_at: string
+          went_extra_time: boolean
+          went_penalties: boolean
+          winner_team_id: string | null
+        }
+        Insert: {
+          away_goals_120?: number | null
+          away_goals_90: number
+          created_at?: string
+          created_by?: string | null
+          fixture_id: string
+          home_goals_120?: number | null
+          home_goals_90: number
+          id?: string
+          penalty_winner_team_id?: string | null
+          qualified_team_id?: string | null
+          result_status?: string
+          tournament_id: string
+          updated_at?: string
+          went_extra_time?: boolean
+          went_penalties?: boolean
+          winner_team_id?: string | null
+        }
+        Update: {
+          away_goals_120?: number | null
+          away_goals_90?: number
+          created_at?: string
+          created_by?: string | null
+          fixture_id?: string
+          home_goals_120?: number | null
+          home_goals_90?: number
+          id?: string
+          penalty_winner_team_id?: string | null
+          qualified_team_id?: string | null
+          result_status?: string
+          tournament_id?: string
+          updated_at?: string
+          went_extra_time?: boolean
+          went_penalties?: boolean
+          winner_team_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_results_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "match_results_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: true
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_results_penalty_winner_team_id_fkey"
+            columns: ["penalty_winner_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_results_qualified_team_id_fkey"
+            columns: ["qualified_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_results_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_results_winner_team_id_fkey"
+            columns: ["winner_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_match_stats: {
+        Row: {
+          assists: number
+          created_at: string
+          fixture_id: string
+          goals: number
+          id: string
+          minutes_played: number | null
+          player_id: string
+          red_cards: number
+          team_id: string
+          tournament_id: string
+          updated_at: string
+          yellow_cards: number
+        }
+        Insert: {
+          assists?: number
+          created_at?: string
+          fixture_id: string
+          goals?: number
+          id?: string
+          minutes_played?: number | null
+          player_id: string
+          red_cards?: number
+          team_id: string
+          tournament_id: string
+          updated_at?: string
+          yellow_cards?: number
+        }
+        Update: {
+          assists?: number
+          created_at?: string
+          fixture_id?: string
+          goals?: number
+          id?: string
+          minutes_played?: number | null
+          player_id?: string
+          red_cards?: number
+          team_id?: string
+          tournament_id?: string
+          updated_at?: string
+          yellow_cards?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_match_stats_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: false
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_match_stats_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_match_stats_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_match_stats_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       players: {
         Row: {
           active: boolean
@@ -335,6 +670,7 @@ export type Database = {
     }
     Functions: {
       is_admin: { Args: never; Returns: boolean }
+      is_fixture_locked: { Args: { p_fixture_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
