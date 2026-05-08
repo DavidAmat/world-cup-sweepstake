@@ -17,7 +17,9 @@
     "db:reset": "supabase db reset",
     "db:diff": "supabase db diff -f",
     "db:push": "supabase db push --linked",
-    "types:gen": "supabase gen types typescript --local 2>/dev/null | grep -v '^Connecting to db' > src/lib/supabase/database.types.ts"
+    "types:gen": "supabase gen types typescript --local 2>/dev/null | grep -v '^Connecting to db' > src/lib/supabase/database.types.ts",
+    "wc2022:upload": "tsx --env-file=.env.local scripts/wc2022/upload.ts",
+    "wc2022:download": "tsx --env-file=.env.local scripts/wc2022/download.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -42,6 +44,7 @@
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

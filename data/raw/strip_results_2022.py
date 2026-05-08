@@ -1,12 +1,21 @@
 """
-Strip official results from the 2022 World Cup matches JSON and rebase
+Strip official results from the 2022 World Cup matches JSON, rebase
 the kickoff dates into June-July 2026 (Madrid local time) so we can
-exercise the 24h prediction lock with a realistic future calendar.
+exercise the 24h prediction lock with a realistic future calendar,
+and KEEP ONLY the group-stage matches.
+
+Why drop knockouts here: in a real tournament the knockout brackets
+are unknown until group stage ends. The seed mirrors that — only
+group-stage matches go in at bootstrap. The admin will append the 16
+knockout matches to the neutral JSON as the brackets resolve, and
+re-run `npm run wc2022:upload` to insert them. The upload script
+itself does NOT filter by fase, so any new entry will be picked up.
 
 Reads `data/partidos/2022/partidos_resultados_2022.json` (the 64
 matches with real scores) and produces
 `data/partidos/2022/partidos_2022_sin_resultados.json` with:
 
+  · 48 group-stage matches only
   · same shape (no key removed)
   · result fields nulled (marcador_*, prorroga, penaltis, ganador)
   · `fecha` rebased: original day → 2026-06-11 + delta_days, fixed at
@@ -90,7 +99,8 @@ def main() -> None:
             f"got {type(records).__name__}"
         )
 
-    transformed = [transform_record(r) for r in records]
+    group_only = [r for r in records if r.get("fase") == "fase_grupos"]
+    transformed = [transform_record(r) for r in group_only]
 
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with OUTPUT_PATH.open("w", encoding="utf-8") as f:
@@ -98,6 +108,7 @@ def main() -> None:
         f.write("\n")
 
     print(f"Read   {len(records)} matches from {INPUT_PATH}")
+    print(f"Filter group_stage only: kept {len(transformed)} of {len(records)}")
     print(f"Wrote  {len(transformed)} matches to   {OUTPUT_PATH}")
     print(f"Date delta applied: +{DATE_DELTA.days} days")
     print(f"Kickoff hour fixed at: {KICKOFF_HOUR:02d}:{KICKOFF_MINUTE:02d}:00 (Madrid local)")
