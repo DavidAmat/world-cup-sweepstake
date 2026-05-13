@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+// Seeder-specific schemas (used only by upload.ts). The Python pipeline
+// match schema lives in src/lib/fixtures/pythonFormat.ts because it is
+// also consumed by the admin import UI (hito 07).
+
 export const TournamentSchema = z.object({
   slug: z.string().regex(/^[a-z0-9_-]+$/),
   name: z.string(),
@@ -22,29 +26,8 @@ export const TeamSchema = z.object({
 export const TeamsSchema = z.array(TeamSchema).length(32);
 export type TeamInput = z.infer<typeof TeamSchema>;
 
-// Schema for the Python pipeline JSON (after stripping results).
-// Shape matches data/partidos/2022/partidos_2022_sin_resultados.json.
-export const PythonMatchSchema = z.object({
-  external_id: z.string(),
-  fase: z.enum([
-    "fase_grupos",
-    "octavos",
-    "cuartos",
-    "semis",
-    "tercer_puesto",
-    "final",
-  ]),
-  tipo_partido: z.enum(["grupo", "eliminatoria"]),
-  jornada: z.number().int().nullable(),
-  grupo: z.string().regex(/^[A-H]$/).nullable(),
-  equipo_1: z.string(),
-  equipo_2: z.string(),
-  fecha: z.string(),
-  marcador_equipo_1_90_mins: z.number().int().nullable(),
-  marcador_equipo_2_90_mins: z.number().int().nullable(),
-  prorroga: z.boolean().nullable(),
-  penaltis: z.boolean().nullable(),
-  ganador: z.string().nullable(),
-});
-export const PythonMatchesSchema = z.array(PythonMatchSchema);
-export type PythonMatch = z.infer<typeof PythonMatchSchema>;
+export {
+  PythonMatchSchema,
+  PythonMatchesSchema,
+  type PythonMatch,
+} from "../../../src/lib/fixtures/pythonFormat";
