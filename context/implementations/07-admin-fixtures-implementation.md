@@ -142,6 +142,26 @@ roles. Esto confirma end-to-end que la app alcanza Supabase Auth.
 > app análogo al de los scripts) queda fuera del hito 07 — anotado
 > para hito 16 (despliegue/CI) o cuando estorbe.
 
+## Incidente · "hydration mismatch" al filtrar por r16
+
+Tras importar los 8 octavos (import OK) y filtrar por r16, el
+navegador mostraba el warning de React 19 "A tree hydrated but some
+attributes of the server rendered HTML didn't match".
+
+Diagnóstico (log del dev server): el único nodo divergente es el
+`<html>`, con un atributo `data-scribe-recorder-ready="true"`
+**inyectado por una extensión del navegador** (grabador tipo Scribe),
+no presente en el HTML del servidor. No es un bug del código; el
+import y el listado funcionan. Falso positivo típico de extensiones
+que mutan `<html>`/`<body>` (Grammarly, gestores de contraseñas,
+grabadores, etc.).
+
+Fix: `suppressHydrationWarning` en el `<html>` de
+`src/app/layout.tsx`. Suprime solo los atributos/text de ESE elemento
+(no es recursivo), así que un mismatch real en nuestros componentes
+seguiría avisando. Es el patrón documentado por Next/React para este
+caso. typecheck/lint/format verdes.
+
 ## Pasos 3-5 · Schemas, actions, edición y creación individual
 
 - `src/app/admin/fixtures/schemas.ts`: Zod
