@@ -1,0 +1,90 @@
+[
+  {
+    "external_id": "wc2022_r16_001",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "Países Bajos",
+    "equipo_2": "Estados Unidos",
+    "fecha": "2026-06-29T18:00:00",
+    "venue": "Estadio Internacional Jalifa"
+  },
+  {
+    "external_id": "wc2022_r16_002",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "Argentina",
+    "equipo_2": "Australia",
+    "fecha": "2026-06-29T21:00:00",
+    "venue": "Estadio Ahmad bin Ali"
+  },
+  {
+    "external_id": "wc2022_r16_003",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "Francia",
+    "equipo_2": "Polonia",
+    "fecha": "2026-06-30T18:00:00",
+    "venue": "Estadio Al Thumama"
+  },
+  {
+    "external_id": "wc2022_r16_004",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "Inglaterra",
+    "equipo_2": "Senegal",
+    "fecha": "2026-06-30T21:00:00",
+    "venue": "Estadio Al Bayt"
+  },
+  {
+    "external_id": "wc2022_r16_005",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "Japón",
+    "equipo_2": "Croacia",
+    "fecha": "2026-07-01T18:00:00",
+    "venue": "Estadio Al Janoub"
+  },
+  {
+    "external_id": "wc2022_r16_006",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "Brasil",
+    "equipo_2": "Corea del Sur",
+    "fecha": "2026-07-01T21:00:00",
+    "venue": "Estadio 974"
+  },
+  {
+    "external_id": "wc2022_r16_007",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "Marruecos",
+    "equipo_2": "España",
+    "fecha": "2026-07-02T18:00:00",
+    "venue": "Ciudad de la Educación"
+  },
+  {
+    "external_id": "wc2022_r16_008",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "Portugal",
+    "equipo_2": "Suiza",
+    "fecha": "2026-07-02T21:00:00",
+    "venue": "Estadio Lusail"
+  }
+]

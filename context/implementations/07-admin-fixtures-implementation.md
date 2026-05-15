@@ -15,8 +15,30 @@
 - [x] Paso 7 · Cosméticos (links en `/admin`, lint/typecheck/format).
 - [x] Paso 8 · Verificación funcional + roundtrip `wc2022:download`
       (resolver probado contra DB local).
-- [ ] Paso 9 · Producción.
-- [ ] Paso 10 · Cierre de bitácora.
+- [x] Paso 9 · Smoke test en navegador con el usuario (David1 admin,
+      David2 player). Import de 8 octavos OK, edición OK, gate de
+      acceso OK tras el fix del Proxy.
+- [x] Paso 10 · Cierre de bitácora.
+
+## Cierre del hito 07
+
+Hito 07 **cerrado**. El usuario validó en navegador: listado,
+edición, importación masiva de octavos (`context/fixtures/octavos.json`,
+mantenido a petición del usuario) e idempotencia. Tres incidentes
+encontrados y resueltos durante el smoke test, documentados abajo:
+(1) "fetch failed" local → `.env.local` a IP LAN; (2) hydration
+mismatch → `suppressHydrationWarning` (extensión de navegador, no
+era bug); (3) player→404 en /admin → gate movido al Proxy.
+
+Commits del hito (push directo a master): `0c8ec92`, `8a6b16d`,
+`1069443`, `e42d85c`, `05192ea`, `740abd0`.
+
+Acceptance criteria del plan (`07-admin-fixtures.md` §11): todos
+cumplidos. Datos: prod sigue con 48 fixtures de grupos; local tiene
+además 8 octavos de prueba (solo local).
+
+Siguiente: hito 08 — predicciones iniciales. Bootstrap reescrito en
+`context/plan/08-bootstrap-prompt.md`.
 
 ## Decisiones aprobadas
 
