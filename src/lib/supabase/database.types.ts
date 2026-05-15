@@ -175,52 +175,45 @@ export type Database = {
       };
       initial_predictions: {
         Row: {
-          best_player_id: string | null;
+          best_player_text: string | null;
           champion_team_id: string | null;
           created_at: string;
           id: string;
           locked_at: string | null;
           runner_up_team_id: string | null;
           submitted_at: string | null;
-          top_scorer_player_id: string | null;
+          top_scorer_text: string | null;
           tournament_id: string;
           updated_at: string;
           user_id: string;
         };
         Insert: {
-          best_player_id?: string | null;
+          best_player_text?: string | null;
           champion_team_id?: string | null;
           created_at?: string;
           id?: string;
           locked_at?: string | null;
           runner_up_team_id?: string | null;
           submitted_at?: string | null;
-          top_scorer_player_id?: string | null;
+          top_scorer_text?: string | null;
           tournament_id: string;
           updated_at?: string;
           user_id: string;
         };
         Update: {
-          best_player_id?: string | null;
+          best_player_text?: string | null;
           champion_team_id?: string | null;
           created_at?: string;
           id?: string;
           locked_at?: string | null;
           runner_up_team_id?: string | null;
           submitted_at?: string | null;
-          top_scorer_player_id?: string | null;
+          top_scorer_text?: string | null;
           tournament_id?: string;
           updated_at?: string;
           user_id?: string;
         };
         Relationships: [
-          {
-            foreignKeyName: "initial_predictions_best_player_id_fkey";
-            columns: ["best_player_id"];
-            isOneToOne: false;
-            referencedRelation: "players";
-            referencedColumns: ["id"];
-          },
           {
             foreignKeyName: "initial_predictions_champion_team_id_fkey";
             columns: ["champion_team_id"];
@@ -233,13 +226,6 @@ export type Database = {
             columns: ["runner_up_team_id"];
             isOneToOne: false;
             referencedRelation: "teams";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "initial_predictions_top_scorer_player_id_fkey";
-            columns: ["top_scorer_player_id"];
-            isOneToOne: false;
-            referencedRelation: "players";
             referencedColumns: ["id"];
           },
           {
@@ -1041,6 +1027,14 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      are_initial_predictions_locked: {
+        Args: { p_tournament_id: string };
+        Returns: boolean;
+      };
+      initial_predictions_lock_at: {
+        Args: { p_tournament_id: string };
+        Returns: string;
+      };
       is_admin: { Args: never; Returns: boolean };
       is_fixture_locked: { Args: { p_fixture_id: string }; Returns: boolean };
     };

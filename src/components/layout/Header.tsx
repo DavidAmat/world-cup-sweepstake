@@ -32,6 +32,9 @@ export async function Header() {
               <Link href="/dashboard" className="hover:underline">
                 Mi porra
               </Link>
+              <Link href="/predictions/initial" className="hover:underline">
+                Predicciones
+              </Link>
               {isAdmin && (
                 <Link href="/admin" className="hover:underline">
                   Administración
