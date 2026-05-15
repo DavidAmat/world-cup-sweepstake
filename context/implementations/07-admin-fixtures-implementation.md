@@ -7,13 +7,14 @@
 - [x] Paso 1 · Helpers compartidos (`madridTime`, `getDefaultTournament`,
       refactor `pythonFormat`).
 - [x] Paso 2 · Listado `/admin/fixtures`.
-- [ ] Paso 3 · Schemas Zod + esqueletos de server actions.
-- [ ] Paso 4 · Edición `/admin/fixtures/[id]`.
-- [ ] Paso 5 · Creación individual `/admin/fixtures/new`.
-- [ ] Paso 6 · Import masivo (`prompts/`, `/admin/fixtures/import`,
+- [x] Paso 3 · Schemas Zod + esqueletos de server actions.
+- [x] Paso 4 · Edición `/admin/fixtures/[id]`.
+- [x] Paso 5 · Creación individual `/admin/fixtures/new`.
+- [x] Paso 6 · Import masivo (`prompts/`, `/admin/fixtures/import`,
       `previewImport` + `commitImport`).
-- [ ] Paso 7 · Cosméticos (links en `/admin`, lint/typecheck/format).
-- [ ] Paso 8 · Verificación funcional + roundtrip `wc2022:download`.
+- [x] Paso 7 · Cosméticos (links en `/admin`, lint/typecheck/format).
+- [x] Paso 8 · Verificación funcional + roundtrip `wc2022:download`
+      (resolver probado contra DB local).
 - [ ] Paso 9 · Producción.
 - [ ] Paso 10 · Cierre de bitácora.
 
@@ -105,4 +106,88 @@ Archivos creados:
 Probado con `curl http://localhost:3000/admin/fixtures` → `307` al
 login (sin auth), confirma que la ruta existe y el middleware `proxy`
 le pasa el filtro de auth correctamente.
+
+## Pasos 3-5 · Schemas, actions, edición y creación individual
+
+- `src/app/admin/fixtures/schemas.ts`: Zod
+  (`UpdateFixturePayloadSchema`, `CreateFixturePayloadSchema`) +
+  helpers `readUpdatePayload`/`readCreatePayload` que coercen
+  `FormData` (todo llega como string). Regla clave: si vienen
+  `team_id` y `placeholder` a la vez, gana `team_id` y se anula el
+  placeholder, para no violar el check `team OR placeholder`.
+- `src/app/admin/fixtures/actions.ts`: `updateFixture` y
+  `createFixture`. Validan, comprueban equipos distintos,
+  consistencia round↔stage (create), unicidad de `external_id`
+  (create), convierten kickoff Madrid→UTC, persisten con el server
+  client (RLS admin), `revalidatePath` y redirect con `?ok=` / `?error=`.
+- `src/app/admin/fixtures/[id]/page.tsx`: edición. Server component +
+  `<form action={updateFixture}>`. `external_id`/fase/ronda/grupo en
+  read-only; editables kickoff (datetime-local en Madrid), equipo o
+  placeholder por lado, venue, status. Warnings: dentro de 24h del
+  kickoff y estado completed/cancelled.
+- `src/app/admin/fixtures/new/page.tsx`: creación individual. Selects
+  de stage/round/teams; hint del patrón `wc2022_<round>_NNN`.
+
+## Paso 6 · Importación masiva por JSON
+
+- `prompts/admin-fixtures-import.md`: prompt versionado para ChatGPT.
+  Schema exacto, lista de los 32 equipos de Catar 2022, reglas duras
+  (snake_case external_id, fecha Madrid ISO sin TZ, placeholders en
+  vez de inventar), ejemplo input→output, plantilla para 2026.
+- `src/app/admin/fixtures/_import.ts`: lógica pura compartida por
+  preview y commit. `parseImportPayload` (JSON.parse + Zod
+  `ImportFixturesSchema` cap 1..64), `buildTeamLookup`,
+  `resolveImport` (mapea fase→stage/round, resuelve equipo por
+  display/canonical/alias, detecta placeholders, convierte TZ,
+  decide create vs update por `external_id` existente).
+- `src/app/admin/fixtures/actions.ts`: `previewImport`
+  (`useActionState`, devuelve report sin tocar DB) y `commitImport`
+  (re-resuelve server-side, rechaza si hay errores, upsert masivo
+  `onConflict tournament_id,external_id`, redirect a la lista con
+  `?ok=imported:`).
+- `src/app/admin/fixtures/import/{page.tsx,ImportClient.tsx}`:
+  textarea + botón validar (preview verde/ámbar/rojo + contadores) +
+  botón confirmar (deshabilitado si hay errores). `<details>` con
+  el formato esperado.
+
+### Detección de placeholders (bug encontrado y corregido)
+
+Primera versión usaba `/^[12]\.?\s?º\b/i`. El `\b` junto a `º`
+(no word-char) no casa, así que `"2.º Grupo C"` se marcaba error.
+Reescrito a heurística robusta: es placeholder si empieza por dígito,
+o contiene la palabra `grupo`/`group`, o empieza por uno de los
+prefijos conocidos (ganador/perdedor/segundo/…/winner/runner-up/tbd),
+o empieza por `?`. Un nombre de equipo real nunca cumple eso.
+
+### Verificación del resolver (script throwaway contra DB local)
+
+Payload de prueba con 5 filas: 2 octavos con equipos reales, 1 con
+typo (`Argntina`), 1 con placeholders (`Ganador A` vs `2.º Grupo C`),
+1 reusando un `external_id` de fase de grupos existente.
+
+```
+counts: {"create":3,"update":1,"error":1,"total":5}
+  [create] wc2022_r16_001  Países Bajos vs Estados Unidos  kickoff=...T14:00:00Z (CEST OK)
+  [create] wc2022_r16_002  Argentina vs Australia
+  [ERROR]  wc2022_r16_typo  "Argntina" no reconocido ni placeholder
+  [create] wc2022_r16_ph   Ganador A vs 2.º Grupo C  (ambos placeholder)
+  [update] wc2022_group_a_md1_001  Catar vs Ecuador  (external_id existente)
+```
+
+Conversión TZ correcta: `18:00 Madrid` → `16:00Z`, idéntica a los
+seeds del hito 06.
+
+## Paso 7 · Cosméticos
+
+- `src/app/admin/page.tsx`: tarjeta-link a `/admin/fixtures` +
+  placeholder de "próximamente" para hitos 10/11/14.
+- `src/components/ui/Badge.tsx` (creado en paso 2): badges de estado.
+- Lint nuevo de Next 16 (`react-hooks/purity`) marca `Date.now()` en
+  server components. Solución: `await connection()` (de `next/server`)
+  para forzar render dinámico con Cache Components + un
+  `eslint-disable-next-line react-hooks/purity` justificado en las dos
+  líneas que calculan la ventana de bloqueo de 24h. Documentado por
+  si reaparece en hitos posteriores.
+- `npm run typecheck`, `lint`, `format:check`: verdes. Roundtrip
+  `wc2022:download` sigue 0/0/0 tras todo el hito.
 

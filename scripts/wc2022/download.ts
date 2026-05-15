@@ -1,9 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import {
-  PythonMatchesSchema,
-  TournamentSchema,
-  type PythonMatch,
-} from "./lib/schemas";
+import { PythonMatchesSchema, TournamentSchema, type PythonMatch } from "./lib/schemas";
 import { PATHS } from "./lib/paths";
 import { assertSafeTarget, detectTarget } from "./lib/env";
 import { createScriptAdminClient } from "./lib/supabase";
@@ -23,9 +19,7 @@ import type { RoundCode, StageCode } from "./lib/catalogs";
 //   --write        → overwrite the local JSON with the DB snapshot
 
 async function fetchSnapshot(): Promise<PythonMatch[]> {
-  const tournament = TournamentSchema.parse(
-    JSON.parse(readFileSync(PATHS.tournamentJson, "utf8")),
-  );
+  const tournament = TournamentSchema.parse(JSON.parse(readFileSync(PATHS.tournamentJson, "utf8")));
   const supabase = createScriptAdminClient();
 
   step(`Reading fixtures from DB (tournament=${tournament.slug})`);
@@ -122,7 +116,9 @@ async function fetchSnapshot(): Promise<PythonMatch[]> {
     let ganador: string | null = null;
     if (result) {
       if (result.went_penalties || result.went_extra_time) {
-        ganador = result.winner_team_id ? (winnerNameById.get(result.winner_team_id) ?? null) : null;
+        ganador = result.winner_team_id
+          ? (winnerNameById.get(result.winner_team_id) ?? null)
+          : null;
       } else if (result.home_goals_90 > result.away_goals_90) {
         ganador = home;
       } else if (result.away_goals_90 > result.home_goals_90) {
@@ -197,9 +193,7 @@ async function main() {
 
   let local: PythonMatch[] = [];
   if (existsSync(PATHS.fixturesJson)) {
-    local = PythonMatchesSchema.parse(
-      JSON.parse(readFileSync(PATHS.fixturesJson, "utf8")),
-    );
+    local = PythonMatchesSchema.parse(JSON.parse(readFileSync(PATHS.fixturesJson, "utf8")));
     info("matches in local JSON", local.length);
   } else {
     info("local JSON", "(missing)");

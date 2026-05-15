@@ -1,9 +1,5 @@
 import { readFileSync } from "node:fs";
-import {
-  PythonMatchesSchema,
-  TeamsSchema,
-  TournamentSchema,
-} from "./lib/schemas";
+import { PythonMatchesSchema, TeamsSchema, TournamentSchema } from "./lib/schemas";
 import { PATHS } from "./lib/paths";
 import { assertSafeTarget, detectTarget } from "./lib/env";
 import { createScriptAdminClient } from "./lib/supabase";
@@ -21,15 +17,9 @@ async function main() {
   assertSafeTarget(target, { writes: true });
 
   step("Loading JSONs");
-  const tournament = TournamentSchema.parse(
-    JSON.parse(readFileSync(PATHS.tournamentJson, "utf8")),
-  );
-  const teams = TeamsSchema.parse(
-    JSON.parse(readFileSync(PATHS.teamsJson, "utf8")),
-  );
-  const matches = PythonMatchesSchema.parse(
-    JSON.parse(readFileSync(PATHS.fixturesJson, "utf8")),
-  );
+  const tournament = TournamentSchema.parse(JSON.parse(readFileSync(PATHS.tournamentJson, "utf8")));
+  const teams = TeamsSchema.parse(JSON.parse(readFileSync(PATHS.teamsJson, "utf8")));
+  const matches = PythonMatchesSchema.parse(JSON.parse(readFileSync(PATHS.fixturesJson, "utf8")));
   info("tournament", tournament.slug);
   info("teams", teams.length);
   info("matches", matches.length);
@@ -50,12 +40,11 @@ async function main() {
     }
   }
 
-  const fixturesResult = await upsertFixtures(
-    supabase,
-    tournamentRow.id,
-    matches,
-    { stagesByCode, roundsByCode, teamsByName },
-  );
+  const fixturesResult = await upsertFixtures(supabase, tournamentRow.id, matches, {
+    stagesByCode,
+    roundsByCode,
+    teamsByName,
+  });
 
   step("Done");
   info("tournament", tournamentRow.slug);

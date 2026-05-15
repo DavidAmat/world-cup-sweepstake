@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { requireAdmin } from "@/lib/permissions/requireAdmin";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
@@ -14,18 +15,13 @@ type SearchParams = Promise<{ round?: string; status?: string; ok?: string }>;
 
 const LOCK_WINDOW_MS = 24 * 60 * 60 * 1000;
 
-export default async function AdminFixturesPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
+export default async function AdminFixturesPage({ searchParams }: { searchParams: SearchParams }) {
+  await connection(); // unblock Date.now() for the lockedByKickoff tally
   const { supabase } = await requireAdmin();
   const tournament = await getDefaultTournament();
   const params = await searchParams;
 
-  const roundFilter = ROUNDS.find((r) => r.code === params.round)?.code as
-    | RoundFilter
-    | undefined;
+  const roundFilter = ROUNDS.find((r) => r.code === params.round)?.code as RoundFilter | undefined;
   const statusFilter = STATUS_VALUES.includes(params.status as StatusFilter)
     ? (params.status as StatusFilter)
     : undefined;
@@ -83,6 +79,7 @@ export default async function AdminFixturesPage({
     cancelled: 0,
     lockedByKickoff: 0,
   };
+  // eslint-disable-next-line react-hooks/purity -- request-scoped; connection() above forces dynamic render
   const now = Date.now();
   for (const f of allForCounts ?? []) {
     if (f.status in counts) {
@@ -99,9 +96,8 @@ export default async function AdminFixturesPage({
         <div>
           <h1 className="text-2xl font-bold">Fixtures</h1>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            Torneo: <strong>{tournament.name}</strong>. {counts.total} fixtures ·{" "}
-            {counts.scheduled} programados · {counts.completed} finalizados ·{" "}
-            {counts.cancelled} cancelados ·{" "}
+            Torneo: <strong>{tournament.name}</strong>. {counts.total} fixtures · {counts.scheduled}{" "}
+            programados · {counts.completed} finalizados · {counts.cancelled} cancelados ·{" "}
             <span className="text-amber-700 dark:text-amber-300">
               {counts.lockedByKickoff} bloqueados ahora
             </span>
@@ -192,7 +188,7 @@ export default async function AdminFixturesPage({
       <div className="mt-6 overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b border-zinc-200 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:border-zinc-800">
+            <tr className="border-b border-zinc-200 text-left text-xs font-semibold tracking-wide text-zinc-500 uppercase dark:border-zinc-800">
               <th className="py-2 pr-3">Ronda</th>
               <th className="py-2 pr-3">external_id</th>
               <th className="py-2 pr-3">Partido</th>
@@ -204,10 +200,7 @@ export default async function AdminFixturesPage({
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td
-                  colSpan={6}
-                  className="py-6 text-center text-zinc-500 dark:text-zinc-400"
-                >
+                <td colSpan={6} className="py-6 text-center text-zinc-500 dark:text-zinc-400">
                   No hay fixtures que cumplan el filtro.
                 </td>
               </tr>
@@ -216,14 +209,10 @@ export default async function AdminFixturesPage({
                 const home = f.home_team?.display_name;
                 const away = f.away_team?.display_name;
                 const homeLabel = home ?? (
-                  <span className="italic text-zinc-400">
-                    {f.home_placeholder ?? "—"}
-                  </span>
+                  <span className="text-zinc-400 italic">{f.home_placeholder ?? "—"}</span>
                 );
                 const awayLabel = away ?? (
-                  <span className="italic text-zinc-400">
-                    {f.away_placeholder ?? "—"}
-                  </span>
+                  <span className="text-zinc-400 italic">{f.away_placeholder ?? "—"}</span>
                 );
                 return (
                   <tr
