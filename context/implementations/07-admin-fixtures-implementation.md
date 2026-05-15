@@ -162,6 +162,42 @@ Fix: `suppressHydrationWarning` en el `<html>` de
 seguiría avisando. Es el patrón documentado por Next/React para este
 caso. typecheck/lint/format verdes.
 
+## Incidente · player en /admin/fixtures → 404 en vez de /dashboard
+
+Con David2 (player), `/admin/fixtures` daba 404 "This page could not
+be found." en vez de redirigir a `/dashboard`.
+
+Diagnóstico (log dev server): `requireAdmin()` hacía
+`redirect("/dashboard")` pero la request acababa en
+`GET /dashboard/fixtures 404`. Causa: las páginas con `connection()`
+son dinámicas/streamed; según los docs de Next 16, `redirect()` en
+contexto de streaming emite un **redirect client-side vía meta-tag**
+que resuelve mal los paths anidados (mantiene el último segmento
+`fixtures`, de ahí `/dashboard/fixtures`). Los docs recomiendan
+explícitamente hacer redirects de auth **en el Proxy, antes del
+render** (`NextResponse.redirect`).
+
+Fix: gate de `/admin` movido a `src/proxy.ts`. Tras `getClaims()`, si
+`pathname` empieza por `/admin`: sin sesión → `307 /login`; con
+sesión pero `profile.role !== 'admin'` → `307 /dashboard`. Es un
+redirect de servidor limpio y absoluto, sin el problema de streaming.
+`requireAdmin()` se mantiene en las páginas como defensa en
+profundidad.
+
+Verificado con login real (script throwaway, `redirect: "manual"`):
+
+```
+David2 (player): status=307 location=/dashboard
+David1 (admin) : status=200 location=(none)
+anon           : status=307 location=/login
+```
+
+> Nota: `requireAuth`/`requireAdmin` siguen usando `redirect()` y
+> tendrían el mismo riesgo de mis-resolución en streaming para otros
+> flujos (p.ej. sesión caducada en `/admin`). Como el Proxy ahora
+> intercepta `/admin/*` antes del render, deja de ser el camino
+> activo para esas rutas. Endurecer el resto queda fuera del hito 07.
+
 ## Pasos 3-5 · Schemas, actions, edición y creación individual
 
 - `src/app/admin/fixtures/schemas.ts`: Zod
