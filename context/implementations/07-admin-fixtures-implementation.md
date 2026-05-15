@@ -107,6 +107,41 @@ Probado con `curl http://localhost:3000/admin/fixtures` → `307` al
 login (sin auth), confirma que la ruta existe y el middleware `proxy`
 le pasa el filtro de auth correctamente.
 
+## Incidente · "fetch failed" al registrar usuarios en local
+
+Durante el smoke test del usuario, el POST a `/register` devolvía
+`?error=fetch%20failed` (303). Diagnóstico:
+
+- `.env.local` tenía `NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321`
+  (puesto así "por portabilidad", confiando en que los scripts
+  wc2022:* lo auto-reescriben a la IP LAN — pero **la app Next no
+  tiene ese rewrite**).
+- Comprobado empíricamente: `curl`/`node fetch` a `127.0.0.1:54321`,
+  `localhost`, `[::1]`, `0.0.0.0` → connection refused instantáneo.
+  Solo `192.168.0.112:54321` → 200. (Docker mapea `0.0.0.0:54321` y
+  `[::]:54321` pero el host no alcanza loopback; quirk de este Docker
+  Desktop, ya documentado en hitos 03/06.)
+- Por tanto cualquier llamada server-side a Supabase (signUp,
+  getClaims, queries) fallaba con `fetch failed`. Bug latente desde
+  el hito 05; no se había probado el registro en local hasta ahora.
+
+Fix: `.env.local` → `NEXT_PUBLIC_SUPABASE_URL=http://192.168.0.112:54321`
+(fichero gitignored, cambio local, no afecta a prod/Vercel). Comentario
+del fichero actualizado avisando del caveat DHCP (si cambia la IP LAN,
+actualizar esta línea **y** `scripts/wc2022/lib/env.ts`). Dev server
+reiniciado (Next lee env al arrancar).
+
+Verificación: `/register` pasa de fallar a `200`; creados David1
+(admin) y David2 (player) vía admin API — el trigger `handle_new_user`
+del hito 05 generó los profiles automáticamente y se ajustaron los
+roles. Esto confirma end-to-end que la app alcanza Supabase Auth.
+
+> Deuda: el `.env.local` con IP LAN hardcodeada es frágil ante DHCP y
+> no reproducible en un clone limpio. Arreglo de raíz (hacer que
+> Supabase/Docker exponga 127.0.0.1, o un rewrite en el cliente de la
+> app análogo al de los scripts) queda fuera del hito 07 — anotado
+> para hito 16 (despliegue/CI) o cuando estorbe.
+
 ## Pasos 3-5 · Schemas, actions, edición y creación individual
 
 - `src/app/admin/fixtures/schemas.ts`: Zod
