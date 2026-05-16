@@ -35,6 +35,9 @@ export async function Header() {
               <Link href="/predictions/initial" className="hover:underline">
                 Predicciones
               </Link>
+              <Link href="/predictions/matches" className="hover:underline">
+                Partidos
+              </Link>
               {isAdmin && (
                 <Link href="/admin" className="hover:underline">
                   Administración

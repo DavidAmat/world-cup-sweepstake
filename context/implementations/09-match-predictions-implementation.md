@@ -8,13 +8,13 @@
 
 - [x] Paso 1 · Micro-migración `is_fixture_locked → app_now()` (local).
 - [x] Paso 1b · Migración a prod (db push) + commit.
-- [ ] Paso 2 · Helper `src/lib/predictions/matchLock.ts`.
-- [ ] Paso 3 · `schemas.ts` + `actions.ts` (save + generateRandom).
-- [ ] Paso 4 · Página `/predictions/matches`.
-- [ ] Paso 5 · Página `/predictions/matches/public`.
-- [ ] Paso 6 · Navegación (Header + dashboard).
-- [ ] Paso 7 · typecheck/lint/format/build verdes.
-- [ ] Paso 8 · Smoke local David1/2/3 + push master.
+- [x] Paso 2 · Helper `src/lib/predictions/matchLock.ts`.
+- [x] Paso 3 · `schemas.ts` + `actions.ts` (save + generateRandom).
+- [x] Paso 4 · Página `/predictions/matches`.
+- [x] Paso 5 · Página `/predictions/matches/public`.
+- [x] Paso 6 · Navegación (Header + dashboard).
+- [x] Paso 7 · typecheck/lint/format/build verdes.
+- [ ] Paso 8 · Smoke navegador David1/2/3 (usuario) + push master.
 - [ ] Paso 9 · Cierre de bitácora.
 
 ## Decisiones aprobadas
@@ -54,4 +54,51 @@ limpio salvo los 3 ficheros nuevos del hito.
 Prod: usuario confirmó. `echo y | npx supabase db push --linked`
 aplicó `20260517120000`. `migration list --linked` confirma
 Local==Remote (…20260517120000 en ambos). Sin pérdida de datos
-(`create or replace` de función). Commit del paso 1: ver abajo.
+(`create or replace` de función). Commit `d7a6ca2` (migración +
+plan + bitácora) push a master.
+
+## Pasos 2-7 · App
+
+- `src/lib/predictions/matchLock.ts`: `getMatchLockState()` =
+  `syncAppNowFromEnv()` + **un** `rpc("app_now")`; `isFixtureLocked
+  (kickoffIso, appNowIso)` reproduce en JS la fórmula de
+  `public.is_fixture_locked` (appNow ≥ kickoff−24h). Un round-trip,
+  no N; "now" de Postgres → sin `Date.now()` en server component.
+- `schemas.ts`: `FixturePredictionSchema` (Zod) con `superRefine`
+  que espeja los 2 CHECK de `match_predictions` + invariante D09-9
+  (grupos no empatan→no, eliminatoria empate90'⇒prórroga obligatoria;
+  120'≥90'; penaltis⇒empate a 120'; sin penaltis⇒gana el del 120';
+  el que pasa ∈ {home,away} y coincide con el ganador). `home/away_
+  team_id` e `is_knockout` los inyecta el server (no son input del
+  usuario). `readFixturePayload` lee campos `*_<fid>`; si 90' vacío
+  ⇒ `skip` (guardado parcial OK).
+- `actions.ts`: `saveRoundMatchPredictions` (requireAuth, recarga
+  fixtures de la ronda por `round_id`, salta sin-equipos y
+  bloqueados, valida por fixture, `upsert` masivo `onConflict
+  fixture_id,user_id`, `submitted_at` omitido → default en insert,
+  preservado en update). `generateRandomMatchPredictions`
+  (**requireAdmin**): dado 0.4/0.7 → bucket HOME/DRAW/AWAY; grupos
+  terminan ahí; eliminatoria empate90'⇒prórroga, `PENALTY_PROB=0.7`,
+  ganador 50/50, 120' coherente (empate si penaltis, +1 del ganador
+  si se decide en prórroga). Construye filas que respetan los CHECK
+  por construcción.
+- `/predictions/matches/page.tsx`: selector de ronda (`?round=`,
+  form GET), default = primera ronda con fixture abierto. Por
+  fixture: sin-equipos deshabilitado / bloqueado solo-lectura (sin
+  redirect) / abierto con form. Eliminatoria muestra siempre
+  prórroga/120'/penaltis/equipo que pasa. Botón "🎲 Generar
+  predicciones aleatorias" solo si `profiles.role==='admin'`. Banner
+  "🧪 Fecha simulada" + banners ok/error.
+- `/predictions/matches/public/page.tsx`: mismo selector; por
+  fixture, si no bloqueado "se hará pública al bloquear" (no se
+  filtran ajenas: RLS), si bloqueado una card por usuario
+  (`profiles`) con 90'/120'/penaltis/equipo que pasa.
+- Nav: `Header.tsx` +link "Partidos"; `dashboard` +2 tarjetas.
+
+`database.types.ts` sin cambios (no hubo migración nueva de tabla).
+`typecheck`/`lint`/`format:check`/`build` verdes (build lista
+`/predictions/matches` y `/predictions/matches/public`). Rutas
+gateadas: anónimo → `307 /login` en ambas (proxy).
+
+Pendiente: smoke en navegador por el usuario (David1 admin /
+David2 / David3 players), incl. `make fecha` para mover el lock.

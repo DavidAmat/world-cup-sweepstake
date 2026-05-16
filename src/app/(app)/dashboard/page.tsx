@@ -35,6 +35,24 @@ export default async function DashboardPage() {
             Lo que predijo cada participante (al empezar el torneo).
           </p>
         </a>
+        <a
+          href="/predictions/matches"
+          className="rounded-md border border-zinc-200 bg-white p-4 text-sm hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-600"
+        >
+          <p className="font-semibold">Predicciones de partidos</p>
+          <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+            Marcadores por jornada; prórroga y penaltis en eliminatorias.
+          </p>
+        </a>
+        <a
+          href="/predictions/matches/public"
+          className="rounded-md border border-zinc-200 bg-white p-4 text-sm hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-600"
+        >
+          <p className="font-semibold">Partidos · vista pública</p>
+          <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+            Predicciones de cada partido una vez bloqueado.
+          </p>
+        </a>
       </div>
       {profile?.role === "admin" && (
         <p className="mt-4 rounded-md border border-zinc-200 bg-zinc-100 p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
