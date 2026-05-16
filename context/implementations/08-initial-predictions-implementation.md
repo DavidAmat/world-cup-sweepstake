@@ -1,6 +1,6 @@
 # 08 — Predicciones iniciales · bitácora de implementación
 
-> Hito en curso. Plan: `context/plan/08-initial-predictions.md`.
+> Hito **CERRADO**. Plan: `context/plan/08-initial-predictions.md`.
 
 ## Estado
 
@@ -12,8 +12,35 @@
 - [x] Paso 5 · Página `/predictions/initial/public`.
 - [x] Paso 6 · Navegación (Header + dashboard).
 - [x] Paso 7 · typecheck/lint/format/build verdes.
-- [~] Paso 8 · Verificación automática hecha; smoke browser pendiente.
-- [ ] Paso 9 · Cierre de bitácora.
+- [x] Paso 8 · Verificación automática + smoke browser del usuario OK.
+- [x] Paso 9 · Clasificados multi-choice (revisión usuario).
+- [x] Paso 10 · FECHA_ACTUAL (app_now) + Makefile `make fecha`.
+- [x] Paso 11 · Cierre de bitácora.
+
+## Cierre del hito 08
+
+Hito 08 **cerrado**. El usuario validó en navegador: formulario de
+predicciones iniciales (campeón, subcampeón, pichichi/mejor jugador
+texto libre, clasificados multi-choice 2 por grupo), modo solo
+lectura tras el lock, y vista pública comparativa con dropdown por
+categoría. `FECHA_ACTUAL` funciona (probado congelando el torneo a
+2026-06-12: predicciones bloqueadas + públicas).
+
+Migraciones aplicadas local **y prod**: `20260515120000`
+(D2 free-text + lock + RLS), `20260516120000` (app_now + app_settings
++ FECHA_ACTUAL). Tipos regenerados.
+
+Commits del hito (push directo a master): `16f6f3a`, `4e45554`,
+`fb213fb`, `0423d69`, `4e52a05`, `6783992`.
+
+**Incidente** (documentado en Paso 11): un script de verificación
+throwaway borró por `tournament_id` las predicciones reales de test
+en local (solo local, prod intacto). El usuario las re-creó. Regla a
+futuro: scripts throwaway nunca borran por torneo, solo filas que
+crean y acotadas por user_id de test.
+
+Siguiente: hito 09 — predicciones de partidos. Bootstrap reescrito en
+`context/plan/08-bootstrap-prompt.md`.
 
 ## Decisiones aprobadas
 
