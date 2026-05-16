@@ -5,7 +5,7 @@
 ## Estado
 
 - [x] Paso 1 · Migración SQL (D2 free-text + lock + RLS) — local.
-- [ ] Paso 1b · Migración a prod (db:push) — pendiente confirmación.
+- [x] Paso 1b · Migración a prod (db:push) — aplicada.
 - [x] Paso 2 · Helper `src/lib/predictions/initialLock.ts`.
 - [x] Paso 3 · `schemas.ts` + `actions.ts`.
 - [x] Paso 4 · Página `/predictions/initial` (form + lectura).
@@ -105,5 +105,19 @@ real David1/David2 contra Supabase local:
 - DB restaurada (`predictions_open_until=null`, predicciones de
   prueba borradas) → lista para el smoke en navegador.
 
-Pendiente: smoke en navegador por el usuario (David1/David2) y
-`db:push` a prod (confirmación).
+Pendiente: smoke en navegador por el usuario (David1/David2).
+
+## Paso 9 · Producción
+
+Usuario confirmó. `npx supabase db push --linked` aplicó
+`20260515120000` a prod (initial_predictions/gqp vacías en prod, 0
+filas, sin pérdida). `migration list --linked` confirma Local==Remote
+en `20260515120000`. Tipos no se regeneran: schema local==prod, el
+`database.types.ts` commiteado ya es correcto.
+
+Commit `16f6f3a` push a master (`f3ca8c5..16f6f3a`) → Vercel
+autodespliega. Orden seguro respetado: migración a prod ANTES del
+deploy del código que la usa.
+
+Pendiente para cerrar el hito: smoke en navegador (David1/David2) en
+local y/o prod (`https://world-cup-sweepstake-mu.vercel.app`).
