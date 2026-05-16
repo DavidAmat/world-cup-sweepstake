@@ -192,3 +192,9 @@ verificación. **Regla a futuro**: los scripts throwaway solo borran
 filas que ellos crean, acotadas por `user_id` de test; nunca un
 delete por torneo. No ejecutar limpiezas destructivas sin confirmar
 cuando puede haber datos del usuario.
+
+Commits: `0423d69`. Migración `20260516120000` aplicada a prod
+(`migration list --linked` confirma Local==Remote) y push a master
+(`fb213fb..0423d69`). En prod `FECHA_ACTUAL` no está seteada → fecha
+real. Recordatorio: reintroducir en local las predicciones de test
+borradas por el incidente.
