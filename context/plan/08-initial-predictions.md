@@ -108,22 +108,22 @@ Vinculantes una vez aprobadas. Marco mi recomendación.
   las ves; las de los demás, solo tras el lock. Coherente con cómo
   `match_predictions` abre la lectura tras `is_fixture_locked`.
 
-- **D08-5 · Clasificados de grupo: se captura la posición (1.º/2.º).**
-  La UI muestra por grupo dos selects: "1.º clasificado" y "2.º
-  clasificado". Se guardan dos filas en `gqp` con
-  `predicted_position = 1` y `= 2`. Razón: `predicted_position` ya
-  existe en el schema, es barato capturarlo ahora y evita un
-  backfill cuando hito 11 puntúe el orden (PID §6.3 lo contempla
-  como opcional). Si hito 11 decide no puntuar orden, el dato sobra
-  pero no estorba. **No** se permite el mismo equipo en 1.º y 2.º.
+- **D08-5 · Clasificados de grupo: multi-choice de exactamente 2, sin
+  orden** (revisión del usuario, sustituye a la versión 1.º/2.º).
+  Por grupo se muestran los 4 equipos como **checkboxes**; hay que
+  marcar **exactamente 2** (`GROUP_QUALIFIERS`). El orden NO se
+  predice → se guardan 2 filas en `gqp` con `predicted_position =
+  null` (la columna ya es nullable; **no requiere migración**).
+  Validación: 0, 1 o 3+ marcados en cualquier grupo = error que
+  nombra el grupo. Cada equipo debe pertenecer a su grupo.
 
-- **D08-6 · Guardado parcial permitido.** El usuario puede guardar
-  con campos vacíos y completar luego (hasta el lock). No se exige
-  rellenar todo. Validación = solo consistencia: `champion ≠
-  runner_up` si ambos puestos; por grupo, o vacío o ambas posiciones
-  con equipos distintos y pertenecientes a ese grupo; longitudes de
-  texto. `submitted_at` se sella en el primer guardado y se mantiene;
-  `updated_at` lo lleva el trigger.
+- **D08-6 · Guardado parcial parcial.** Campeón, subcampeón, pichichi
+  y mejor jugador son opcionales (se pueden dejar para luego, hasta
+  el lock). **Los clasificados NO son parciales** (revisión D08-5):
+  para guardar, los 8 grupos deben tener exactamente 2 equipos cada
+  uno. Otras validaciones: `champion ≠ runner_up` si ambos puestos;
+  longitudes de texto. `submitted_at` se sella en el primer guardado
+  y se mantiene; `updated_at` lo lleva el trigger.
 
 - **D08-7 · `group_qualification_predictions`: estrategia
   delete-then-insert por usuario.** Al guardar, se borran todas las
@@ -352,7 +352,8 @@ y sus `gqp`, y `getInitialLockState`.
   - Pichichi: `<input type="text" name="top_scorer_text" maxLength=80>`.
   - Mejor jugador: `<input type="text" name="best_player_text">`.
   - Clasificados: por cada grupo A–H un `<fieldset>` con los 4
-    equipos del grupo y dos selects: `qual_<G>_pos1`, `qual_<G>_pos2`.
+    equipos como checkboxes `qual_<G>` (multi-choice); hay que marcar
+    exactamente 2 (sin orden).
   - Banner `?ok=` / `?error=` (mismo patrón que el resto).
   - Aviso visual: "Podrás editar hasta el DD/MM/YYYY · HH:MM
     (Madrid). Después solo lectura."
@@ -414,18 +415,18 @@ export const InitialPredictionSchema = z.object({
   runner_up_team_id: Uuid.nullable(),
   top_scorer_text: FreeText,
   best_player_text: FreeText,
-  // qualifiers: por grupo, pos1/pos2 uuid|null (coerción "" → null)
+  // qualifiers: por grupo, array de team_ids (checkboxes, getAll)
   qualifiers: z.array(z.object({
-    group_code: z.string().regex(/^[A-H]$/),
-    pos1_team_id: Uuid.nullable(),
-    pos2_team_id: Uuid.nullable(),
+    group_code: z.enum(GROUP_CODES),
+    team_ids: z.array(Uuid),
   })),
 });
 ```
 
 Cruzadas (en el action, dependen de la BD): `champion ≠ runner_up`;
-`pos1 ≠ pos2` por grupo; cada team pertenece a su `group_code` y al
-torneo. Mensajes de error en español.
+exactamente `GROUP_QUALIFIERS` (2) por grupo en los 8 grupos; cada
+team pertenece a su `group_code` y al torneo. `predicted_position`
+se guarda `null` (sin orden). Mensajes de error en español.
 
 ---
 
@@ -470,8 +471,8 @@ Migración a prod: te pido confirmación explícita antes de `db:push`
     dropdown de categoría funciona.
   - Revertir: `update tournaments set predictions_open_until =
     null`.
-- Validaciones: campeón = subcampeón → error; mismo equipo en 1.º y
-  2.º de un grupo → error; equipo de otro grupo en un grupo → error.
+- Validaciones: campeón = subcampeón → error; grupo con 0/1/3+
+  marcados → error nombrando el grupo; equipo de otro grupo → error.
 - `requireAuth`: anónimo en `/predictions/initial` → `/login`.
 
 > Nota: los 8 octavos solo-local no afectan al lock (min(kickoff) es

@@ -60,7 +60,7 @@ export default async function PublicInitialPredictionsPage({
       .eq("tournament_id", tournament.id),
     supabase
       .from("group_qualification_predictions")
-      .select("user_id, group_code, team_id, predicted_position")
+      .select("user_id, group_code, team_id")
       .eq("tournament_id", tournament.id),
     supabase.from("teams").select("id, display_name").eq("tournament_id", tournament.id),
   ]);
@@ -69,13 +69,13 @@ export default async function PublicInitialPredictionsPage({
     id ? (teams?.find((t) => t.id === id)?.display_name ?? "—") : "—";
 
   const predByUser = new Map((preds ?? []).map((p) => [p.user_id, p]));
-  // user_id → group_code → { 1: teamId, 2: teamId }
-  const gqpByUser = new Map<string, Map<string, Record<number, string>>>();
+  // user_id → group_code → Set(team_id) (order is not predicted)
+  const gqpByUser = new Map<string, Map<string, Set<string>>>();
   for (const row of gqp ?? []) {
-    const byGroup = gqpByUser.get(row.user_id) ?? new Map();
-    const entry = byGroup.get(row.group_code) ?? {};
-    if (row.predicted_position) entry[row.predicted_position] = row.team_id;
-    byGroup.set(row.group_code, entry);
+    const byGroup = gqpByUser.get(row.user_id) ?? new Map<string, Set<string>>();
+    const set = byGroup.get(row.group_code) ?? new Set<string>();
+    set.add(row.team_id);
+    byGroup.set(row.group_code, set);
     gqpByUser.set(row.user_id, byGroup);
   }
 
@@ -142,12 +142,12 @@ export default async function PublicInitialPredictionsPage({
                     <p className="text-zinc-500">— sin predicción —</p>
                   ) : (
                     GROUP_CODES.map((g) => {
-                      const q = byGroup.get(g) ?? {};
+                      const ids = [...(byGroup.get(g) ?? [])];
                       return (
                         <div key={g}>
                           <span className="font-semibold">Grupo {g}: </span>
                           <span className="text-zinc-600 dark:text-zinc-400">
-                            1.º {teamName(q[1])} · 2.º {teamName(q[2])}
+                            {ids.length ? ids.map((id) => teamName(id)).join(" · ") : "—"}
                           </span>
                         </div>
                       );

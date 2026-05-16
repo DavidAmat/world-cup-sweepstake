@@ -1,20 +1,23 @@
 import { z } from "zod";
 
 // The 8 groups of the tournament. `group_qualifiers_per_group` is 2 for
-// wc_2022_test, so per group we capture the predicted 1st and 2nd. If a
-// future tournament changes the count this constant + the form grid is
-// what grows; the storage model (one gqp row per qualifier with
-// predicted_position) already supports N.
+// wc_2022_test: per group the user picks EXACTLY 2 teams (order does not
+// matter — predicted_position is stored as null). If a future tournament
+// changes the count, GROUP_QUALIFIERS + the form grid is what grows.
 export const GROUP_CODES = ["A", "B", "C", "D", "E", "F", "G", "H"] as const;
 export type GroupCode = (typeof GROUP_CODES)[number];
+
+export const GROUP_QUALIFIERS = 2;
 
 const UuidOrNull = z.string().uuid("Selección inválida").nullable();
 const FreeTextOrNull = z.string().trim().min(1).max(80, "Máximo 80 caracteres").nullable();
 
+// Per group the form posts 0..N checkbox values under the same name
+// (`qual_<G>`). We validate the "exactly 2" rule in the server action so
+// the error message can name the offending group in Spanish.
 const QualifierSchema = z.object({
   group_code: z.enum(GROUP_CODES),
-  pos1_team_id: UuidOrNull,
-  pos2_team_id: UuidOrNull,
+  team_ids: z.array(z.string().uuid("Selección inválida")),
 });
 
 export const InitialPredictionPayloadSchema = z.object({
@@ -44,8 +47,10 @@ export function readInitialPayload(formData: FormData): InitialPredictionPayload
     best_player_text: field(formData, "best_player_text"),
     qualifiers: GROUP_CODES.map((g) => ({
       group_code: g,
-      pos1_team_id: field(formData, `qual_${g}_pos1`),
-      pos2_team_id: field(formData, `qual_${g}_pos2`),
+      team_ids: formData
+        .getAll(`qual_${g}`)
+        .map((v) => String(v).trim())
+        .filter((v) => v !== ""),
     })),
   });
 }

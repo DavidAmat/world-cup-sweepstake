@@ -121,3 +121,27 @@ deploy del código que la usa.
 
 Pendiente para cerrar el hito: smoke en navegador (David1/David2) en
 local y/o prod (`https://world-cup-sweepstake-mu.vercel.app`).
+
+## Paso 10 · Revisión del usuario: clasificados como multi-choice
+
+El usuario pidió cambiar los clasificados de grupo: en vez de dos
+dropdowns 1.º/2.º, **checkboxes** con los 4 equipos del grupo y
+**exactamente 2** obligatorios en **cada** grupo (0/1/3+ = error).
+El orden ya no se predice.
+
+- `schemas.ts`: `GROUP_QUALIFIERS = 2`; `qualifiers[].team_ids:
+  string[]` leído con `formData.getAll('qual_<G>')`.
+- `actions.ts`: valida `team_ids.length === 2` (tras dedupe) por
+  grupo, pertenencia a grupo; guarda `gqp` con
+  `predicted_position = null`.
+- `page.tsx`: fieldset por grupo con checkboxes `name="qual_<G>"`,
+  pre-marcados desde un `Set` por grupo; vista solo-lectura lista los
+  2 equipos sin orden. Nota de ayuda actualizada (clasificados
+  requieren 2 por grupo; campeón/textos sí opcionales).
+- `public/page.tsx`: `gqpByUser` pasa a `Map<group, Set<teamId>>`;
+  render une los nombres con " · ", sin 1.º/2.º.
+
+**Sin cambio de migración**: `predicted_position` ya era nullable.
+typecheck/lint/format/build verdes. Verificado a nivel DB que un
+insert de `gqp` con `predicted_position=null` pasa el check y la RLS
+de jugador (read-back OK, DB limpiada).

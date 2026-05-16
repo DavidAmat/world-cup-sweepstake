@@ -4,7 +4,7 @@ import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getInitialLockState } from "@/lib/predictions/initialLock";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { Badge } from "@/components/ui/Badge";
-import { GROUP_CODES } from "./schemas";
+import { GROUP_CODES, GROUP_QUALIFIERS } from "./schemas";
 import { saveInitialPredictions } from "./actions";
 
 type SearchParams = Promise<{ error?: string; ok?: string }>;
@@ -47,16 +47,16 @@ export default async function InitialPredictionsPage({
 
   const { data: gqp } = await supabase
     .from("group_qualification_predictions")
-    .select("group_code, team_id, predicted_position")
+    .select("group_code, team_id")
     .eq("tournament_id", tournament.id)
     .eq("user_id", userId);
 
-  // group_code → { 1: teamId, 2: teamId }
-  const qualByGroup = new Map<string, Record<number, string>>();
+  // group_code → Set(team_id) (order is not predicted)
+  const qualByGroup = new Map<string, Set<string>>();
   for (const row of gqp ?? []) {
-    const entry = qualByGroup.get(row.group_code) ?? {};
-    if (row.predicted_position) entry[row.predicted_position] = row.team_id;
-    qualByGroup.set(row.group_code, entry);
+    const set = qualByGroup.get(row.group_code) ?? new Set<string>();
+    set.add(row.team_id);
+    qualByGroup.set(row.group_code, set);
   }
 
   const teamName = (id: string | null | undefined) =>
@@ -192,49 +192,34 @@ export default async function InitialPredictionsPage({
               Clasificados de cada grupo
             </legend>
             <p className="mb-3 text-xs text-zinc-500">
-              Por cada grupo, quién pasa como 1.º y 2.º. Déjalo vacío si aún no lo tienes claro.
+              Marca exactamente <strong>{GROUP_QUALIFIERS}</strong> equipos por grupo (los que crees
+              que pasan de ronda). El orden no importa.
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               {GROUP_CODES.map((g) => {
                 const groupTeams = teamsByGroup.get(g) ?? [];
-                const qual = qualByGroup.get(g) ?? {};
+                const selected = qualByGroup.get(g) ?? new Set<string>();
                 return (
-                  <div
+                  <fieldset
                     key={g}
                     className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
                   >
-                    <p className="mb-2 text-sm font-semibold">Grupo {g}</p>
-                    <label className="flex flex-col gap-1 text-sm">
-                      <span className="text-xs text-zinc-500">1.º clasificado</span>
-                      <select
-                        name={`qual_${g}_pos1`}
-                        defaultValue={qual[1] ?? ""}
-                        className={INPUT_CLS}
-                      >
-                        <option value="">— Sin elegir —</option>
-                        {groupTeams.map((t) => (
-                          <option key={t.id} value={t.id}>
-                            {t.display_name}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label className="mt-2 flex flex-col gap-1 text-sm">
-                      <span className="text-xs text-zinc-500">2.º clasificado</span>
-                      <select
-                        name={`qual_${g}_pos2`}
-                        defaultValue={qual[2] ?? ""}
-                        className={INPUT_CLS}
-                      >
-                        <option value="">— Sin elegir —</option>
-                        {groupTeams.map((t) => (
-                          <option key={t.id} value={t.id}>
-                            {t.display_name}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  </div>
+                    <legend className="px-1 text-sm font-semibold">Grupo {g}</legend>
+                    <div className="flex flex-col gap-1.5">
+                      {groupTeams.map((t) => (
+                        <label key={t.id} className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            name={`qual_${g}`}
+                            value={t.id}
+                            defaultChecked={selected.has(t.id)}
+                            className="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700"
+                          />
+                          <span>{t.display_name}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
                 );
               })}
             </div>
@@ -255,7 +240,9 @@ export default async function InitialPredictionsPage({
             </Link>
           </div>
           <p className="text-xs text-zinc-500">
-            Puedes guardar parcialmente y completar más tarde, mientras el torneo no haya empezado.
+            Campeón, subcampeón, pichichi y mejor jugador puedes dejarlos para luego. Los
+            clasificados requieren {GROUP_QUALIFIERS} equipos en cada grupo para poder guardar.
+            Editable mientras el torneo no haya empezado.
           </p>
         </form>
       )}
@@ -275,7 +262,7 @@ function ReadOnlyView({
   runnerUpName: string;
   topScorer: string;
   bestPlayer: string;
-  qualByGroup: Map<string, Record<number, string>>;
+  qualByGroup: Map<string, Set<string>>;
   teamName: (id: string | null | undefined) => string;
 }) {
   return (
@@ -292,12 +279,12 @@ function ReadOnlyView({
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {GROUP_CODES.map((g) => {
-            const q = qualByGroup.get(g) ?? {};
+            const ids = [...(qualByGroup.get(g) ?? [])];
             return (
               <div key={g} className="text-sm">
                 <span className="font-semibold">Grupo {g}: </span>
                 <span className="text-zinc-600 dark:text-zinc-400">
-                  1.º {teamName(q[1])} · 2.º {teamName(q[2])}
+                  {ids.length ? ids.map((id) => teamName(id)).join(" · ") : "—"}
                 </span>
               </div>
             );

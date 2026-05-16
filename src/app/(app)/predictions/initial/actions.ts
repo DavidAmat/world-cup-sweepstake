@@ -6,7 +6,7 @@ import { z } from "zod";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getInitialLockState } from "@/lib/predictions/initialLock";
-import { readInitialPayload } from "./schemas";
+import { GROUP_QUALIFIERS, readInitialPayload } from "./schemas";
 
 const SELF = "/predictions/initial";
 
@@ -62,38 +62,35 @@ export async function saveInitialPredictions(formData: FormData) {
   ensureTeam(payload.champion_team_id, "Campeón");
   ensureTeam(payload.runner_up_team_id, "Subcampeón");
 
-  // gqp rows to insert (only fully-filled groups).
+  // gqp rows to insert. Exactly GROUP_QUALIFIERS teams per group, every
+  // group, no order (predicted_position = null). User decision: 0, 1 or
+  // 3+ selected in any group is an error.
   const gqpRows: {
     tournament_id: string;
     user_id: string;
     group_code: string;
     team_id: string;
-    predicted_position: number;
+    predicted_position: null;
   }[] = [];
 
   for (const q of payload.qualifiers) {
-    const { group_code, pos1_team_id, pos2_team_id } = q;
-    const filled = [pos1_team_id, pos2_team_id].filter(Boolean).length;
-    if (filled === 0) continue;
-    if (filled === 1) {
-      fail(`Grupo ${group_code}: elige el 1.º y el 2.º clasificado, o deja ambos vacíos.`);
+    const { group_code } = q;
+    const teamIds = [...new Set(q.team_ids)];
+    if (teamIds.length !== GROUP_QUALIFIERS) {
+      fail(
+        `Grupo ${group_code}: tienes que seleccionar exactamente ${GROUP_QUALIFIERS} equipos (has marcado ${teamIds.length}).`,
+      );
     }
-    if (pos1_team_id === pos2_team_id) {
-      fail(`Grupo ${group_code}: el 1.º y el 2.º clasificado no pueden ser el mismo equipo.`);
-    }
-    for (const [tid, pos] of [
-      [pos1_team_id, 1],
-      [pos2_team_id, 2],
-    ] as const) {
-      if (groupByTeam.get(tid as string) !== group_code) {
-        fail(`Grupo ${group_code}: el equipo elegido no pertenece a ese grupo.`);
+    for (const tid of teamIds) {
+      if (groupByTeam.get(tid) !== group_code) {
+        fail(`Grupo ${group_code}: un equipo seleccionado no pertenece a ese grupo.`);
       }
       gqpRows.push({
         tournament_id: tournament.id,
         user_id: userId,
         group_code,
-        team_id: tid as string,
-        predicted_position: pos,
+        team_id: tid,
+        predicted_position: null,
       });
     }
   }
