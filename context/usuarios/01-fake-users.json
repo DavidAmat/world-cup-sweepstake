@@ -11,6 +11,12 @@
             "email": "david2@gmail.com",
             "password": "david2david2",
             "role": "player"
+        },
+        {
+            "name": "David3",
+            "email": "david3@gmail.com",
+            "password": "david3david3",
+            "role": "player"
         }
     ]
 }

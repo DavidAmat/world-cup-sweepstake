@@ -141,6 +141,17 @@ Vinculantes una vez aprobadas. Marco mi recomendación.
   prefieres URL en español lo cambio a carpetas
   `predicciones/iniciales` (trivial, dímelo en la revisión).
 
+- **D08-9 · `FECHA_ACTUAL` (now simulable)** (revisión del usuario).
+  Para poder mover la "fecha actual" y ver el lock abrir/cerrar sin
+  esperar al tiempo real. El override NO puede ser solo de app
+  (desincronizaría la RLS, que también evalúa el lock): vive en la
+  DB. Migración `20260516120000`: tabla `app_settings` (fila única,
+  `fecha_actual`), función `app_now()`,
+  `are_initial_predictions_locked` usa `app_now()` en vez de `now()`.
+  La app sincroniza `app_settings.fecha_actual` desde el env var
+  `FECHA_ACTUAL` (service-role, solo si cambia). Vacío = fecha real.
+  Banner "🧪 Fecha simulada" en las páginas cuando está activo.
+
 ---
 
 ## 3. Migración SQL propuesta

@@ -28,6 +28,24 @@ export type Database = {
   };
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          fecha_actual: string | null;
+          id: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          fecha_actual?: string | null;
+          id?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          fecha_actual?: string | null;
+          id?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       fixtures: {
         Row: {
           away_placeholder: string | null;
@@ -1027,6 +1045,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      app_now: { Args: never; Returns: string };
       are_initial_predictions_locked: {
         Args: { p_tournament_id: string };
         Returns: boolean;

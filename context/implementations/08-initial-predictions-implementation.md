@@ -145,3 +145,50 @@ El orden ya no se predice.
 typecheck/lint/format/build verdes. Verificado a nivel DB que un
 insert de `gqp` con `predicted_position=null` pasa el check y la RLS
 de jugador (read-back OK, DB limpiada).
+
+## Paso 11 · FECHA_ACTUAL — "now" simulable (revisión del usuario)
+
+Problema: el lock se evalúa en DOS sitios que deben coincidir (app
+vía rpc y RLS internamente). Una "fecha falsa" solo en la app
+desincronizaría la RLS (writes seguirían permitidos, filas ajenas
+ocultas). Solución: el override vive en la DB.
+
+- Migración `20260516120000_app_now_override.sql`: tabla
+  `app_settings` (fila única, `fecha_actual timestamptz` nullable),
+  función `app_now()` (`security definer`, devuelve
+  `coalesce(app_settings.fecha_actual, now())`),
+  `are_initial_predictions_locked` repunta de `now()` → `app_now()`.
+  RLS de `app_settings`: select authenticated + admin_all.
+- `src/lib/dates/appNow.ts`: `parseFechaActual` (acepta
+  `YYYY-MM-DD`, `YYYY-MM-DDTHH:MM` Madrid, o ISO con Z/offset) +
+  `syncAppNowFromEnv` (service-role, escribe `app_settings` solo si
+  cambia; nunca lanza).
+- `initialLock.ts`: sincroniza el env antes del rpc y devuelve
+  `overriding`/`fechaActual`. Las dos páginas muestran un banner
+  "🧪 Fecha simulada" cuando está activo.
+- `.env.example` y `.env.local`: `FECHA_ACTUAL` documentado
+  (comentado por defecto = fecha real). Cambiarla → reiniciar dev.
+
+Verificado a nivel DB/RLS (script throwaway, login real):
+`fecha_actual=null` o `2026-06-10` → `locked=false`, jugador ve solo
+la suya; `fecha_actual=2026-06-12` (tras el 1er partido
+2026-06-11 20:00Z) → `locked=true`, jugador ve TODAS (públicas),
+write bloqueado (204, valor intacto). app_settings restaurado a null.
+
+### INCIDENTE · borrado de predicciones reales en local
+
+El script de verificación `_tmp_fa.ts` terminaba con
+`admin.from('initial_predictions').delete().eq('tournament_id', tid)`
+(+ gqp). Ese patrón venía de los tests del paso 8/10 cuando las
+tablas estaban **vacías**. Pero entre medias el usuario había hecho
+submit real de las predicciones de todos los usuarios (browser
+local). El script **borró esas predicciones reales** (local: 0 filas
+tras ejecutarlo). Solo local; prod intacto (0 predicciones, los
+submits fueron contra el dev server local). No recuperable (Postgres
+local sin PITR) — hay que reintroducir los datos de test.
+
+**Causa raíz**: borrado por `tournament_id` en un script de
+verificación. **Regla a futuro**: los scripts throwaway solo borran
+filas que ellos crean, acotadas por `user_id` de test; nunca un
+delete por torneo. No ejecutar limpiezas destructivas sin confirmar
+cuando puede haber datos del usuario.

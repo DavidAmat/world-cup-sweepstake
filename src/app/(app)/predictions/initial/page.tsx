@@ -20,7 +20,7 @@ export default async function InitialPredictionsPage({
   const { error, ok } = await searchParams;
   const { userId, supabase } = await requireAuth();
   const tournament = await getDefaultTournament();
-  const { lockAt, locked } = await getInitialLockState(tournament.id);
+  const { lockAt, locked, overriding, fechaActual } = await getInitialLockState(tournament.id);
 
   const { data: teams } = await supabase
     .from("teams")
@@ -92,6 +92,14 @@ export default async function InitialPredictionsPage({
           </>
         )}
       </p>
+
+      {overriding && (
+        <p className="mt-4 rounded-md border border-sky-300 bg-sky-50 p-3 text-xs text-sky-800 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-200">
+          🧪 Fecha simulada (FECHA_ACTUAL):{" "}
+          <strong>{fechaActual ? formatMadridDateTime(fechaActual) : "—"} (Madrid)</strong>. El
+          bloqueo se evalúa contra esta fecha, no la real.
+        </p>
+      )}
 
       {error && (
         <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300">
