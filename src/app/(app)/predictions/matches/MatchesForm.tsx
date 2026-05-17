@@ -38,18 +38,36 @@ const INPUT_CLS =
   "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950";
 const GOAL_CLS = `${INPUT_CLS} w-16 text-center`;
 
+type Meta = { isKnockout: boolean; homeId: string; awayId: string };
+
+// Extra time, penalties and the qualified team are derived from the 90'
+// score for knockout fixtures, kept consistent with the server rules:
+//  · draw at 90' ⇒ extra time (penalties optional, free winner).
+//  · not a draw ⇒ no extra time; the team that advances is the 90' winner.
+//  · group stage ⇒ none of these apply.
+function derive(v: Values, m: Meta): Values {
+  if (!m.isKnockout) return { ...v, et: false, pen: false, qual: "" };
+  const both = v.h90 !== "" && v.a90 !== "";
+  const draw = both && v.h90 === v.a90;
+  const et = draw;
+  const pen = et ? v.pen : false;
+  let qual = v.qual;
+  if (both && !draw) {
+    qual = Number(v.h90) > Number(v.a90) ? m.homeId : m.awayId;
+  }
+  return { ...v, et, pen, qual };
+}
+
 function initial(f: FixtureVM): Values {
   const s = f.saved;
-  // Extra time is derived, not stored UI state: a knockout draw at 90'
-  // always implies extra time (kept consistent with the server rule).
-  const et = !!s && f.isKnockout && s.h90 === s.a90;
-  return {
+  const base: Values = {
     h90: s ? String(s.h90) : "",
     a90: s ? String(s.a90) : "",
-    et,
-    pen: et ? (s?.pen ?? false) : false,
+    et: s?.et ?? false,
+    pen: s?.pen ?? false,
     qual: s?.qual ?? "",
   };
+  return derive(base, { isKnockout: f.isKnockout, homeId: f.homeId, awayId: f.awayId });
 }
 
 function isSaved(v: Values, s: SavedVM | null): boolean {
@@ -72,23 +90,18 @@ export function MatchesForm({ rounds }: { rounds: RoundVM[] }) {
     return m;
   });
 
-  const knockoutById = useMemo(() => {
-    const m: Record<string, boolean> = {};
-    for (const f of allFixtures) m[f.id] = f.isKnockout;
+  const metaById = useMemo(() => {
+    const m: Record<string, Meta> = {};
+    for (const f of allFixtures)
+      m[f.id] = { isKnockout: f.isKnockout, homeId: f.homeId, awayId: f.awayId };
     return m;
   }, [allFixtures]);
 
   const set = (id: string, patch: Partial<Values>) =>
-    setValues((prev) => {
-      const next = { ...prev[id], ...patch };
-      // Extra time is automatic: a knockout fixture drawn at 90' always
-      // goes to extra time; otherwise (or in the group stage) it never
-      // does. The user does not toggle it. Penalties require extra time.
-      const draw90 = next.h90 !== "" && next.a90 !== "" && next.h90 === next.a90;
-      next.et = knockoutById[id] === true && draw90;
-      if (!next.et) next.pen = false;
-      return { ...prev, [id]: next };
-    });
+    setValues((prev) => ({
+      ...prev,
+      [id]: derive({ ...prev[id], ...patch }, metaById[id]),
+    }));
 
   const savedById = useMemo(() => {
     const m: Record<string, SavedVM | null> = {};
@@ -208,6 +221,11 @@ function Editable({
   v: Values;
   set: (id: string, patch: Partial<Values>) => void;
 }) {
+  const bothEntered = v.h90 !== "" && v.a90 !== "";
+  const draw = bothEntered && v.h90 === v.a90;
+  // Knockout decided in 90' → the team that advances is the winner and is
+  // not user-editable. On a draw the user picks freely (ET/penalties).
+  const autoQualified = f.isKnockout && bothEntered && !draw;
   return (
     <div className="mt-3 flex flex-col gap-3">
       <div className="flex items-center gap-2 text-sm">
@@ -267,16 +285,34 @@ function Editable({
           </label>
           <label className="flex flex-col gap-1">
             <span className="font-medium">Equipo que pasa</span>
-            <select
-              name={`qual_${f.id}`}
-              value={v.qual}
-              onChange={(e) => set(f.id, { qual: e.target.value })}
-              className={INPUT_CLS}
-            >
-              <option value="">— Sin elegir —</option>
-              <option value={f.homeId}>{f.home}</option>
-              <option value={f.awayId}>{f.away}</option>
-            </select>
+            {autoQualified ? (
+              <>
+                <input type="hidden" name={`qual_${f.id}`} value={v.qual} />
+                <select value={v.qual} disabled className={INPUT_CLS}>
+                  <option value={f.homeId}>{f.home}</option>
+                  <option value={f.awayId}>{f.away}</option>
+                </select>
+                <span className="text-xs text-zinc-500">
+                  Automático: pasa el ganador a 90&apos;.
+                </span>
+              </>
+            ) : (
+              <>
+                <select
+                  name={`qual_${f.id}`}
+                  value={v.qual}
+                  onChange={(e) => set(f.id, { qual: e.target.value })}
+                  className={INPUT_CLS}
+                >
+                  <option value="">— Sin elegir —</option>
+                  <option value={f.homeId}>{f.home}</option>
+                  <option value={f.awayId}>{f.away}</option>
+                </select>
+                <span className="text-xs text-zinc-500">
+                  Empate: elige tú qué equipo pasa (prórroga/penaltis).
+                </span>
+              </>
+            )}
           </label>
         </div>
       )}

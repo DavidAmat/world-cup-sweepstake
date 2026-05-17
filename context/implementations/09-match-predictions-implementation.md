@@ -183,3 +183,15 @@ submission usa un `<input type="hidden" name="et_<id>" value="1">`
 solo cuando `et` (un checkbox disabled no se postea). Coherente con
 las reglas Zod del server (knockout+empate90'⇒prórroga; prórroga⇒
 empate90'). Sin migración; checks verdes.
+
+### "Equipo que pasa" automático si no hay empate (petición usuario)
+
+Se centralizó la derivación en `derive(values, meta)` (usada por
+`initial()` y `set()`). En knockout: si el 90' **no** es empate ⇒
+`qual = ganador (más goles)`, y el `<select>` se renderiza
+`disabled` (no editable) + `<input type="hidden" name="qual_<id>">`
+para que se postee igual. Si el 90' es **empate** ⇒ select editable
+(el usuario elige libremente quién pasa). Grupos: sin campo. Espeja
+la regla Zod del server (sin prórroga ⇒ el que pasa = ganador del
+90'). El generador random ya cumplía esto. Sin migración; checks
+verdes.
