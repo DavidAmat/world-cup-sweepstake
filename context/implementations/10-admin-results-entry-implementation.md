@@ -1,7 +1,7 @@
 # 10 — Admin: introducción de resultados · bitácora de implementación
 
-> Hito en curso. Plan: `context/plan/10-admin-results-entry.md`
-> Bootstrap: `context/plan/08-bootstrap-prompt.md`
+> Hito **CERRADO**. Plan: `context/plan/10-admin-results-entry.md`
+> Bootstrap siguiente: `context/plan/08-bootstrap-prompt.md` (actualizado para hito 11).
 
 ## Estado
 
@@ -14,7 +14,10 @@
       (migración `20260517140000`, local Y prod; `migration list --linked`
       → Local==Remote). Generador random = `confirmed` (confirmado por el
       usuario).
-- [ ] Paso 7 · Smoke navegador por el usuario + cierre.
+- [x] Paso 7 · Smoke navegador ✓. Columna "Pasa" añadida al listado de
+      eliminatorias (commit `d4b2171`). Hito cerrado.
+
+> **HITO CERRADO** — commits `b5b4fd8`, `1146245`, `d4b2171`.
 
 ## Decisiones aprobadas
 
@@ -169,5 +172,7 @@ para probar el motor del hito 11 sin clics extra. Per-ronda (no todo el
 torneo) porque la página es por ronda y las eliminatorias pueden no tener
 equipos. Fácil de cambiar si prefieres borrador o todo-el-torneo.
 
-typecheck/lint/format/build verdes. Pendiente: confirmar push de la migración
-a prod, luego commit + push master; smoke navegador del usuario.
+typecheck/lint/format/build verdes. Migración aplicada a prod (confirmada por
+el usuario). Commits: `1146245` (generador + drop 120') · `d4b2171` (columna
+"Pasa" en listado de eliminatorias). Smoke verificado en navegador. Hito 10
+cerrado.

@@ -1,45 +1,47 @@
 Hola. Continuamos un proyecto a mitad: una app web privada para gestionar
-una porra del Mundial de fútbol 2026 entre 10 amigos. Llevamos 9 hitos
-cerrados (02-09). Ahora toca el hito 10: panel admin para introducir
-resultados de partidos (marcador, goleadores, prórroga, penaltis) y
-disparar el recálculo del torneo.
+una porra del Mundial de fútbol 2026 entre 10 amigos. Llevamos 10 hitos
+cerrados (02-10). Ahora toca el hito 11: motor de puntuación.
 
 UI en español. Código, SQL y nombres de tabla en inglés. Comunícate
 conmigo en español.
 
 # QUÉ HITO ES Y DÓNDE ESTÁ DEFINIDO TÉCNICAMENTE
 
-- **Hito 10 — Admin: introducción de resultados.**
+- **Hito 11 — Motor de puntuación.**
 - Definición técnica de alto nivel (fuente para el plan detallado):
-  - `context/plan/01-plan.md` §7, sección "Hito 10 — Admin: introducción
-    de resultados" (scope, esqueleto, acceptance).
-  - `context/initial-setup/02-pid.md`: §4.2 (tablas `match_results`,
-    `match_goals`, `player_match_stats`), §5.6 (flujo admin de
-    resultados), §6 (reglas de puntuación — el motor es el hito 11,
-    aquí solo se capturan los datos).
+  - `context/plan/01-plan.md` §7, sección "Hito 11 — Motor de
+    puntuación" (scope, esqueleto, acceptance).
+  - `context/initial-setup/02-pid.md`: §4.2 (tablas `scoring_rules`,
+    `prediction_scores`), §6 (sistema de puntuación completo: criterios
+    y multiplicadores).
 - El **plan detallado lo escribes tú** al empezar, en
-  `context/plan/10-admin-results-entry.md` (NO existe aún; crearlo es
+  `context/plan/11-scoring-engine.md` (NO existe aún; crearlo es
   tu primer entregable). Yo lo reviso y te digo "adelante".
 - La bitácora se va llenando **en paralelo** en
-  `context/implementations/10-admin-results-entry-implementation.md`.
+  `context/implementations/11-scoring-engine-implementation.md`.
 
 # LEE ESTO ANTES DE NADA
 
 En este orden, hasta entender el estado actual:
 
-1. `context/initial-setup/02-pid.md` — Project Initiation Document.
-   Fuente de verdad funcional. Mira §4.2 (tablas de resultados),
-   §5.6 (flujo admin), §6 (scoring — solo para entender qué datos
-   necesita el motor del hito 11).
-2. `context/plan/01-plan.md` — índice maestro. Lee §6 (roadmap) y
-   §7 hito 10.
-3. Bitácoras más relevantes (patrones que reutilizarás):
+1. `context/initial-setup/02-pid.md` — §4.2 (tablas `scoring_rules` y
+   `prediction_scores`, estructura del JSON de reglas, tabla
+   `match_predictions`) y §6 (todos los criterios de puntuación:
+   ganador, resultado exacto, cercanía de goles, prórroga, penaltis,
+   equipo clasificado, multiplicadores por fase, predicciones iniciales,
+   clasificados de grupo).
+2. `context/plan/01-plan.md` — §7 hito 11 (funciones puras, orquestador,
+   tests unitarios, `points_breakdown`).
+3. `src/lib/scoring/recalculate.ts` — el **stub vacío** que ya existe y
+   es llamado desde `confirmMatchResult`. El hito 11 lo rellena.
+4. Bitácoras relevantes (patrones que reutilizarás):
+   - `context/implementations/10-admin-results-entry-implementation.md`
+     (CERRADO — cómo están `match_results` y `match_goals`; modelo de
+     datos sin goles a 120').
    - `context/implementations/09-match-predictions-implementation.md`
-     (CERRADO — patrón de server actions, upsert, validación Zod,
-     cliente component `MatchesForm.tsx`).
-   - `context/implementations/07-admin-fixtures-implementation.md`
-     (CERRADO — patrones de páginas admin, `ImportClient.tsx` como
-     precedente de client component en admin).
+     (CERRADO — modelo de `match_predictions`: sin resultado a 120',
+     solo `predicts_extra_time`, `predicts_penalties`,
+     `predicted_qualified_team_id`).
 
 # RESUMEN DE LOS HITOS CERRADOS
 
@@ -134,29 +136,77 @@ Hito 09 — Predicciones de partidos (CERRADO)
     bloqueado).
   - Nav: `Header.tsx` +link "Partidos"; `dashboard` +2 tarjetas.
 
-# DECISIONES CERRADAS QUE AFECTAN AL HITO 10
+Hito 10 — Admin: introducción de resultados (CERRADO)
+  Plan: `context/plan/10-admin-results-entry.md`
+  Bitácora: `context/implementations/10-admin-results-entry-implementation.md`
+  - Migración `20260517140000`: eliminado CHECK que ataba
+    `went_extra_time` a la presencia de goles a 120' en
+    `match_results`. Espejo de `20260517130000`. Columnas
+    `home/away_goals_120` conservadas (nullable, siempre NULL).
+  - `/admin/results` (listado por jornada): dropdown de ronda,
+    badge de estado (Sin resultado / Borrador / Confirmado),
+    marcador, columna "Pasa" solo en rondas de eliminatoria.
+    Botón "🎲 Generar resultados aleatorios (esta jornada)" que
+    confirma resultados random para todos los fixtures con equipos
+    de la ronda seleccionada.
+  - `/admin/results/[fixtureId]`: server component + `ResultForm.tsx`
+    (`"use client"`). Modelo: 90' score + `went_penalties` +
+    `qualified_team_id` (free pick cuando empate en knockout). La
+    prórroga es derivada (knockout+empate90'⇒ET automático). Sin
+    goles a 120'. Lista dinámica de goles (equipo, jugador nullable,
+    minuto, periodo, own_goal, penalty_goal). Dos botones:
+    "Guardar borrador" (`saveMatchResult`) y "Confirmar y recalcular"
+    (`confirmMatchResult`). Vista read-only cuando confirmed (no
+    redirect); botón "Editar resultado" → `?edit=1`.
+  - `src/app/admin/results/schemas.ts`: `deriveResult(payload)` =
+    única fuente de verdad para calcular columnas DB
+    (`went_extra_time`, `winner_team_id`, `qualified_team_id`,
+    `penalty_winner_team_id`); reusado por form action y generador
+    random.
+  - `src/app/admin/results/actions.ts`: `saveMatchResult` (draft),
+    `confirmMatchResult` (confirmed + stub recálculo),
+    `generateRandomResults` (por ronda, confirmed, sin goles).
+  - `src/lib/scoring/recalculate.ts`: **stub vacío** — el hito 11
+    lo rellena. Llamado por `confirmMatchResult` y
+    `generateRandomResults`.
+  - Commits: `b5b4fd8`, `1146245`, `d4b2171`.
+
+# DECISIONES CERRADAS QUE AFECTAN AL HITO 11
 
 Vinculantes. No las cuestiones sin un motivo muy fuerte.
 
-- **Las tablas `match_results`, `match_goals` y `player_match_stats`
-  YA EXISTEN** (migración `20260508164810`). No las recrees. Revisa
-  su estructura antes de escribir el plan.
-- **`match_results` es 1:1 con `fixture`**: `unique (fixture_id)`,
-  `home_goals_90`, `away_goals_90`, `extra_time`, `home_goals_120`,
-  `away_goals_120`, `penalties`, `winner_team_id`. Estado: `draft` →
-  `confirmed`.
-- **`match_goals`**: `fixture_id`, `team_id`, `player_id` (nullable:
-  autogol o jugador sin asignar), `minute` (nullable), `is_own_goal`,
-  `is_penalty`. Un insert por gol.
-- **`player_match_stats`**: opcional/progresivo. No bloquea el hito.
-- **Admin gate**: rutas `/admin/*` gateadas en `src/proxy.ts`; en
-  server components y actions usa `requireAdmin()`.
-- **Sin scoring aquí** (es el hito 11). El hito 10 solo captura
-  y persiste; la acción "confirmar" simplemente cambia el estado a
-  `confirmed` y llama (de momento vacío) al stub del recálculo.
-- **Reutiliza**: `getDefaultTournament`, `madridTime`, `Badge`,
-  `requireAdmin`, el patrón de upsert masivo de `actions.ts` del 09,
-  y el patrón "render read-only si estado=confirmed, no redirect".
+- **El 120' score no existe** en ninguna tabla de predicciones ni de
+  resultados. El scoring de eliminatorias solo puede comparar:
+  - `match_predictions.predicts_extra_time` vs `match_results.went_extra_time`
+  - `match_predictions.predicts_penalties` vs `match_results.went_penalties`
+  - `match_predictions.predicted_qualified_team_id` vs
+    `match_results.qualified_team_id`
+  - El resultado a 90' (`home/away_goals_90`) existe en ambas tablas.
+- **`src/lib/scoring/recalculate.ts` ya existe** como stub. La función
+  `recalculateTournamentScores(tournamentId)` es el punto de entrada.
+  El hito 11 implementa su cuerpo.
+- **`scoring_rules` y `prediction_scores` ya existen** como tablas vacías.
+  El hito 11 necesita: (1) una migración/seed con la fila de reglas activa
+  para el torneo `wc_2022_test`, y (2) la lógica que escribe en
+  `prediction_scores`.
+- **Funciones puras primero.** El scoring debe ser testable de forma
+  aislada antes de conectarse a la DB. Tests unitarios obligatorios.
+- **Admin client para recalculate.** `recalculateTournamentScores` borra
+  y reinserta `prediction_scores` (operación privilegiada) → usar
+  `createAdminClient()` (service role). Las acciones de resultados usan
+  el cliente de usuario (RLS `is_admin()`), pero el recálculo masivo
+  bypasea RLS directamente.
+- **Recálculo siempre completo.** Al confirmar un resultado, se borran
+  TODAS las `prediction_scores` del torneo y se recalculan desde cero
+  (pocos usuarios, pocos partidos; es barato y evita inconsistencias).
+- **`initial_predictions` usa texto libre** (hito 08). Las columnas
+  `top_scorer_text` y `best_player_text` son strings, no FKs a players.
+  El scoring de pichichi/mejor jugador compara texto contra texto (o lo
+  dejamos fuera del scope del hito 11 si es complejo; decidirlo en el
+  plan).
+- **Los valores numéricos del scoring son una decisión pendiente.** El
+  PID §6 tiene ejemplos conceptuales. Propón unos valores razonables en
+  el plan; el usuario los revisará.
 
 # ESTADO DE INFRAESTRUCTURA Y URLS
 
@@ -186,7 +236,8 @@ Migraciones aplicadas (local Y prod):
   ...20260515120000_initial_predictions_freetext_and_lock,
   ...20260516120000_app_now_override,
   ...20260517120000_is_fixture_locked_app_now,
-  ...20260517130000_match_predictions_drop_120.
+  ...20260517130000_match_predictions_drop_120,
+  ...20260517140000_match_results_drop_120.
   Tras cualquier migración nueva: `npm run types:gen` y luego
   `npx prettier --write src/lib/supabase/database.types.ts` (el
   fichero autogenerado no sale prettier-clean; formatéalo para que
@@ -194,14 +245,13 @@ Migraciones aplicadas (local Y prod):
 
 Datos cargados:
   - **Prod**: torneo `wc_2022_test` (active), 32 teams, 48 fixtures
-    de grupos, 56 predicciones de partido (de los smokes del hito 09).
-    Sin match_results. Sin predicciones iniciales (las pruebas fueron
-    en local).
-  - **Local**: lo mismo + 8 octavos `wc2022_r16_*` (solo local,
-    placeholders). Predicciones de partido de los 3 usuarios de test.
-    `FECHA_ACTUAL` probablemente en null (hora real); ajustar con
-    `make fecha` si necesitas simular partidos bloqueados para probar
-    que admin puede/no puede editar resultados de un fixture locked.
+    de grupos. Predicciones de partido de los smokes del hito 09.
+    Sin `scoring_rules`. Sin `prediction_scores`. Sin
+    `match_results` (los resultados se introdujeron en local).
+  - **Local**: lo mismo + 8 octavos `wc2022_r16_*` (solo local).
+    Predicciones de partido de 3 usuarios de test. `match_results`
+    y `match_goals` del hito 10 (introducidos manualmente y con el
+    generador aleatorio). `FECHA_ACTUAL` probablemente en null.
 
 Gotchas Next 16 ya resueltos (replícalos, no los redescubras):
   - `redirect()` en server component streaming mis-resuelve paths.
@@ -234,47 +284,54 @@ A producción (pide confirmación antes):
   echo y | npx supabase db push --linked # migraciones (pide OK)
   git push origin master                 # Vercel autodeploya
 
-# TAREA: HITO 10 — ADMIN: INTRODUCCIÓN DE RESULTADOS
+# TAREA: HITO 11 — MOTOR DE PUNTUACIÓN
 
-Objetivo: el admin introduce manualmente el resultado de cada partido
-(goles a 90', prórroga, goles a 120', penaltis, equipo que pasa,
-lista de goleadores) y confirma. Al confirmar, el resultado queda en
-estado `confirmed` y se dispara un stub de recálculo (vacío por ahora;
-el motor real es el hito 11).
+Objetivo: dado un resultado confirmado de un partido, calcular los
+puntos de cada usuario según sus predicciones y las reglas activas del
+torneo. Guardar el desglose en `prediction_scores`. Actualizar cada
+vez que el admin confirma (o re-confirma) un resultado.
 
 Pasos generales (sujetos a tu plan detallado en
-`context/plan/10-admin-results-entry.md`):
+`context/plan/11-scoring-engine.md`):
 
-1. Leer PID §4.2, §5.6 y `01-plan.md` §7 hito 10. Inspeccionar la
-   estructura actual de `match_results`, `match_goals`,
-   `player_match_stats` en local (psql o Studio).
-2. Proponer en el plan: estructura de la página `/admin/results`
-   (selector de jornada/ronda → lista de fixtures), formulario por
-   fixture (inline o página separada), gestión de `draft`→`confirmed`,
-   cómo manejar la lista de goleadores (jugador + equipo + minuto +
-   flags), y el stub de recálculo.
-3. Migración si necesaria (p.ej. añadir columna `status` a
-   `match_results` si no existe, o ajustar algún CHECK). Aplicar local
-   y tras confirmación a prod.
-4. Server actions en `src/app/admin/results/actions.ts`:
-   `saveMatchResult` (draft, upsert `match_results` + replace
-   `match_goals`), `confirmMatchResult` (draft→confirmed + stub
-   recálculo).
-5. Páginas `/admin/results` y `/admin/results/[fixtureId]` (o
-   formulario inline, según lo que decidas en el plan).
-6. Vista read-only cuando el resultado ya esté `confirmed` (patrón
-   del hito 09: no redirect, renderiza en modo lectura).
-7. Navegación: añadir "Resultados" a `/admin` nav / sidebar.
+1. Leer PID §6 (todos los criterios de puntuación) y `01-plan.md`
+   §7 hito 11. Inspeccionar `scoring_rules` y `prediction_scores`
+   en local (psql o Studio).
+2. Proponer en el plan: estructura del JSON de reglas (versión 1 con
+   valores concretos), funciones puras con sus firmas, orquestador,
+   si se scorean o no las predicciones iniciales en este hito, si
+   se implementan tests con Vitest/Jest.
+3. Migración con seed de `scoring_rules` (una fila activa para
+   `wc_2022_test` con los valores acordados). Aplicar local + prod
+   tras confirmación.
+4. Funciones puras en `src/lib/scoring/`:
+   - `scoreGroupMatch(prediction, result, rules)` → `{total, breakdown}`
+   - `scoreKnockoutMatch(prediction, result, rules)` → `{total, breakdown}`
+   - `scoreInitialPrediction(prediction, finalResult, rules)` (si entra
+     en scope)
+   - `scoreGroupQualificationPrediction(...)` (si entra en scope)
+   - `applyStageMultiplier(points, stageCode, rules)` → number
+5. Orquestador `recalculateTournamentScores(tournamentId)` en
+   `src/lib/scoring/recalculate.ts` (ya existe como stub):
+   1. Borrar `prediction_scores` del torneo.
+   2. Leer predicciones + resultados confirmados + reglas activas.
+   3. Calcular in-memory.
+   4. Insertar en bulk.
+6. Tests unitarios (mínimo: acierto exacto grupos, cerca por un gol,
+   fallo, empate, knockout con ET, knockout con penaltis, equipo
+   clasificado).
+7. Verificar que al confirmar un resultado desde `/admin/results/[id]`
+   el recálculo se dispara y `prediction_scores` se actualiza.
 8. typecheck/lint/format/build verdes. Smoke local. Push master.
 9. Bitácora en paralelo desde el paso 1.
 
 # CÓMO TRABAJAS CONMIGO
 
 - Primero escribes el plan detallado en
-  `context/plan/10-admin-results-entry.md`. Yo lo reviso y te digo
+  `context/plan/11-scoring-engine.md`. Yo lo reviso y te digo
   "adelante" (o ajustes).
 - Bitácora en paralelo en
-  `context/implementations/10-admin-results-entry-implementation.md`,
+  `context/implementations/11-scoring-engine-implementation.md`,
   no al final.
 - Commits: 1 por unidad coherente. **Mensaje de commit: máximo 1
   línea**, Conventional Commits en inglés, `Co-Authored-By: Claude`.
@@ -293,12 +350,13 @@ Pasos generales (sujetos a tu plan detallado en
 
 # EMPIEZA AQUÍ
 
-1. Lee "LEE ESTO ANTES DE NADA" (sobre todo PID §4.2/§5.6 y la
-   bitácora del hito 09).
-2. Inspecciona el estado: `npm run db:status`, mira `match_results` /
-   `match_goals` / `player_match_stats` en Studio o psql.
-3. Escribe el plan detallado del hito 10 en
-   `context/plan/10-admin-results-entry.md`. No implementes todavía.
+1. Lee "LEE ESTO ANTES DE NADA" (sobre todo PID §6, `01-plan.md`
+   §7 hito 11, y las dos bitácoras cerradas).
+2. Inspecciona el estado: estructura de `scoring_rules` y
+   `prediction_scores` en psql; contenido de `match_predictions` y
+   `match_results` disponibles en local para el smoke.
+3. Escribe el plan detallado del hito 11 en
+   `context/plan/11-scoring-engine.md`. No implementes todavía.
 4. Pídeme aprobación.
 5. Aprobado, ejecuta paso a paso siguiendo las convenciones de los
    hitos previos.
