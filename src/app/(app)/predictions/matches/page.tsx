@@ -30,13 +30,6 @@ export default async function MatchPredictionsPage({
   const tournament = await getDefaultTournament();
   const { appNow, overriding, fechaActual } = await getMatchLockState();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("user_id", userId)
-    .maybeSingle();
-  const isAdmin = profile?.role === "admin";
-
   const [{ data: rounds }, { data: fxData }, { data: preds }] = await Promise.all([
     supabase
       .from("rounds")
@@ -143,17 +136,15 @@ export default async function MatchPredictionsPage({
         </p>
       )}
 
-      {isAdmin && (
-        <form action={generateRandomMatchPredictions} className="mt-4">
-          <button
-            type="submit"
-            className="rounded-md border border-amber-400 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
-            title="Herramienta de prueba (admin): rellena al azar todos tus partidos no bloqueados"
-          >
-            🎲 Generar predicciones aleatorias
-          </button>
-        </form>
-      )}
+      <form action={generateRandomMatchPredictions} className="mt-4">
+        <button
+          type="submit"
+          className="rounded-md border border-amber-400 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
+          title="Rellena al azar todos tus partidos no bloqueados"
+        >
+          🎲 Generar predicciones aleatorias
+        </button>
+      </form>
 
       {roundVMs.length === 0 ? (
         <p className="mt-6 text-sm text-zinc-600 dark:text-zinc-400">

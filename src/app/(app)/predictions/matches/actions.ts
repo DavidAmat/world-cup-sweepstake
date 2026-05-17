@@ -3,7 +3,6 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAuth } from "@/lib/permissions/requireAuth";
-import { requireAdmin } from "@/lib/permissions/requireAdmin";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getMatchLockState, isFixtureLocked } from "@/lib/predictions/matchLock";
 import { readFixturePayload } from "./schemas";
@@ -129,7 +128,7 @@ const parse = (s: string): [number, number] => {
 };
 
 export async function generateRandomMatchPredictions() {
-  const { userId, supabase } = await requireAdmin();
+  const { userId, supabase } = await requireAuth();
   const tournament = await getDefaultTournament();
 
   const { data: fixtures } = await supabase
