@@ -40,11 +40,14 @@ const GOAL_CLS = `${INPUT_CLS} w-16 text-center`;
 
 function initial(f: FixtureVM): Values {
   const s = f.saved;
+  // Extra time is derived, not stored UI state: a knockout draw at 90'
+  // always implies extra time (kept consistent with the server rule).
+  const et = !!s && f.isKnockout && s.h90 === s.a90;
   return {
     h90: s ? String(s.h90) : "",
     a90: s ? String(s.a90) : "",
-    et: s?.et ?? false,
-    pen: s?.pen ?? false,
+    et,
+    pen: et ? (s?.pen ?? false) : false,
     qual: s?.qual ?? "",
   };
 }
@@ -69,11 +72,21 @@ export function MatchesForm({ rounds }: { rounds: RoundVM[] }) {
     return m;
   });
 
+  const knockoutById = useMemo(() => {
+    const m: Record<string, boolean> = {};
+    for (const f of allFixtures) m[f.id] = f.isKnockout;
+    return m;
+  }, [allFixtures]);
+
   const set = (id: string, patch: Partial<Values>) =>
     setValues((prev) => {
       const next = { ...prev[id], ...patch };
-      // Penalties require extra time.
-      if (patch.et === false) next.pen = false;
+      // Extra time is automatic: a knockout fixture drawn at 90' always
+      // goes to extra time; otherwise (or in the group stage) it never
+      // does. The user does not toggle it. Penalties require extra time.
+      const draw90 = next.h90 !== "" && next.a90 !== "" && next.h90 === next.a90;
+      next.et = knockoutById[id] === true && draw90;
+      if (!next.et) next.pen = false;
       return { ...prev, [id]: next };
     });
 
@@ -224,18 +237,22 @@ function Editable({
       {f.isKnockout && (
         <div className="flex flex-col gap-2 rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm dark:border-zinc-800 dark:bg-zinc-950/40">
           <p className="text-xs text-zinc-500">
-            Solo si el partido acaba empatado a 90&apos; (eliminatoria). No se predice el resultado
-            de la prórroga, solo si la hay, si hay penaltis y qué equipo pasa.
+            La prórroga es automática: si predices empate a 90&apos; en eliminatoria, hay prórroga.
+            No se predice el resultado de la prórroga, solo si hay penaltis y qué equipo pasa.
           </p>
+          {v.et && <input type="hidden" name={`et_${f.id}`} value="1" />}
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              name={`et_${f.id}`}
               checked={v.et}
-              onChange={(e) => set(f.id, { et: e.target.checked })}
+              disabled
+              readOnly
               className="h-4 w-4"
+              aria-label="Habrá prórroga (automático)"
             />
-            <span>Habrá prórroga</span>
+            <span className={v.et ? "" : "text-zinc-400"}>
+              Habrá prórroga {v.et ? "(empate a 90′ → sí)" : "(automático)"}
+            </span>
           </label>
           <label className="flex items-center gap-2">
             <input

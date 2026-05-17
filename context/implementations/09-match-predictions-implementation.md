@@ -171,3 +171,15 @@ Rediseño de `/predictions/matches` (petición del usuario):
   server-side fuera del form del cliente.
 - Sin migración. typecheck/lint/format/build verdes; build lista
   `/predictions/matches`; anónimo → `307 /login`.
+
+### Prórroga automática en eliminatorias (petición del usuario)
+
+En `MatchesForm.tsx` la prórroga deja de ser un checkbox manual: es
+**derivada**. En `set()` e `initial()`, para fixtures knockout,
+`et = (h90 !== "" && a90 !== "" && h90 === a90)`; si `!et` ⇒
+`pen=false`. El checkbox de prórroga se muestra `disabled`/`readOnly`
+(solo informativo, "automático" / "empate a 90′ → sí") y la
+submission usa un `<input type="hidden" name="et_<id>" value="1">`
+solo cuando `et` (un checkbox disabled no se postea). Coherente con
+las reglas Zod del server (knockout+empate90'⇒prórroga; prórroga⇒
+empate90'). Sin migración; checks verdes.
