@@ -10,11 +10,8 @@ import { readFixturePayload } from "./schemas";
 
 const SELF = "/predictions/matches";
 
-function back(round: string | null, params: string): never {
-  const q = new URLSearchParams();
-  if (round) q.set("round", round);
-  for (const [k, v] of new URLSearchParams(params)) q.set(k, v);
-  redirect(`${SELF}?${q.toString()}`);
+function back(params: string): never {
+  redirect(`${SELF}?${params}`);
 }
 
 type FixtureRow = {
@@ -47,25 +44,17 @@ type PredictionRow = {
   predicted_qualified_team_id: string | null;
 };
 
-export async function saveRoundMatchPredictions(formData: FormData) {
+// Single-page save: the form posts every editable fixture of the whole
+// tournament (all rounds stacked on one page). We upsert the ones the user
+// filled and skip empty / locked ones. Partial save is OK.
+export async function saveAllMatchPredictions(formData: FormData) {
   const { userId, supabase } = await requireAuth();
   const tournament = await getDefaultTournament();
-  const round = (formData.get("round") as string | null)?.trim() || null;
-  if (!round) back(null, "error=" + encodeURIComponent("Falta la jornada."));
-
-  const { data: roundRow } = await supabase
-    .from("rounds")
-    .select("id")
-    .eq("tournament_id", tournament.id)
-    .eq("code", round)
-    .maybeSingle();
-  if (!roundRow) back(round, "error=" + encodeURIComponent("Jornada no encontrada."));
 
   const { data: fixtures } = await supabase
     .from("fixtures")
     .select("id, kickoff_at, home_team_id, away_team_id, stage:stages ( code )")
-    .eq("tournament_id", tournament.id)
-    .eq("round_id", roundRow.id);
+    .eq("tournament_id", tournament.id);
 
   const { appNow } = await getMatchLockState();
 
@@ -106,20 +95,20 @@ export async function saveRoundMatchPredictions(formData: FormData) {
   }
 
   if (errors.length > 0) {
-    back(round, "error=" + encodeURIComponent(errors.slice(0, 4).join(" · ")));
+    back("error=" + encodeURIComponent(errors.slice(0, 4).join(" · ")));
   }
   if (rows.length === 0) {
-    back(round, "error=" + encodeURIComponent("No has rellenado ningún partido."));
+    back("error=" + encodeURIComponent("No has rellenado ningún partido."));
   }
 
   const { error } = await supabase
     .from("match_predictions")
     .upsert(rows, { onConflict: "fixture_id,user_id" });
-  if (error) back(round, "error=" + encodeURIComponent(error.message));
+  if (error) back("error=" + encodeURIComponent(error.message));
 
   revalidatePath(SELF);
   revalidatePath(`${SELF}/public`);
-  back(round, "ok=saved");
+  back("ok=saved");
 }
 
 // ── Random generator (admin only, testing aid) ───────────────────────────────

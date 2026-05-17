@@ -133,3 +133,41 @@ penaltis y qué equipo pasa. El **resultado a 120' NO se anota**.
   hasta `20260517130000`). `types:gen` → `database.types.ts` sin
   cambios (solo se quitó un CHECK, no columnas).
   typecheck/lint/format/build verdes.
+
+## Cambio del usuario · single-page con todas las jornadas + estado guardado
+
+Rediseño de `/predictions/matches` (petición del usuario):
+
+1. **Fuera el dropdown de jornada.** Todas las jornadas apiladas
+   verticalmente en una sola página, ordenadas por `rounds.sort_order`
+   (grupos → r16 → qf → sf → tercer puesto → final; la final siempre
+   al final). Separador (heading con `border-b-2`) por jornada.
+2. **Pills de navegación** (anclas `#r-<code>`, `scroll-mt-32`) en una
+   barra **sticky** arriba; saltan a cada jornada sin salir de la
+   página.
+3. **Badge de estado por partido**: `Guardado` (emerald) cuando los
+   valores del form == lo persistido; `Sin guardar` (amber) si no hay
+   predicción o el usuario lo editó; **un solo botón global "Guardar
+   predicciones"** (sticky arriba + abajo) hace `upsert` de todas las
+   jornadas. Contador "N partidos sin guardar".
+4. **Badge `Bloqueado`** (zinc) cuando `is_fixture_locked` (jugado o
+   dentro de las 24 h): fila en solo lectura, sin inputs.
+
+- Nuevo **client component** `MatchesForm.tsx` (`"use client"`,
+  `useState`/`useMemo`): mantiene el estado por fixture, recalcula el
+  badge al editar (`isSaved` compara con el snapshot del server),
+  fuerza `pen=false` si se desmarca prórroga, deshabilita penaltis
+  sin prórroga. Precedente de client component: `admin/fixtures/
+  import/ImportClient.tsx`. El `<form action={saveAllMatch
+  Predictions}>` envuelve todo; al guardar, redirect → la página
+  recarga con snapshots frescos → todo verde.
+- `actions.ts`: `saveRoundMatchPredictions` → **`saveAllMatch
+  Predictions`** (recorre todos los fixtures del torneo, no por
+  ronda; salta locked/sin-equipos/vacíos; upsert masivo). `back()`
+  simplificado (sin `?round=`). Generador random intacto.
+- `page.tsx`: server component que arma el `RoundVM[]` (rounds con
+  fixtures, predicción guardada normalizada) y lo pasa a
+  `MatchesForm`; banners ok/error/FECHA y botón admin "🎲" siguen
+  server-side fuera del form del cliente.
+- Sin migración. typecheck/lint/format/build verdes; build lista
+  `/predictions/matches`; anónimo → `307 /login`.
