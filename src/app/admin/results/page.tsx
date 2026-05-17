@@ -13,8 +13,8 @@ type FixtureRow = {
   kickoff_at: string;
   home_placeholder: string | null;
   away_placeholder: string | null;
-  home_team: { display_name: string } | null;
-  away_team: { display_name: string } | null;
+  home_team: { id: string; display_name: string } | null;
+  away_team: { id: string; display_name: string } | null;
   round: { code: string; name: string } | null;
 };
 
@@ -25,6 +25,7 @@ type ResultRow = {
   away_goals_90: number;
   went_extra_time: boolean;
   went_penalties: boolean;
+  qualified_team_id: string | null;
 };
 
 const DEFAULT_ROUND: RoundCode = "group_md1";
@@ -54,8 +55,8 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
           kickoff_at,
           home_placeholder,
           away_placeholder,
-          home_team:teams!fixtures_home_team_id_fkey ( display_name ),
-          away_team:teams!fixtures_away_team_id_fkey ( display_name ),
+          home_team:teams!fixtures_home_team_id_fkey ( id, display_name ),
+          away_team:teams!fixtures_away_team_id_fkey ( id, display_name ),
           round:rounds ( code, name )
         `,
       )
@@ -68,7 +69,7 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
   const { data: resultsData } = await supabase
     .from("match_results")
     .select(
-      "fixture_id, result_status, home_goals_90, away_goals_90, went_extra_time, went_penalties",
+      "fixture_id, result_status, home_goals_90, away_goals_90, went_extra_time, went_penalties, qualified_team_id",
     )
     .eq("tournament_id", tournament.id);
   const resultByFixture = new Map<string, ResultRow>();
@@ -76,6 +77,8 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
 
   const confirmedCount = (resultsData ?? []).filter((r) => r.result_status === "confirmed").length;
   const draftCount = (resultsData ?? []).filter((r) => r.result_status === "draft").length;
+
+  const isKnockoutRound = ROUNDS.find((r) => r.code === roundCode)?.stage_code !== "group_stage";
 
   return (
     <main className="mx-auto max-w-5xl p-10">
@@ -160,6 +163,7 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
               <th className="py-2 pr-3">Partido</th>
               <th className="py-2 pr-3">Fecha (Madrid)</th>
               <th className="py-2 pr-3">Marcador</th>
+              {isKnockoutRound && <th className="py-2 pr-3">Pasa</th>}
               <th className="py-2 pr-3">Estado</th>
               <th className="py-2 pr-3">Acciones</th>
             </tr>
@@ -167,7 +171,10 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
           <tbody>
             {fixtures.length === 0 ? (
               <tr>
-                <td colSpan={5} className="py-6 text-center text-zinc-500 dark:text-zinc-400">
+                <td
+                  colSpan={isKnockoutRound ? 6 : 5}
+                  className="py-6 text-center text-zinc-500 dark:text-zinc-400"
+                >
                   No hay partidos en esta jornada.
                 </td>
               </tr>
@@ -205,6 +212,19 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
                       {formatMadridDateTime(f.kickoff_at)}
                     </td>
                     <td className="py-2 pr-3 font-mono">{scoreLabel}</td>
+                    {isKnockoutRound && (
+                      <td className="py-2 pr-3">
+                        {result?.qualified_team_id ? (
+                          ((result.qualified_team_id === f.home_team?.id
+                            ? f.home_team?.display_name
+                            : f.away_team?.display_name) ?? "—")
+                        ) : result ? (
+                          <span className="text-xs text-zinc-400 italic">Sin asignar</span>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                    )}
                     <td className="py-2 pr-3">{statusBadge}</td>
                     <td className="py-2 pr-3">
                       {hasTeams ? (
