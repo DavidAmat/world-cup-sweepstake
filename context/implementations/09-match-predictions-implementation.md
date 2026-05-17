@@ -1,6 +1,6 @@
 # 09 — Predicciones de partidos · bitácora de implementación
 
-> Hito **EN CURSO**. Plan: `context/plan/09-match-predictions.md`
+> Hito **CERRADO**. Plan: `context/plan/09-match-predictions.md`
 > (aprobado por el usuario: "Adelante"). Bootstrap:
 > `context/plan/08-bootstrap-prompt.md`.
 
@@ -14,8 +14,10 @@
 - [x] Paso 5 · Página `/predictions/matches/public`.
 - [x] Paso 6 · Navegación (Header + dashboard).
 - [x] Paso 7 · typecheck/lint/format/build verdes.
-- [ ] Paso 8 · Smoke navegador David1/2/3 (usuario) + push master.
-- [ ] Paso 9 · Cierre de bitácora.
+- [x] Paso 8 · Smoke navegador David1/2/3 (usuario) + push master.
+- [x] Paso 9 · Cierre de bitácora.
+
+> **HITO CERRADO** — último commit `a4a5c60`.
 
 ## Decisiones aprobadas
 

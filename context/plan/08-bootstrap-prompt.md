@@ -1,46 +1,45 @@
 Hola. Continuamos un proyecto a mitad: una app web privada para gestionar
-una porra del Mundial de fútbol 2026 entre 10 amigos. Llevamos 7 hitos
-cerrados (02-08). Ahora toca el hito 09: predicciones de partidos
-(fase de grupos y eliminatorias) con su vista pública y bloqueo 24h
-antes de cada partido.
+una porra del Mundial de fútbol 2026 entre 10 amigos. Llevamos 9 hitos
+cerrados (02-09). Ahora toca el hito 10: panel admin para introducir
+resultados de partidos (marcador, goleadores, prórroga, penaltis) y
+disparar el recálculo del torneo.
 
 UI en español. Código, SQL y nombres de tabla en inglés. Comunícate
 conmigo en español.
 
 # QUÉ HITO ES Y DÓNDE ESTÁ DEFINIDO TÉCNICAMENTE
 
-- **Hito 09 — Predicciones de partidos.**
+- **Hito 10 — Admin: introducción de resultados.**
 - Definición técnica de alto nivel (fuente para el plan detallado):
-  - `context/plan/01-plan.md` §7, sección "Hito 09 — Predicciones de
-    partidos" (scope, validación cruzada Zod, acceptance).
-  - `context/initial-setup/02-pid.md`: §5.7 (predicciones de
-    partidos: grupos vs eliminatorias), §5.8 (vista pública de
-    partidos), §4.4 (regla de bloqueo: `now >= kickoff_at - 24h`),
-    §4.2 (tabla `match_predictions`), §6.2 (criterios que se
-    puntuarán en hito 11 — NO se implementa scoring aquí).
+  - `context/plan/01-plan.md` §7, sección "Hito 10 — Admin: introducción
+    de resultados" (scope, esqueleto, acceptance).
+  - `context/initial-setup/02-pid.md`: §4.2 (tablas `match_results`,
+    `match_goals`, `player_match_stats`), §5.6 (flujo admin de
+    resultados), §6 (reglas de puntuación — el motor es el hito 11,
+    aquí solo se capturan los datos).
 - El **plan detallado lo escribes tú** al empezar, en
-  `context/plan/09-match-predictions.md` (NO existe aún; crearlo es
-  tu primer entregable, igual que en 07/08). Yo lo reviso y te digo
-  "adelante".
+  `context/plan/10-admin-results-entry.md` (NO existe aún; crearlo es
+  tu primer entregable). Yo lo reviso y te digo "adelante".
 - La bitácora se va llenando **en paralelo** en
-  `context/implementations/09-match-predictions-implementation.md`.
+  `context/implementations/10-admin-results-entry-implementation.md`.
 
 # LEE ESTO ANTES DE NADA
 
 En este orden, hasta entender el estado actual:
 
 1. `context/initial-setup/02-pid.md` — Project Initiation Document.
-   Fuente de verdad funcional. Mira §5.7, §5.8, §4.4, §4.2, §6.2.
-2. `context/plan/01-plan.md` — índice maestro de los 17 hitos. Lee §6
-   (roadmap) y §7 (resumen por hito, sobre todo Hito 09).
-3. Bitácoras de los hitos cerrados. La del **08 es crítica**
-   (patrones que reutilizas casi tal cual en el 09):
-   - `context/implementations/06-seed-and-import-master-data-implementation.md`
+   Fuente de verdad funcional. Mira §4.2 (tablas de resultados),
+   §5.6 (flujo admin), §6 (scoring — solo para entender qué datos
+   necesita el motor del hito 11).
+2. `context/plan/01-plan.md` — índice maestro. Lee §6 (roadmap) y
+   §7 hito 10.
+3. Bitácoras más relevantes (patrones que reutilizarás):
+   - `context/implementations/09-match-predictions-implementation.md`
+     (CERRADO — patrón de server actions, upsert, validación Zod,
+     cliente component `MatchesForm.tsx`).
    - `context/implementations/07-admin-fixtures-implementation.md`
-   - `context/implementations/08-initial-predictions-implementation.md`
-4. Planes detallados 07 y 08 (modelo de datos y decisiones vivas):
-   - `context/plan/07-admin-fixtures.md`
-   - `context/plan/08-initial-predictions.md`
+     (CERRADO — patrones de páginas admin, `ImportClient.tsx` como
+     precedente de client component en admin).
 
 # RESUMEN DE LOS HITOS CERRADOS
 
@@ -55,7 +54,7 @@ Hito 03 — Supabase local + migraciones
 
 Hito 04 — Esquema de BD
   Migraciones SQL → 17 tablas. Helpers SQL: `is_admin()`,
-  `is_fixture_locked(uuid)` (= `now() >= kickoff_at - 24h`),
+  `is_fixture_locked(uuid)` (= `app_now() >= kickoff_at - 24h`),
   `set_updated_at()`. RLS local+prod.
 
 Hito 05 — Auth + profiles + roles
@@ -78,81 +77,89 @@ Hito 07 — Admin: fixtures (CERRADO)
 Hito 08 — Predicciones iniciales (CERRADO)
   Plan: `context/plan/08-initial-predictions.md`
   Bitácora: `context/implementations/08-initial-predictions-implementation.md`
-  Qué hay (reutilízalo en el 09):
-  - Páginas player: `/predictions/initial` (form / **solo lectura
-    cuando hay lock — NO redirect**) y `/predictions/initial/public`
-    (card por usuario + dropdown por categoría, oculta hasta el lock).
-    Rutas en inglés, UI en español, bajo `src/app/(app)/predictions/`.
-  - `src/lib/predictions/initialLock.ts`: estado de lock vía `rpc`
-    (lo decide Postgres, no `Date.now()` → esquiva
-    `react-hooks/purity` sin `connection()`). **Replica este patrón
-    para el lock por fixture del hito 09.**
-  - **Migración `20260515120000`**: `initial_predictions` pasó a
-    texto libre (`top_scorer_text`/`best_player_text`, se eliminó la
-    deuda D2 de `players`); funciones
-    `initial_predictions_lock_at()` / `are_initial_predictions_locked()`;
-    RLS: ves lo tuyo siempre, lo de los demás solo tras el lock,
-    writes denegados pasado el lock.
-  - **Migración `20260516120000` — `FECHA_ACTUAL` / `app_now()`**:
+  - `/predictions/initial` (form / solo lectura si lock — NO redirect)
+    y `/predictions/initial/public` (card por usuario + dropdown
+    por categoría, oculta hasta el lock).
+  - `src/lib/predictions/initialLock.ts`: estado de lock vía `rpc`.
+  - Migración `20260515120000`: `initial_predictions` con texto libre
+    (`top_scorer_text` / `best_player_text`); funciones
+    `initial_predictions_lock_at()` / `are_initial_predictions_locked()`.
+  - Migración `20260516120000` — `FECHA_ACTUAL` / `app_now()`:
     tabla `app_settings` (fila única `fecha_actual`), función
-    `public.app_now()` = `coalesce(app_settings.fecha_actual,
-    now())`. `are_initial_predictions_locked` compara contra
-    `app_now()`. La app sincroniza `app_settings.fecha_actual` desde
-    el env `FECHA_ACTUAL` (`src/lib/dates/appNow.ts`, service-role,
-    solo si cambia). Banner "🧪 Fecha simulada" en las páginas.
-    **Importante para el hito 09**: `is_fixture_locked(uuid)` aún usa
-    `now()`, NO `app_now()`. Si quieres que `FECHA_ACTUAL` también
-    simule el bloqueo de predicciones de partido (muy útil para
-    probar), propón en el plan repuntar `is_fixture_locked` a
-    `app_now()` (migración pequeña, mismo patrón).
-  - `Makefile` con `make fecha FECHA=<v>` (reescribe `.env.local` y
-    reinicia `npm run dev`). `make fecha FECHA=` vuelve a hora real.
+    `public.app_now() = coalesce(app_settings.fecha_actual, now())`.
+    La app sincroniza desde env `FECHA_ACTUAL`
+    (`src/lib/dates/appNow.ts`, service-role). Banner "🧪 Fecha
+    simulada" en páginas. `make fecha FECHA=<v>` / `make fecha FECHA=`.
   - Clasificados de grupo: multi-choice (checkboxes), exactamente 2
-    por grupo, sin orden (`predicted_position = null`).
-  - Lección dura (incidente del 08): **los scripts de verificación
-    throwaway NUNCA borran por `tournament_id`**; solo filas que
-    crean, acotadas por `user_id` de test. No ejecutar borrados
-    destructivos sin confirmar si puede haber datos del usuario.
+    por grupo, sin orden.
+  - **Lección dura**: scripts de verificación throwaway NUNCA borran
+    por `tournament_id`; solo filas que crean, acotadas por `user_id`
+    de test.
 
-# DECISIONES CERRADAS QUE AFECTAN AL HITO 09
+Hito 09 — Predicciones de partidos (CERRADO)
+  Plan: `context/plan/09-match-predictions.md`
+  Bitácora: `context/implementations/09-match-predictions-implementation.md`
+  - Migración `20260517120000`: `is_fixture_locked` repuntado a
+    `app_now()` → `FECHA_ACTUAL` simula también el lock de partido.
+  - Migración `20260517130000`: eliminado CHECK que ataba
+    `predicts_extra_time` a la presencia de goles a 120'.
+    Columnas `home/away_goals_120` conservadas (nullable, siempre NULL
+    en predicciones); `check1` (penaltis⇒prórroga) conservado.
+  - `src/lib/predictions/matchLock.ts`: `getMatchLockState()` =
+    un único `rpc("app_now")` + `isFixtureLocked(kickoffIso, appNowIso)`
+    en JS (= appNow ≥ kickoff − 24h). Sin `Date.now()` en server
+    component (esquiva `react-hooks/purity`).
+  - `src/app/(app)/predictions/matches/schemas.ts`: Zod con
+    `superRefine` que espeja los CHECK de `match_predictions` +
+    invariantes (penaltis⇒prórroga; prórroga⇒empate 90'; knockout
+    draw⇒prórroga obligatoria; el que pasa ∈{home,away}).
+  - `actions.ts`: `saveAllMatchPredictions` (requireAuth, todos los
+    fixtures del torneo, skip locked/sin-equipos/vacíos, upsert masivo
+    `onConflict fixture_id,user_id`). `generateRandomMatchPredictions`
+    (requireAuth; dado 40%/30%/30%; knockout draw⇒ET+70%pen+50/50
+    ganador).
+  - `MatchesForm.tsx` (`"use client"`): client component con
+    `useState`/`useMemo`; función `derive(values, meta)` centraliza
+    la lógica derivada (ET automático en knockout draw, `qual`
+    automático si no empate, `pen=false` si !ET); badge
+    Guardado/Sin guardar/Bloqueado por fixture; sticky bar con
+    contador + botón global. Patrón: disabled checkbox/select no
+    se postea → `<input type="hidden">` para ET y qual automático.
+  - `/predictions/matches/page.tsx`: server component que arma
+    `RoundVM[]` (todas las jornadas apiladas, pills ancla #r-{code},
+    scroll-mt-32). Botón "🎲 Generar predicciones aleatorias"
+    visible para TODOS los usuarios autenticados.
+  - `/predictions/matches/public/page.tsx`: selector de ronda,
+    card por usuario por fixture bloqueado (RLS oculta lo no
+    bloqueado).
+  - Nav: `Header.tsx` +link "Partidos"; `dashboard` +2 tarjetas.
+
+# DECISIONES CERRADAS QUE AFECTAN AL HITO 10
 
 Vinculantes. No las cuestiones sin un motivo muy fuerte.
 
-- **La tabla `match_predictions` y su RLS YA EXISTEN**
-  (migración `20260508164810_predictions.sql`). No la recrees. Tiene:
-  `home_goals_90`, `away_goals_90`, `predicts_extra_time`,
-  `home_goals_120`, `away_goals_120`, `predicts_penalties`,
-  `predicted_winner_team_id`, `predicted_qualified_team_id`,
-  `unique (fixture_id, user_id)`, y **CHECKs**: prórroga ⇔ goles 120
-  presentes; penaltis ⇒ prórroga. RLS: `select` propia o
-  `is_fixture_locked(fixture_id)` o admin; `insert/update/delete`
-  propia y solo si NO `is_fixture_locked`; `admin_all`. Es decir, el
-  hito 09 es **sobre todo UI + server actions + reutilización**, la
-  capa DB ya está hecha (salvo el posible repunte a `app_now`).
-- **Lock por fixture = `now() >= kickoff_at - 24h`** (PID §4.4), ya
-  implementado en `is_fixture_locked`. La UI bloquea a las 24h; el
-  server también valida antes del upsert; tras el lock la predicción
-  se hace pública (RLS) y la página se renderiza en **modo lectura**
-  (no redirect, gotcha de streaming).
-- **Grupos vs eliminatorias** (PID §5.7): grupos → solo
-  `home_goals_90`/`away_goals_90`. Eliminatorias → además toggle
-  prórroga (+ goles 120), toggle penaltis, y equipo que pasa
-  (`predicted_qualified_team_id`). Validación cruzada Zod espejando
-  los CHECK de la tabla (no penaltis sin prórroga, etc.).
-- **Fixtures con placeholders**: en local hay 8 octavos
-  `wc2022_r16_*` con `home_placeholder`/`away_placeholder` y team_id
-  null (los cruces no se conocen). Decide en el plan qué pasa al
-  predecir un fixture sin equipos asignados (p.ej. permitir solo
-  goles, o no permitir predicción hasta que el admin asigne equipos).
-- **Sin scoring** (es hito 11). Aquí solo se capturan y muestran
-  predicciones.
-- Reutiliza: `getDefaultTournament`, `madridTime`, `Badge`, el
-  patrón de `initialLock.ts` (rpc), `appNow`/`FECHA_ACTUAL`, el
-  `Makefile`, y el patrón "render read-only si locked, no redirect".
-  Gate de auth: `/admin/*` en `proxy.ts`; rutas de jugador con
-  `requireAuth()`.
+- **Las tablas `match_results`, `match_goals` y `player_match_stats`
+  YA EXISTEN** (migración `20260508164810`). No las recrees. Revisa
+  su estructura antes de escribir el plan.
+- **`match_results` es 1:1 con `fixture`**: `unique (fixture_id)`,
+  `home_goals_90`, `away_goals_90`, `extra_time`, `home_goals_120`,
+  `away_goals_120`, `penalties`, `winner_team_id`. Estado: `draft` →
+  `confirmed`.
+- **`match_goals`**: `fixture_id`, `team_id`, `player_id` (nullable:
+  autogol o jugador sin asignar), `minute` (nullable), `is_own_goal`,
+  `is_penalty`. Un insert por gol.
+- **`player_match_stats`**: opcional/progresivo. No bloquea el hito.
+- **Admin gate**: rutas `/admin/*` gateadas en `src/proxy.ts`; en
+  server components y actions usa `requireAdmin()`.
+- **Sin scoring aquí** (es el hito 11). El hito 10 solo captura
+  y persiste; la acción "confirmar" simplemente cambia el estado a
+  `confirmed` y llama (de momento vacío) al stub del recálculo.
+- **Reutiliza**: `getDefaultTournament`, `madridTime`, `Badge`,
+  `requireAdmin`, el patrón de upsert masivo de `actions.ts` del 09,
+  y el patrón "render read-only si estado=confirmed, no redirect".
 
 # ESTADO DE INFRAESTRUCTURA Y URLS
+
 Repo:        github.com/DavidAmat/world-cup-sweepstake (público)
 Branch:      master (commits directos a master, no PR)
 Vercel:      https://world-cup-sweepstake-mu.vercel.app
@@ -177,7 +184,9 @@ Env vars (.env.local local / Vercel prod):
 Migraciones aplicadas (local Y prod):
   ...164810_predictions (match_predictions + RLS, ya existía),
   ...20260515120000_initial_predictions_freetext_and_lock,
-  ...20260516120000_app_now_override.
+  ...20260516120000_app_now_override,
+  ...20260517120000_is_fixture_locked_app_now,
+  ...20260517130000_match_predictions_drop_120.
   Tras cualquier migración nueva: `npm run types:gen` y luego
   `npx prettier --write src/lib/supabase/database.types.ts` (el
   fichero autogenerado no sale prettier-clean; formatéalo para que
@@ -185,28 +194,29 @@ Migraciones aplicadas (local Y prod):
 
 Datos cargados:
   - **Prod**: torneo `wc_2022_test` (active), 32 teams, 48 fixtures
-    de grupos. Sin match_results. Sin predicciones (las pruebas del
-    08 fueron en local).
+    de grupos, 56 predicciones de partido (de los smokes del hito 09).
+    Sin match_results. Sin predicciones iniciales (las pruebas fueron
+    en local).
   - **Local**: lo mismo + 8 octavos `wc2022_r16_*` (solo local,
-    placeholders). El usuario re-creó predicciones iniciales de test
-    (2 `initial_predictions` + 32 `gqp`). `FECHA_ACTUAL` quedó en
-    `2026-06-12T09:00` (torneo "empezado"): para probar el hito 09
-    seguramente quieras `make fecha FECHA=` (hora real) o una fecha
-    relativa a algún `kickoff_at`.
+    placeholders). Predicciones de partido de los 3 usuarios de test.
+    `FECHA_ACTUAL` probablemente en null (hora real); ajustar con
+    `make fecha` si necesitas simular partidos bloqueados para probar
+    que admin puede/no puede editar resultados de un fixture locked.
 
 Gotchas Next 16 ya resueltos (replícalos, no los redescubras):
   - `redirect()` en server component streaming mis-resuelve paths.
     Gates en `proxy.ts`; estados read-only se renderizan, no se
     redirige.
   - `Date.now()`/`Math.random()` en server components →
-    `react-hooks/purity`. Usa el lock vía `rpc` (now()/app_now() de
-    la DB), como `initialLock.ts`.
+    `react-hooks/purity`. Usa el lock vía `rpc` (app_now() de la DB).
   - `<html>` lleva `suppressHydrationWarning` (extensiones). No lo
     quites.
   - Migración local: `npx supabase migration up --local` (NO
     `db:reset`, que vacía la DB). A prod: `echo y | npx supabase db
     push --linked`; verificar con `npx supabase migration list
     --linked`.
+  - Commits: máximo 1 línea, Conventional Commits en inglés,
+    `Co-Authored-By: Claude`. Push directo a master.
 
 # COMANDOS HABITUALES
 
@@ -224,44 +234,47 @@ A producción (pide confirmación antes):
   echo y | npx supabase db push --linked # migraciones (pide OK)
   git push origin master                 # Vercel autodeploya
 
-# TAREA: HITO 09 — PREDICCIONES DE PARTIDOS
+# TAREA: HITO 10 — ADMIN: INTRODUCCIÓN DE RESULTADOS
 
-Objetivo: cada usuario predice cada partido (grupos: resultado a 90';
-eliminatorias: + prórroga/penaltis/equipo que pasa), editable hasta
-24h antes del kickoff; tras el lock, solo lectura y público. Sin
-scoring (hito 11).
+Objetivo: el admin introduce manualmente el resultado de cada partido
+(goles a 90', prórroga, goles a 120', penaltis, equipo que pasa,
+lista de goleadores) y confirma. Al confirmar, el resultado queda en
+estado `confirmed` y se dispara un stub de recálculo (vacío por ahora;
+el motor real es el hito 11).
 
 Pasos generales (sujetos a tu plan detallado en
-`context/plan/09-match-predictions.md`):
+`context/plan/10-admin-results-entry.md`):
 
-1. Leer PID §5.7/§5.8/§4.4/§4.2/§6.2 y `01-plan.md` §7 hito 09.
-2. Decidir y proponer (en el plan): ¿repuntar `is_fixture_locked` a
-   `app_now()` para que `FECHA_ACTUAL` también simule el bloqueo de
-   partidos? (recomendado, migración pequeña). Cómo tratar fixtures
-   con placeholders. Estructura de `/predicciones/partidos` (selector
-   de jornada/ronda, lista de fixtures con form inline).
-3. Helper de lock por fixture (patrón `initialLock.ts`, vía `rpc`
-   `is_fixture_locked`).
-4. Página `/predictions/matches` (rutas en inglés, UI español):
-   por jornada/ronda, form por fixture; grupos vs eliminatorias;
-   validación Zod cruzada espejando los CHECK de `match_predictions`.
-   Server action valida el lock antes del upsert.
-5. Vista pública `/predictions/matches/public`: card por usuario por
-   fixture, visible solo cuando el fixture está bloqueado (RLS ya lo
-   permite).
-6. UI coherente con `/predictions/initial`, `/rules`,
-   `/admin/fixtures`. Reutiliza helpers existentes.
-7. typecheck/lint/format/build verdes. Smoke local con David1/David2
-   (usa `make fecha` para mover el lock). Push a master.
-8. Bitácora en paralelo desde el paso 1.
+1. Leer PID §4.2, §5.6 y `01-plan.md` §7 hito 10. Inspeccionar la
+   estructura actual de `match_results`, `match_goals`,
+   `player_match_stats` en local (psql o Studio).
+2. Proponer en el plan: estructura de la página `/admin/results`
+   (selector de jornada/ronda → lista de fixtures), formulario por
+   fixture (inline o página separada), gestión de `draft`→`confirmed`,
+   cómo manejar la lista de goleadores (jugador + equipo + minuto +
+   flags), y el stub de recálculo.
+3. Migración si necesaria (p.ej. añadir columna `status` a
+   `match_results` si no existe, o ajustar algún CHECK). Aplicar local
+   y tras confirmación a prod.
+4. Server actions en `src/app/admin/results/actions.ts`:
+   `saveMatchResult` (draft, upsert `match_results` + replace
+   `match_goals`), `confirmMatchResult` (draft→confirmed + stub
+   recálculo).
+5. Páginas `/admin/results` y `/admin/results/[fixtureId]` (o
+   formulario inline, según lo que decidas en el plan).
+6. Vista read-only cuando el resultado ya esté `confirmed` (patrón
+   del hito 09: no redirect, renderiza en modo lectura).
+7. Navegación: añadir "Resultados" a `/admin` nav / sidebar.
+8. typecheck/lint/format/build verdes. Smoke local. Push master.
+9. Bitácora en paralelo desde el paso 1.
 
 # CÓMO TRABAJAS CONMIGO
 
 - Primero escribes el plan detallado en
-  `context/plan/09-match-predictions.md`. Yo lo reviso y te digo
+  `context/plan/10-admin-results-entry.md`. Yo lo reviso y te digo
   "adelante" (o ajustes).
 - Bitácora en paralelo en
-  `context/implementations/09-match-predictions-implementation.md`,
+  `context/implementations/10-admin-results-entry-implementation.md`,
   no al final.
 - Commits: 1 por unidad coherente. **Mensaje de commit: máximo 1
   línea**, Conventional Commits en inglés, `Co-Authored-By: Claude`.
@@ -280,15 +293,12 @@ Pasos generales (sujetos a tu plan detallado en
 
 # EMPIEZA AQUÍ
 
-1. Lee "LEE ESTO ANTES DE NADA" (sobre todo PID §5.7/§5.8/§4.4 y la
-   bitácora del hito 08).
-2. Inspecciona el estado: `npm run db:status`, mira
-   `match_predictions` / `fixtures` / `app_settings` en Studio o
-   psql. Comprueba `FECHA_ACTUAL` en `.env.local`.
-3. Escribe el plan detallado del hito 09 en
-   `context/plan/09-match-predictions.md` (incluida la propuesta de
-   repuntar `is_fixture_locked` a `app_now()` y el trato de
-   placeholders). No implementes todavía.
+1. Lee "LEE ESTO ANTES DE NADA" (sobre todo PID §4.2/§5.6 y la
+   bitácora del hito 09).
+2. Inspecciona el estado: `npm run db:status`, mira `match_results` /
+   `match_goals` / `player_match_stats` en Studio o psql.
+3. Escribe el plan detallado del hito 10 en
+   `context/plan/10-admin-results-entry.md`. No implementes todavía.
 4. Pídeme aprobación.
 5. Aprobado, ejecuta paso a paso siguiendo las convenciones de los
    hitos previos.
