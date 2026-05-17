@@ -9,7 +9,12 @@
 - [x] Paso 2 · Listado `/admin/results`.
 - [x] Paso 3 · Formulario `/admin/results/[fixtureId]` (server + client component).
 - [x] Paso 4 · Admin hub actualizado + typecheck/lint/format/build verdes.
-- [ ] Paso 5 · Smoke en navegador por el usuario + push master.
+- [x] Paso 5 · Push master (commit `b5b4fd8`).
+- [x] Paso 6 · Cambio del usuario: generador aleatorio + drop 120'
+      (migración `20260517140000`, local Y prod; `migration list --linked`
+      → Local==Remote). Generador random = `confirmed` (confirmado por el
+      usuario).
+- [ ] Paso 7 · Smoke navegador por el usuario + cierre.
 
 ## Decisiones aprobadas
 
@@ -102,6 +107,67 @@ Fixtures sin equipos: "Sin equipos" (sin link). Banners `?ok`/`?error`.
   `307 /login` en `/admin/results` y `/admin/results/<uuid>` (proxy del
   hito 07 ya cubre `/admin/*`).
 
-Pendiente: smoke en navegador por el usuario (David1 admin) — introducir
-resultado de grupo en borrador, confirmar, ver read-only, editar, re-confirmar;
-probar un knockout local con prórroga + penaltis. Luego push a master.
+Push a master: commit `b5b4fd8`.
+
+---
+
+## Paso 6 · Cambio del usuario · generador aleatorio + sin 120'
+
+Dos peticiones del usuario tras revisar la UI:
+
+1. **Botón "Generar resultados aleatorios"** en `/admin/results` (como el de
+   predicciones del hito 09), para rellenar rápido en desarrollo.
+2. **Quitar los goles a 120'** del formulario de eliminatoria (misma decisión
+   que en hito 09 para predicciones). El resultado solo captura: marcador a
+   90', si hubo penaltis y qué equipo pasó. El 120' NO se anota.
+
+### Migración `20260517140000_match_results_drop_120.sql`
+
+Espejo de `20260517130000` para `match_results`: `drop constraint
+match_results_check` (el que ataba `went_extra_time` a la presencia de
+`home/away_goals_120`). Se mantiene `match_results_check1` (penaltis ⇒
+prórroga ∧ penalty_winner). Columnas `home/away_goals_120` conservadas
+(nullable, siempre NULL desde ahora). Aplicada **local** con `npx supabase
+migration up --local`; `psql` confirma que solo queda `match_results_check1`.
+`npm run types:gen` + prettier → `database.types.ts` **sin cambios** (solo se
+quitó un CHECK, no columnas). **Pendiente push a prod** (`db push --linked`,
+pide confirmación). Prod no tiene filas en `match_results` → no destructivo.
+
+### Modelo nuevo (espeja hito 09)
+
+- `schemas.ts`: fuera `home/away_goals_120` y `went_extra_time` del input.
+  Campos del payload: 90' + `went_penalties` + `qualified_team_id` (equipo que
+  pasa, free pick). Nuevo `deriveResult(payload)` = única fuente de verdad que
+  calcula columnas DB: knockout empate90' ⇒ `went_extra_time=true`, ganador =
+  el pick, `penalty_winner = pick` si penaltis; knockout no-empate ⇒ ganador
+  del 90'; grupos ⇒ winner null si empate, sin qualified. `home/away_goals_120`
+  siempre null. `superRefine`: penaltis solo si knockout+empate90'; empate90'
+  knockout ⇒ qualified obligatorio ∈ {home,away}; goles ∈ equipos.
+- `actions.ts`: `persistResult` usa `deriveResult` (fuera lógica 120' inline).
+  Nuevo `generateRandomResults(formData)`: requireAdmin, valida `round`,
+  recorre fixtures de la ronda con equipos, dado 0.4/0.7 → bucket, knockout
+  empate90' ⇒ penaltis 70 % + ganador 50/50; reusa `deriveResult`; upsert
+  masivo `onConflict fixture_id` como **confirmed**; borra `match_goals` de
+  esos fixtures (el random no crea goles → consistencia); stub recálculo;
+  redirect `?round=&ok=random`.
+- `ResultForm.tsx`: fuera inputs 120' y checkbox manual de prórroga. Prórroga
+  **derivada** (knockout + empate90' ⇒ automática, texto informativo). Si
+  empate90': checkbox penaltis + un único select "Equipo que pasó"
+  (= ganador/penalty_winner). Si knockout resuelto en 90': texto "Pasa X". Si
+  faltan goles: hint. Hidden `went_penalties`/`qualified_team_id` solo en
+  empate90'.
+- `[fixtureId]/page.tsx`: prop `existingResult` ahora
+  `{home_goals_90, away_goals_90, went_penalties, qualified_team_id}`. Vista
+  read-only: "Hubo prórroga" (sin marcador 120') + penaltis si aplica.
+- `/admin/results/page.tsx`: form POST `generateRandomResults` con hidden
+  `round`, botón ámbar "🎲 Generar resultados aleatorios (esta jornada)";
+  banner `ok=random`.
+
+Decisión propia (anotada para revisión): el generador crea los resultados
+**ya confirmados** (no borrador) — el objetivo es tenerlos usables al instante
+para probar el motor del hito 11 sin clics extra. Per-ronda (no todo el
+torneo) porque la página es por ronda y las eliminatorias pueden no tener
+equipos. Fácil de cambiar si prefieres borrador o todo-el-torneo.
+
+typecheck/lint/format/build verdes. Pendiente: confirmar push de la migración
+a prod, luego commit + push master; smoke navegador del usuario.

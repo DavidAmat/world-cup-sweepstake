@@ -4,6 +4,7 @@ import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { Badge } from "@/components/ui/Badge";
 import { ROUNDS, type RoundCode } from "@/lib/fixtures/catalogs";
+import { generateRandomResults } from "./actions";
 
 type SearchParams = Promise<{ round?: string; ok?: string; error?: string }>;
 
@@ -104,6 +105,11 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
           Resultado confirmado.
         </p>
       )}
+      {params.ok === "random" && (
+        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+          Resultados aleatorios generados y confirmados para esta jornada.
+        </p>
+      )}
       {params.error && (
         <p className="mt-4 rounded-md border border-rose-300 bg-rose-50 p-3 text-sm text-rose-700 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-300">
           {params.error}
@@ -133,6 +139,17 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
           className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           Ver jornada
+        </button>
+      </form>
+
+      <form action={generateRandomResults} className="mt-4">
+        <input type="hidden" name="round" value={roundCode} />
+        <button
+          type="submit"
+          className="rounded-md border border-amber-400 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
+          title="Genera y confirma resultados al azar para todos los partidos con equipos de esta jornada (ayuda de desarrollo)"
+        >
+          🎲 Generar resultados aleatorios (esta jornada)
         </button>
       </form>
 

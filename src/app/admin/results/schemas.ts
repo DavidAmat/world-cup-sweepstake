@@ -23,8 +23,13 @@ export const GoalSchema = z.object({
 
 export type GoalInput = z.infer<typeof GoalSchema>;
 
+// The 120' score is NOT captured (user decision, hito 10 — mirrors hito 09).
+// A result captures: 90' score, whether it went to penalties, and which team
+// advanced (free pick when the 90' is a draw in a knockout). Extra time and
+// the official winner are DERIVED, never trusted from the form.
+//
 // home_team_id / away_team_id / is_knockout are injected by the server from
-// the fixture row, never trusted from the client form.
+// the fixture row.
 export const MatchResultPayloadSchema = z
   .object({
     fixture_id: z.string().uuid(),
@@ -33,54 +38,36 @@ export const MatchResultPayloadSchema = z
     is_knockout: z.boolean(),
     home_goals_90: z.number().int().min(0),
     away_goals_90: z.number().int().min(0),
-    went_extra_time: z.boolean(),
-    home_goals_120: z.number().int().min(0).nullable(),
-    away_goals_120: z.number().int().min(0).nullable(),
     went_penalties: z.boolean(),
-    penalty_winner_team_id: z.string().uuid().nullable(),
+    // The advancing team. Required only for a knockout drawn at 90'; otherwise
+    // it is derived from the 90' winner (knockout) or irrelevant (group).
+    qualified_team_id: z.string().uuid().nullable(),
     goals: z.array(GoalSchema),
   })
   .superRefine((d, ctx) => {
-    // Mirror match_results_check: went_extra_time ↔ 120' goals present.
-    if (d.went_extra_time && (d.home_goals_120 == null || d.away_goals_120 == null)) {
-      ctx.addIssue({ code: "custom", message: "Con prórroga debes introducir los goles a 120'." });
-    }
-    if (!d.went_extra_time && (d.home_goals_120 != null || d.away_goals_120 != null)) {
-      ctx.addIssue({ code: "custom", message: "Sin prórroga no puede haber goles a 120'." });
-    }
-    // Mirror match_results_check1: penalties ⇒ extra time ∧ penalty winner.
-    if (d.went_penalties && !d.went_extra_time) {
-      ctx.addIssue({ code: "custom", message: "No puede haber penaltis sin prórroga." });
-    }
-    if (d.went_penalties && d.penalty_winner_team_id == null) {
+    const drawAt90 = d.home_goals_90 === d.away_goals_90;
+    const knockoutDraw = d.is_knockout && drawAt90;
+
+    // Penalties only make sense for a knockout drawn at 90' (⇒ extra time).
+    if (d.went_penalties && !knockoutDraw) {
       ctx.addIssue({
         code: "custom",
-        message: "Con penaltis debes indicar el equipo que ganó la tanda.",
+        message: "Solo puede haber penaltis en una eliminatoria empatada a 90'.",
       });
     }
-    if (!d.went_penalties && d.penalty_winner_team_id != null) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Sin penaltis no puede haber ganador por penaltis.",
-      });
-    }
-    // Penalty winner must be one of the two teams in the fixture.
-    if (
-      d.penalty_winner_team_id != null &&
-      d.penalty_winner_team_id !== d.home_team_id &&
-      d.penalty_winner_team_id !== d.away_team_id
-    ) {
-      ctx.addIssue({
-        code: "custom",
-        message: "El ganador de penaltis debe ser uno de los dos equipos.",
-      });
-    }
-    // Group games never go to extra time.
-    if (!d.is_knockout && (d.went_extra_time || d.went_penalties)) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Un partido de fase de grupos no puede ir a prórroga ni penaltis.",
-      });
+    // A knockout drawn at 90' must declare which team advanced.
+    if (knockoutDraw) {
+      if (d.qualified_team_id == null) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Empate a 90' en eliminatoria: indica qué equipo pasó.",
+        });
+      } else if (d.qualified_team_id !== d.home_team_id && d.qualified_team_id !== d.away_team_id) {
+        ctx.addIssue({
+          code: "custom",
+          message: "El equipo que pasa debe ser uno de los dos equipos.",
+        });
+      }
     }
     // Every goal belongs to one of the two teams.
     for (const g of d.goals) {
@@ -95,6 +82,72 @@ export const MatchResultPayloadSchema = z
   });
 
 export type MatchResultPayload = z.infer<typeof MatchResultPayloadSchema>;
+
+// Persistable columns of match_results. The 120' columns are kept in the
+// schema (nullable) but always written as NULL from now on.
+export type DerivedResult = {
+  home_goals_90: number;
+  away_goals_90: number;
+  went_extra_time: boolean;
+  home_goals_120: null;
+  away_goals_120: null;
+  went_penalties: boolean;
+  penalty_winner_team_id: string | null;
+  winner_team_id: string | null;
+  qualified_team_id: string | null;
+};
+
+// Single source of truth for turning a validated payload into DB columns.
+// Reused by the form action and the random generator.
+export function deriveResult(d: MatchResultPayload): DerivedResult {
+  const drawAt90 = d.home_goals_90 === d.away_goals_90;
+  const ninetyWinner = d.home_goals_90 > d.away_goals_90 ? d.home_team_id : d.away_team_id;
+
+  if (d.is_knockout && drawAt90) {
+    // Draw at 90' ⇒ extra time. The advancing team is the explicit pick
+    // (we do not track the 120' score). Penalties optional.
+    const advance = d.qualified_team_id;
+    return {
+      home_goals_90: d.home_goals_90,
+      away_goals_90: d.away_goals_90,
+      went_extra_time: true,
+      home_goals_120: null,
+      away_goals_120: null,
+      went_penalties: d.went_penalties,
+      penalty_winner_team_id: d.went_penalties ? advance : null,
+      winner_team_id: advance,
+      qualified_team_id: advance,
+    };
+  }
+
+  if (d.is_knockout) {
+    // Decided in 90' (knockouts never end level outside a draw).
+    return {
+      home_goals_90: d.home_goals_90,
+      away_goals_90: d.away_goals_90,
+      went_extra_time: false,
+      home_goals_120: null,
+      away_goals_120: null,
+      went_penalties: false,
+      penalty_winner_team_id: null,
+      winner_team_id: ninetyWinner,
+      qualified_team_id: ninetyWinner,
+    };
+  }
+
+  // Group game: only the 90' score; winner is null on a draw, no qualifier.
+  return {
+    home_goals_90: d.home_goals_90,
+    away_goals_90: d.away_goals_90,
+    went_extra_time: false,
+    home_goals_120: null,
+    away_goals_120: null,
+    went_penalties: false,
+    penalty_winner_team_id: null,
+    winner_team_id: drawAt90 ? null : ninetyWinner,
+    qualified_team_id: null,
+  };
+}
 
 type FixtureMeta = {
   fixture_id: string;
@@ -124,6 +177,8 @@ export function readResultPayload(
     return { ok: false, message: "Lista de goles inválida." };
   }
 
+  const qual = String(formData.get("qualified_team_id") ?? "").trim();
+
   const raw = {
     fixture_id: meta.fixture_id,
     home_team_id: meta.home_team_id,
@@ -131,14 +186,8 @@ export function readResultPayload(
     is_knockout: meta.is_knockout,
     home_goals_90: numOrNull(formData.get("home_goals_90")),
     away_goals_90: numOrNull(formData.get("away_goals_90")),
-    went_extra_time: formData.get("went_extra_time") === "1",
-    home_goals_120: meta.is_knockout ? numOrNull(formData.get("home_goals_120")) : null,
-    away_goals_120: meta.is_knockout ? numOrNull(formData.get("away_goals_120")) : null,
     went_penalties: formData.get("went_penalties") === "1",
-    penalty_winner_team_id: (() => {
-      const v = String(formData.get("penalty_winner_team_id") ?? "").trim();
-      return v === "" ? null : v;
-    })(),
+    qualified_team_id: qual === "" ? null : qual,
     goals,
   };
 

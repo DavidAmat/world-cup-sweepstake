@@ -19,11 +19,8 @@ export type GoalEntry = {
 type ExistingResult = {
   home_goals_90: number;
   away_goals_90: number;
-  went_extra_time: boolean;
-  home_goals_120: number | null;
-  away_goals_120: number | null;
   went_penalties: boolean;
-  penalty_winner_team_id: string | null;
+  qualified_team_id: string | null;
 };
 
 type Props = {
@@ -62,12 +59,22 @@ export function ResultForm({
   const r = existingResult;
   const [h90, setH90] = useState(r ? String(r.home_goals_90) : "");
   const [a90, setA90] = useState(r ? String(r.away_goals_90) : "");
-  const [wentET, setWentET] = useState(r?.went_extra_time ?? false);
-  const [h120, setH120] = useState(r?.home_goals_120 != null ? String(r.home_goals_120) : "");
-  const [a120, setA120] = useState(r?.away_goals_120 != null ? String(r.away_goals_120) : "");
   const [wentPen, setWentPen] = useState(r?.went_penalties ?? false);
-  const [penWinner, setPenWinner] = useState(r?.penalty_winner_team_id ?? "");
+  const [qual, setQual] = useState(r?.qualified_team_id ?? "");
   const [goals, setGoals] = useState<GoalEntry[]>(existingGoals);
+
+  // Extra time and the winner are derived from the 90' score, mirroring the
+  // server (deriveResult): a knockout drawn at 90' goes to extra time and the
+  // advancing team is an explicit pick (the 120' score is not tracked).
+  const bothFilled = h90 !== "" && a90 !== "";
+  const drawAt90 = bothFilled && Number(h90) === Number(a90);
+  const knockoutDraw = isKnockout && drawAt90;
+  const decidedWinner =
+    isKnockout && bothFilled && !drawAt90
+      ? Number(h90) > Number(a90)
+        ? homeTeam
+        : awayTeam
+      : null;
 
   const playersFor = (teamId: string) =>
     teamId === homeTeam.id ? homePlayers : teamId === awayTeam.id ? awayPlayers : [];
@@ -90,27 +97,12 @@ export function ResultForm({
   const patchGoal = (idx: number, patch: Partial<GoalEntry>) =>
     setGoals((gs) => gs.map((g, i) => (i === idx ? { ...g, ...patch } : g)));
 
-  // Toggling extra time off clears the dependent fields.
-  const toggleET = (on: boolean) => {
-    setWentET(on);
-    if (!on) {
-      setH120("");
-      setA120("");
-      setWentPen(false);
-      setPenWinner("");
-    }
-  };
-  const togglePen = (on: boolean) => {
-    setWentPen(on);
-    if (!on) setPenWinner("");
-  };
-
   return (
     <form className="mt-6 space-y-6">
       <input type="hidden" name="fixture_id" value={fixtureId} />
       <input type="hidden" name="goals_json" value={JSON.stringify(goals)} />
-      {wentET && <input type="hidden" name="went_extra_time" value="1" />}
-      {wentPen && <input type="hidden" name="went_penalties" value="1" />}
+      {knockoutDraw && wentPen && <input type="hidden" name="went_penalties" value="1" />}
+      {knockoutDraw && <input type="hidden" name="qualified_team_id" value={qual} />}
 
       <section className="rounded-md border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
         <h2 className="text-sm font-semibold">Resultado a 90&apos;</h2>
@@ -145,68 +137,48 @@ export function ResultForm({
         <section className="rounded-md border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="text-sm font-semibold">Eliminatoria</h2>
 
-          <label className="mt-3 flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={wentET} onChange={(e) => toggleET(e.target.checked)} />
-            ¿Fue a prórroga?
-          </label>
+          {!bothFilled && (
+            <p className="mt-3 text-sm text-zinc-500">
+              Introduce el marcador a 90&apos; para definir la eliminatoria.
+            </p>
+          )}
 
-          {wentET && (
-            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
-              <span className="min-w-28 font-medium">{homeTeam.display_name}</span>
-              <input
-                name="home_goals_120"
-                type="number"
-                min={0}
-                inputMode="numeric"
-                value={h120}
-                onChange={(e) => setH120(e.target.value)}
-                className={GOAL_NUM_CLS}
-                required
-              />
-              <span className="text-zinc-400">–</span>
-              <input
-                name="away_goals_120"
-                type="number"
-                min={0}
-                inputMode="numeric"
-                value={a120}
-                onChange={(e) => setA120(e.target.value)}
-                className={GOAL_NUM_CLS}
-                required
-              />
-              <span className="min-w-28 font-medium">{awayTeam.display_name}</span>
-              <span className="w-full text-xs text-zinc-500">
-                Goles totales tras 120&apos; (incluyen los del 90&apos;).
-              </span>
+          {decidedWinner && (
+            <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+              Resuelto en el tiempo reglamentario. Pasa{" "}
+              <strong>{decidedWinner.display_name}</strong>.
+            </p>
+          )}
+
+          {knockoutDraw && (
+            <div className="mt-3 space-y-3">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Empate a 90&apos; → prórroga (automático). No se anota el resultado a 120&apos;.
+              </p>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={wentPen}
+                  onChange={(e) => setWentPen(e.target.checked)}
+                />
+                ¿Fueron a penaltis?
+              </label>
+              <label className="flex flex-col gap-1 text-sm">
+                <span className="font-medium">
+                  Equipo que pasó {wentPen ? "(ganador de penaltis)" : "(ganó en la prórroga)"}
+                </span>
+                <select
+                  value={qual}
+                  onChange={(e) => setQual(e.target.value)}
+                  className={INPUT_CLS}
+                  required
+                >
+                  <option value="">— Selecciona —</option>
+                  <option value={homeTeam.id}>{homeTeam.display_name}</option>
+                  <option value={awayTeam.id}>{awayTeam.display_name}</option>
+                </select>
+              </label>
             </div>
-          )}
-
-          {wentET && (
-            <label className="mt-3 flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={wentPen}
-                onChange={(e) => togglePen(e.target.checked)}
-              />
-              ¿Fueron a penaltis?
-            </label>
-          )}
-
-          {wentPen && (
-            <label className="mt-3 flex flex-col gap-1 text-sm">
-              <span className="font-medium">Equipo que ganó la tanda de penaltis</span>
-              <select
-                name="penalty_winner_team_id"
-                value={penWinner}
-                onChange={(e) => setPenWinner(e.target.value)}
-                className={INPUT_CLS}
-                required
-              >
-                <option value="">— Selecciona —</option>
-                <option value={homeTeam.id}>{homeTeam.display_name}</option>
-                <option value={awayTeam.id}>{awayTeam.display_name}</option>
-              </select>
-            </label>
           )}
         </section>
       )}

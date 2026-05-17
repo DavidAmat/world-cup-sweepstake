@@ -221,7 +221,7 @@ export default async function ResultEntryPage({
           </p>
           {result.went_extra_time && (
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              Prórroga: {result.home_goals_120} – {result.away_goals_120}
+              Hubo prórroga
               {result.went_penalties && (
                 <> · Penaltis: ganó {teamName(result.penalty_winner_team_id)}</>
               )}
@@ -274,11 +274,8 @@ export default async function ResultEntryPage({
             ? {
                 home_goals_90: result.home_goals_90,
                 away_goals_90: result.away_goals_90,
-                went_extra_time: result.went_extra_time,
-                home_goals_120: result.home_goals_120,
-                away_goals_120: result.away_goals_120,
                 went_penalties: result.went_penalties,
-                penalty_winner_team_id: result.penalty_winner_team_id,
+                qualified_team_id: result.qualified_team_id,
               }
             : null
         }
