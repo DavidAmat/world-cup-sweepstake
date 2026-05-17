@@ -13,7 +13,7 @@
 # Reescribe la línea FECHA_ACTUAL de .env.local y reinicia `npm run dev`
 # (Next lee el env solo al arrancar). Recarga el navegador después.
 
-.PHONY: fecha
+.PHONY: fecha run
 
 fecha:
 	@if grep -qE '^#? *FECHA_ACTUAL=' .env.local 2>/dev/null; then \
@@ -28,3 +28,6 @@ fecha:
 	@sleep 8
 	@tail -3 /tmp/dev08.log
 	@echo ">> dev reiniciado. Recarga el navegador."
+
+run:
+	@npm run dev

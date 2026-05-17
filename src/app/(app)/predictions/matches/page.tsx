@@ -92,7 +92,7 @@ export default async function MatchPredictionsPage({
   const { data: preds } = await supabase
     .from("match_predictions")
     .select(
-      "fixture_id, home_goals_90, away_goals_90, predicts_extra_time, home_goals_120, away_goals_120, predicts_penalties, predicted_qualified_team_id",
+      "fixture_id, home_goals_90, away_goals_90, predicts_extra_time, predicts_penalties, predicted_qualified_team_id",
     )
     .eq("tournament_id", tournament.id)
     .eq("user_id", userId);
@@ -254,8 +254,6 @@ type Pred = {
   home_goals_90: number;
   away_goals_90: number;
   predicts_extra_time: boolean;
-  home_goals_120: number | null;
-  away_goals_120: number | null;
   predicts_penalties: boolean;
   predicted_qualified_team_id: string | null;
 };
@@ -304,7 +302,8 @@ function EditFixture({
       {kn && (
         <div className="flex flex-col gap-2 rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm dark:border-zinc-800 dark:bg-zinc-950/40">
           <p className="text-xs text-zinc-500">
-            Solo si el partido acaba empatado a 90&apos; (eliminatoria).
+            Solo si el partido acaba empatado a 90&apos; (eliminatoria). No se predice el resultado
+            de la prórroga, solo si la hay, si hay penaltis y qué equipo pasa.
           </p>
           <label className="flex items-center gap-2">
             <input
@@ -315,29 +314,6 @@ function EditFixture({
             />
             <span>Habrá prórroga</span>
           </label>
-          <div className="flex items-center gap-2">
-            <span className="w-40 truncate text-right text-xs text-zinc-500">
-              {home} a 120&apos;
-            </span>
-            <input
-              type="number"
-              name={`h120_${fid}`}
-              min={0}
-              defaultValue={p?.home_goals_120 ?? ""}
-              className={GOAL_CLS}
-              aria-label={`Goles ${home} a 120'`}
-            />
-            <span className="text-zinc-400">-</span>
-            <input
-              type="number"
-              name={`a120_${fid}`}
-              min={0}
-              defaultValue={p?.away_goals_120 ?? ""}
-              className={GOAL_CLS}
-              aria-label={`Goles ${away} a 120'`}
-            />
-            <span className="w-40 truncate text-xs text-zinc-500">{away} a 120&apos;</span>
-          </div>
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -382,13 +358,7 @@ function ReadOnly({
       <p>
         90&apos;: <strong>{p.home_goals_90}</strong> - <strong>{p.away_goals_90}</strong>
       </p>
-      {kn && p.predicts_extra_time && (
-        <p>
-          Prórroga 120&apos;: <strong>{p.home_goals_120 ?? "—"}</strong> -{" "}
-          <strong>{p.away_goals_120 ?? "—"}</strong>
-          {p.predicts_penalties ? " · penaltis" : ""}
-        </p>
-      )}
+      {kn && p.predicts_extra_time && <p>Prórroga{p.predicts_penalties ? " · penaltis" : ""}</p>}
       {kn && <p className="text-zinc-500">Pasa: {qualifiedName}</p>}
     </div>
   );

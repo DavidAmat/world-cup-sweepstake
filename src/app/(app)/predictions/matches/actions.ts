@@ -96,8 +96,9 @@ export async function saveRoundMatchPredictions(formData: FormData) {
       home_goals_90: p.home_goals_90,
       away_goals_90: p.away_goals_90,
       predicts_extra_time: p.predicts_extra_time,
-      home_goals_120: p.home_goals_120,
-      away_goals_120: p.away_goals_120,
+      // 120' result is not recorded (user decision); always cleared.
+      home_goals_120: null,
+      away_goals_120: null,
       predicts_penalties: p.predicts_penalties,
       predicted_winner_team_id: p.predicted_qualified_team_id,
       predicted_qualified_team_id: p.predicted_qualified_team_id,
@@ -180,21 +181,12 @@ export async function generateRandomMatchPredictions() {
         row.predicted_winner_team_id = w;
         row.predicted_qualified_team_id = w;
       } else {
-        // Drawn at 90' → extra time always.
+        // Drawn at 90' → extra time always. 120' score is not recorded;
+        // a coin flip decides who advances (penalties or won in ET — we
+        // only track that there was extra time and maybe penalties).
         row.predicts_extra_time = true;
-        const penalties = Math.random() < PENALTY_PROB;
-        const winnerHome = Math.random() < 0.5;
-        const w = winnerHome ? f.home_team_id : f.away_team_id;
-        if (penalties) {
-          // Tied after 120', settled on penalties.
-          row.predicts_penalties = true;
-          row.home_goals_120 = h90;
-          row.away_goals_120 = a90;
-        } else {
-          // Won in extra time → winner scores once more.
-          row.home_goals_120 = h90 + (winnerHome ? 1 : 0);
-          row.away_goals_120 = a90 + (winnerHome ? 0 : 1);
-        }
+        row.predicts_penalties = Math.random() < PENALTY_PROB;
+        const w = Math.random() < 0.5 ? f.home_team_id : f.away_team_id;
         row.predicted_winner_team_id = w;
         row.predicted_qualified_team_id = w;
       }

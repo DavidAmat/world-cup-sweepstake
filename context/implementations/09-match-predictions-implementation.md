@@ -102,3 +102,34 @@ gateadas: anónimo → `307 /login` en ambas (proxy).
 
 Pendiente: smoke en navegador por el usuario (David1 admin /
 David2 / David3 players), incl. `make fecha` para mover el lock.
+
+## Cambio del usuario · NO se predice el resultado a 120'
+
+Decisión del usuario (revisión sobre el plan): la predicción de un
+partido solo captura el resultado a 90', si hay prórroga, si hay
+penaltis y qué equipo pasa. El **resultado a 120' NO se anota**.
+
+- Migración `20260517130000_match_predictions_drop_120.sql`:
+  `drop constraint match_predictions_check` (el que ataba
+  `predicts_extra_time` a la presencia de `home/away_goals_120`).
+  Se mantiene `match_predictions_check1` (penaltis⇒prórroga). Las
+  columnas `home/away_goals_120` se conservan (nullable, sin uso por
+  predicciones) para no hacer un drop destructivo sobre las 56 filas
+  existentes (3 con 120 del smoke previo, intactas). La app siempre
+  escribe esas columnas como NULL a partir de ahora.
+- `schemas.ts`: fuera `home/away_goals_120` del Zod y de
+  `readFixturePayload`; fuera los refines de 120'. Quedan: penaltis
+  ⇒prórroga; prórroga⇒empate 90'; eliminatoria empate90'⇒prórroga;
+  el que pasa ∈{home,away} y, si NO hay prórroga, = ganador del 90'.
+  Con prórroga el ganador es libre (no se rastrea el 120').
+- `actions.ts`: el `upsert` fija `home/away_goals_120 = null`
+  siempre; el generador aleatorio, en eliminatoria con empate a 90',
+  solo marca prórroga + (penaltis 70 %) + ganador 50/50, sin 120'.
+- `page.tsx`/`public/page.tsx`: eliminados inputs y render del
+  120'; el modo lectura/público muestra "prórroga[ · penaltis]".
+  Selects de 120' fuera de los `.select()`.
+- Aplicada local (`migration up`) y **prod** (usuario confirmó;
+  `db push --linked`, `migration list --linked` → Local==Remote
+  hasta `20260517130000`). `types:gen` → `database.types.ts` sin
+  cambios (solo se quitó un CHECK, no columnas).
+  typecheck/lint/format/build verdes.

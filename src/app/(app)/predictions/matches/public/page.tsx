@@ -79,7 +79,7 @@ export default async function PublicMatchPredictionsPage({
   const { data: preds } = await supabase
     .from("match_predictions")
     .select(
-      "fixture_id, user_id, home_goals_90, away_goals_90, predicts_extra_time, home_goals_120, away_goals_120, predicts_penalties, predicted_qualified_team_id",
+      "fixture_id, user_id, home_goals_90, away_goals_90, predicts_extra_time, predicts_penalties, predicted_qualified_team_id",
     )
     .eq("tournament_id", tournament.id)
     .in(
@@ -195,11 +195,7 @@ export default async function PublicMatchPredictionsPage({
                             90&apos;: <strong>{p.home_goals_90}</strong>-
                             <strong>{p.away_goals_90}</strong>
                             {kn && p.predicts_extra_time && (
-                              <>
-                                {" "}
-                                · 120&apos;: {p.home_goals_120 ?? "—"}-{p.away_goals_120 ?? "—"}
-                                {p.predicts_penalties ? " · penaltis" : ""}
-                              </>
+                              <> · prórroga{p.predicts_penalties ? " · penaltis" : ""}</>
                             )}
                             {kn && <> · pasa: {qualified}</>}
                           </p>
