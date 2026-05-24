@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/permissions/requireAdmin";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { recalculateTournamentScores } from "@/lib/scoring/recalculate";
-import { ROUNDS } from "@/lib/fixtures/catalogs";
+import { ROUNDS, type RoundCode } from "@/lib/fixtures/catalogs";
 import { readResultPayload, deriveResult, type MatchResultPayload } from "./schemas";
 
 const SELF = (id: string) => `/admin/results/${id}`;
@@ -222,4 +222,98 @@ export async function generateRandomResults(formData: FormData) {
 
   revalidatePath("/admin/results");
   redirect(`${back}&ok=random`);
+}
+
+// ── Knockout pairing generator (testing aid) ─────────────────────────────────
+// Picks 2 × n distinct teams from the tournament and assigns them at random
+// to the n fixtures of a knockout round (no continuity from previous rounds —
+// each round is reshuffled from the full 48). Wipes any predictions, results,
+// and goals on the touched fixtures so they cannot end up pointing to teams
+// that are no longer there. After re-pairing the orchestrator is invoked so
+// `prediction_scores` is rebuilt consistently.
+
+const KNOCKOUT_ROUNDS = new Set<RoundCode>(["r32", "r16", "qf", "sf", "third", "final"]);
+
+export async function generateKnockoutPairings(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const tournament = await getDefaultTournament();
+
+  const roundCode = String(formData.get("round") ?? "") as RoundCode;
+  if (!KNOCKOUT_ROUNDS.has(roundCode)) {
+    redirect(`/admin/results?error=${encodeURIComponent("Esta ronda no admite cruces.")}`);
+  }
+  const back = `/admin/results?round=${roundCode}`;
+
+  const { data: round } = await supabase
+    .from("rounds")
+    .select("id")
+    .eq("tournament_id", tournament.id)
+    .eq("code", roundCode)
+    .maybeSingle();
+  if (!round) {
+    redirect(`${back}&error=${encodeURIComponent("Jornada no encontrada.")}`);
+  }
+
+  const { data: fixturesRaw } = await supabase
+    .from("fixtures")
+    .select("id")
+    .eq("tournament_id", tournament.id)
+    .eq("round_id", round.id)
+    .order("kickoff_at", { ascending: true });
+  const fixtures = (fixturesRaw ?? []) as Array<{ id: string }>;
+  if (fixtures.length === 0) {
+    redirect(`${back}&error=${encodeURIComponent("No hay partidos en esta ronda.")}`);
+  }
+
+  const { data: teamsRaw } = await supabase
+    .from("teams")
+    .select("id")
+    .eq("tournament_id", tournament.id);
+  const teams = (teamsRaw ?? []) as Array<{ id: string }>;
+  if (teams.length < fixtures.length * 2) {
+    redirect(
+      `${back}&error=${encodeURIComponent(
+        `Equipos insuficientes (${teams.length}) para ${fixtures.length} partidos.`,
+      )}`,
+    );
+  }
+
+  const shuffled = [...teams].sort(() => Math.random() - 0.5);
+  const picked = shuffled.slice(0, fixtures.length * 2);
+
+  const fixtureIds = fixtures.map((f) => f.id);
+  // Drop any stale predictions, results, and goals on these fixtures BEFORE
+  // re-pairing — otherwise FK-orphaned references survive (predicted_qualified
+  // _team_id, qualified_team_id) and would no longer match the new teams.
+  await supabase.from("match_goals").delete().in("fixture_id", fixtureIds);
+  await supabase.from("match_results").delete().in("fixture_id", fixtureIds);
+  await supabase.from("match_predictions").delete().in("fixture_id", fixtureIds);
+
+  // PostgREST has no bulk UPDATE with per-row values, so loop. Volume is
+  // tiny (max 16 for R32) — Promise.all to parallelise the round-trips.
+  const errors: string[] = [];
+  await Promise.all(
+    fixtures.map(async (fx, i) => {
+      const { error } = await supabase
+        .from("fixtures")
+        .update({
+          home_team_id: picked[2 * i].id,
+          away_team_id: picked[2 * i + 1].id,
+          home_placeholder: null,
+          away_placeholder: null,
+        })
+        .eq("id", fx.id);
+      if (error) errors.push(error.message);
+    }),
+  );
+  if (errors.length > 0) {
+    redirect(`${back}&error=${encodeURIComponent(errors.join("; "))}`);
+  }
+
+  // Recompute scores now that predictions/results for this round are gone.
+  // Other rounds keep their data, so the global recalculation is still valid.
+  await recalculateTournamentScores(tournament.id);
+
+  revalidatePath("/admin/results");
+  redirect(`${back}&ok=pairings`);
 }
