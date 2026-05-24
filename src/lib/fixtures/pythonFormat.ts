@@ -6,6 +6,7 @@ import type { RoundCode, StageCode } from "./catalogs";
 
 export const FASE_VALUES = [
   "fase_grupos",
+  "dieciseisavos",
   "octavos",
   "cuartos",
   "semis",
@@ -22,8 +23,11 @@ export const PythonMatchSchema = z.object({
   jornada: z.number().int().nullable(),
   grupo: z
     .string()
-    .regex(/^[A-H]$/)
+    .regex(/^[A-L]$/)
     .nullable(),
+  // For knockout fixtures without assigned teams, use the literal "TBD"
+  // as equipo_1 / equipo_2. The seeder upserts those as
+  // home_placeholder / away_placeholder with home_team_id null.
   equipo_1: z.string().trim().min(1),
   equipo_2: z.string().trim().min(1),
   fecha: z
@@ -53,6 +57,7 @@ export type PythonMatch = z.infer<typeof PythonMatchSchema>;
 
 const FASE_TO_STAGE: Record<Fase, StageCode> = {
   fase_grupos: "group_stage",
+  dieciseisavos: "round_of_32",
   octavos: "round_of_16",
   cuartos: "quarter_final",
   semis: "semi_final",
@@ -62,6 +67,7 @@ const FASE_TO_STAGE: Record<Fase, StageCode> = {
 
 const STAGE_TO_FASE: Record<StageCode, Fase> = {
   group_stage: "fase_grupos",
+  round_of_32: "dieciseisavos",
   round_of_16: "octavos",
   quarter_final: "cuartos",
   semi_final: "semis",
@@ -82,6 +88,7 @@ export function resolveRound(fase: Fase, jornada: number | null): RoundCode {
     if (jornada === 3) return "group_md3";
     throw new Error(`group match without valid jornada: ${jornada}`);
   }
+  if (fase === "dieciseisavos") return "r32";
   if (fase === "octavos") return "r16";
   if (fase === "cuartos") return "qf";
   if (fase === "semis") return "sf";
