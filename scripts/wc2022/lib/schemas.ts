@@ -21,9 +21,10 @@ export const TeamSchema = z.object({
   canonical_name: z.string(),
   display_name: z.string(),
   aliases: z.array(z.string()),
-  group_code: z.string().regex(/^[A-H]$/),
+  group_code: z.string().regex(/^[A-L]$/),
 });
-export const TeamsSchema = z.array(TeamSchema).length(32);
+// 32 teams in 2022, 48 in 2026. Keep open-ended.
+export const TeamsSchema = z.array(TeamSchema).min(1);
 export type TeamInput = z.infer<typeof TeamSchema>;
 
 export {

@@ -1,0 +1,1042 @@
+[
+  {
+    "external_id": "wc2026_md1_a_mex_rsa",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "A",
+    "equipo_1": "México",
+    "equipo_2": "Sudáfrica",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_a_kor_cze",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "A",
+    "equipo_1": "Corea del Sur",
+    "equipo_2": "Chequia",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_a_mex_kor",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "A",
+    "equipo_1": "México",
+    "equipo_2": "Corea del Sur",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_a_cze_rsa",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "A",
+    "equipo_1": "Chequia",
+    "equipo_2": "Sudáfrica",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_a_cze_mex",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "A",
+    "equipo_1": "Chequia",
+    "equipo_2": "México",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_a_rsa_kor",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "A",
+    "equipo_1": "Sudáfrica",
+    "equipo_2": "Corea del Sur",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_b_can_bih",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "B",
+    "equipo_1": "Canadá",
+    "equipo_2": "Bosnia y Herzegovina",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_b_qat_sui",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "B",
+    "equipo_1": "Catar",
+    "equipo_2": "Suiza",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_b_can_qat",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "B",
+    "equipo_1": "Canadá",
+    "equipo_2": "Catar",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_b_sui_bih",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "B",
+    "equipo_1": "Suiza",
+    "equipo_2": "Bosnia y Herzegovina",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_b_sui_can",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "B",
+    "equipo_1": "Suiza",
+    "equipo_2": "Canadá",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_b_bih_qat",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "B",
+    "equipo_1": "Bosnia y Herzegovina",
+    "equipo_2": "Catar",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_c_bra_mar",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "C",
+    "equipo_1": "Brasil",
+    "equipo_2": "Marruecos",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_c_hai_sco",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "C",
+    "equipo_1": "Haití",
+    "equipo_2": "Escocia",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_c_bra_hai",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "C",
+    "equipo_1": "Brasil",
+    "equipo_2": "Haití",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_c_sco_mar",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "C",
+    "equipo_1": "Escocia",
+    "equipo_2": "Marruecos",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_c_sco_bra",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "C",
+    "equipo_1": "Escocia",
+    "equipo_2": "Brasil",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_c_mar_hai",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "C",
+    "equipo_1": "Marruecos",
+    "equipo_2": "Haití",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_d_usa_par",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "D",
+    "equipo_1": "Estados Unidos",
+    "equipo_2": "Paraguay",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_d_aus_tur",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "D",
+    "equipo_1": "Australia",
+    "equipo_2": "Turquía",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_d_usa_aus",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "D",
+    "equipo_1": "Estados Unidos",
+    "equipo_2": "Australia",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_d_tur_par",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "D",
+    "equipo_1": "Turquía",
+    "equipo_2": "Paraguay",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_d_tur_usa",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "D",
+    "equipo_1": "Turquía",
+    "equipo_2": "Estados Unidos",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_d_par_aus",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "D",
+    "equipo_1": "Paraguay",
+    "equipo_2": "Australia",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_e_ger_cuw",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "E",
+    "equipo_1": "Alemania",
+    "equipo_2": "Curazao",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_e_civ_ecu",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "E",
+    "equipo_1": "Costa de Marfil",
+    "equipo_2": "Ecuador",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_e_ger_civ",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "E",
+    "equipo_1": "Alemania",
+    "equipo_2": "Costa de Marfil",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_e_ecu_cuw",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "E",
+    "equipo_1": "Ecuador",
+    "equipo_2": "Curazao",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_e_ecu_ger",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "E",
+    "equipo_1": "Ecuador",
+    "equipo_2": "Alemania",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_e_cuw_civ",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "E",
+    "equipo_1": "Curazao",
+    "equipo_2": "Costa de Marfil",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_f_ned_jpn",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "F",
+    "equipo_1": "Países Bajos",
+    "equipo_2": "Japón",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_f_swe_tun",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "F",
+    "equipo_1": "Suecia",
+    "equipo_2": "Túnez",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_f_ned_swe",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "F",
+    "equipo_1": "Países Bajos",
+    "equipo_2": "Suecia",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_f_tun_jpn",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "F",
+    "equipo_1": "Túnez",
+    "equipo_2": "Japón",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_f_tun_ned",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "F",
+    "equipo_1": "Túnez",
+    "equipo_2": "Países Bajos",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_f_jpn_swe",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "F",
+    "equipo_1": "Japón",
+    "equipo_2": "Suecia",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_g_bel_egy",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "G",
+    "equipo_1": "Bélgica",
+    "equipo_2": "Egipto",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_g_irn_nzl",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "G",
+    "equipo_1": "Irán",
+    "equipo_2": "Nueva Zelanda",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_g_bel_irn",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "G",
+    "equipo_1": "Bélgica",
+    "equipo_2": "Irán",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_g_nzl_egy",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "G",
+    "equipo_1": "Nueva Zelanda",
+    "equipo_2": "Egipto",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_g_nzl_bel",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "G",
+    "equipo_1": "Nueva Zelanda",
+    "equipo_2": "Bélgica",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_g_egy_irn",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "G",
+    "equipo_1": "Egipto",
+    "equipo_2": "Irán",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_h_esp_cpv",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "H",
+    "equipo_1": "España",
+    "equipo_2": "Cabo Verde",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_h_ksa_uru",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "H",
+    "equipo_1": "Arabia Saudí",
+    "equipo_2": "Uruguay",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_h_esp_ksa",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "H",
+    "equipo_1": "España",
+    "equipo_2": "Arabia Saudí",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_h_uru_cpv",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "H",
+    "equipo_1": "Uruguay",
+    "equipo_2": "Cabo Verde",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_h_uru_esp",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "H",
+    "equipo_1": "Uruguay",
+    "equipo_2": "España",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_h_cpv_ksa",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "H",
+    "equipo_1": "Cabo Verde",
+    "equipo_2": "Arabia Saudí",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_i_fra_sen",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "I",
+    "equipo_1": "Francia",
+    "equipo_2": "Senegal",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_i_irq_nor",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "I",
+    "equipo_1": "Irak",
+    "equipo_2": "Noruega",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_i_fra_irq",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "I",
+    "equipo_1": "Francia",
+    "equipo_2": "Irak",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_i_nor_sen",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "I",
+    "equipo_1": "Noruega",
+    "equipo_2": "Senegal",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_i_nor_fra",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "I",
+    "equipo_1": "Noruega",
+    "equipo_2": "Francia",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_i_sen_irq",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "I",
+    "equipo_1": "Senegal",
+    "equipo_2": "Irak",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_j_arg_alg",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "J",
+    "equipo_1": "Argentina",
+    "equipo_2": "Argelia",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_j_aut_jor",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "J",
+    "equipo_1": "Austria",
+    "equipo_2": "Jordania",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_j_arg_aut",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "J",
+    "equipo_1": "Argentina",
+    "equipo_2": "Austria",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_j_jor_alg",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "J",
+    "equipo_1": "Jordania",
+    "equipo_2": "Argelia",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_j_jor_arg",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "J",
+    "equipo_1": "Jordania",
+    "equipo_2": "Argentina",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_j_alg_aut",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "J",
+    "equipo_1": "Argelia",
+    "equipo_2": "Austria",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_k_por_cod",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "K",
+    "equipo_1": "Portugal",
+    "equipo_2": "RD Congo",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_k_uzb_col",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "K",
+    "equipo_1": "Uzbekistán",
+    "equipo_2": "Colombia",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_k_por_uzb",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "K",
+    "equipo_1": "Portugal",
+    "equipo_2": "Uzbekistán",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_k_col_cod",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "K",
+    "equipo_1": "Colombia",
+    "equipo_2": "RD Congo",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_k_col_por",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "K",
+    "equipo_1": "Colombia",
+    "equipo_2": "Portugal",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_k_cod_uzb",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "K",
+    "equipo_1": "RD Congo",
+    "equipo_2": "Uzbekistán",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_l_eng_cro",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "L",
+    "equipo_1": "Inglaterra",
+    "equipo_2": "Croacia",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md1_l_gha_pan",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 1,
+    "grupo": "L",
+    "equipo_1": "Ghana",
+    "equipo_2": "Panamá",
+    "fecha": "2026-05-29 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_l_eng_gha",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "L",
+    "equipo_1": "Inglaterra",
+    "equipo_2": "Ghana",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md2_l_pan_cro",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 2,
+    "grupo": "L",
+    "equipo_1": "Panamá",
+    "equipo_2": "Croacia",
+    "fecha": "2026-06-03 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_l_pan_eng",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "L",
+    "equipo_1": "Panamá",
+    "equipo_2": "Inglaterra",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_md3_l_cro_gha",
+    "fase": "fase_grupos",
+    "tipo_partido": "grupo",
+    "jornada": 3,
+    "grupo": "L",
+    "equipo_1": "Croacia",
+    "equipo_2": "Ghana",
+    "fecha": "2026-06-10 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_01",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_02",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_03",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_04",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_05",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_06",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_07",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_08",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_09",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_10",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_11",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_12",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_13",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_14",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_15",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r32_16",
+    "fase": "dieciseisavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-20 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r16_01",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-24 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r16_02",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-24 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r16_03",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-24 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r16_04",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-24 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r16_05",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-24 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r16_06",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-24 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r16_07",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-24 18:00:00"
+  },
+  {
+    "external_id": "wc2026_r16_08",
+    "fase": "octavos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-24 18:00:00"
+  },
+  {
+    "external_id": "wc2026_qf_01",
+    "fase": "cuartos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-28 18:00:00"
+  },
+  {
+    "external_id": "wc2026_qf_02",
+    "fase": "cuartos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-28 18:00:00"
+  },
+  {
+    "external_id": "wc2026_qf_03",
+    "fase": "cuartos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-28 18:00:00"
+  },
+  {
+    "external_id": "wc2026_qf_04",
+    "fase": "cuartos",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-28 18:00:00"
+  },
+  {
+    "external_id": "wc2026_sf_01",
+    "fase": "semis",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-30 18:00:00"
+  },
+  {
+    "external_id": "wc2026_sf_02",
+    "fase": "semis",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-06-30 18:00:00"
+  },
+  {
+    "external_id": "wc2026_third_01",
+    "fase": "tercer_puesto",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-07-01 18:00:00"
+  },
+  {
+    "external_id": "wc2026_final_01",
+    "fase": "final",
+    "tipo_partido": "eliminatoria",
+    "jornada": null,
+    "grupo": null,
+    "equipo_1": "TBD",
+    "equipo_2": "TBD",
+    "fecha": "2026-07-01 18:00:00"
+  }
+]

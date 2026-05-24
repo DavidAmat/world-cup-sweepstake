@@ -119,10 +119,20 @@ export async function upsertFixtures(
   let skipped = 0;
   const skippedReasons: string[] = [];
 
+  // Knockout fixtures without assigned teams come from the seed with the
+  // literal string "TBD" on both sides; we insert them with a placeholder
+  // instead of a team_id. The admin assigns real teams later via the
+  // "Generar cruces" UI button.
+  const PLACEHOLDER = "TBD";
+
   for (const match of matches) {
-    const homeTeam = ctx.teamsByName.get(match.equipo_1);
-    const awayTeam = ctx.teamsByName.get(match.equipo_2);
-    if (!homeTeam || !awayTeam) {
+    const homeIsPlaceholder = match.equipo_1 === PLACEHOLDER;
+    const awayIsPlaceholder = match.equipo_2 === PLACEHOLDER;
+
+    const homeTeam = homeIsPlaceholder ? null : ctx.teamsByName.get(match.equipo_1);
+    const awayTeam = awayIsPlaceholder ? null : ctx.teamsByName.get(match.equipo_2);
+
+    if ((!homeIsPlaceholder && !homeTeam) || (!awayIsPlaceholder && !awayTeam)) {
       skipped++;
       skippedReasons.push(
         `${match.external_id} (${match.equipo_1} vs ${match.equipo_2}): team not in master data`,
@@ -141,10 +151,10 @@ export async function upsertFixtures(
       stage_id: stage.id,
       round_id: round.id,
       group_code: match.grupo,
-      home_team_id: homeTeam.id,
-      away_team_id: awayTeam.id,
-      home_placeholder: null,
-      away_placeholder: null,
+      home_team_id: homeTeam?.id ?? null,
+      away_team_id: awayTeam?.id ?? null,
+      home_placeholder: homeIsPlaceholder ? PLACEHOLDER : null,
+      away_placeholder: awayIsPlaceholder ? PLACEHOLDER : null,
       kickoff_at: madridLocalToUtcIso(match.fecha),
       venue: null,
       status: "scheduled",

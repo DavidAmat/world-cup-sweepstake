@@ -20,6 +20,7 @@
     "types:gen": "supabase gen types typescript --local 2>/dev/null | grep -v '^Connecting to db' > src/lib/supabase/database.types.ts",
     "wc2022:upload": "tsx --env-file=.env.local scripts/wc2022/upload.ts",
     "wc2022:download": "tsx --env-file=.env.local scripts/wc2022/download.ts",
+    "wc2026:upload": "tsx --env-file=.env.local scripts/wc2026/upload.ts",
     "scoring:smoke": "tsx --env-file=.env.local scripts/scoring/smoke-recalc.ts"
   },
   "dependencies": {
