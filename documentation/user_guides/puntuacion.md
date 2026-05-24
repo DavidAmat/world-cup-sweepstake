@@ -23,11 +23,11 @@ Predices **2-1** y queda **2-1**: 10 puntos.
 Solo se cobra **si NO acertaste el resultado exacto**. Cada equipo cuenta por separado.
 
 | Lo que pasa con los goles de 1 equipo | Puntos |
-|----------------------------------------|--------|
-| Aciertas exacto                        | 3      |
-| Fallas por 1 gol                       | 2      |
-| Fallas por 2 goles                     | 1      |
-| Fallas por 3 goles o más               | 0      |
+| ------------------------------------- | ------ |
+| Aciertas exacto                       | 3      |
+| Fallas por 1 gol                      | 2      |
+| Fallas por 2 goles                    | 1      |
+| Fallas por 3 goles o más              | 0      |
 
 **Ejemplo** (real España 2 - Inglaterra 1):
 
@@ -50,7 +50,7 @@ Solo se cobra **si NO acertaste el resultado exacto**. La diferencia entre los d
 Real: **España 2 - Inglaterra 1**. Tu predicción: **España 3 - Inglaterra 1**.
 
 | Criterio                             | Resultado        | Puntos |
-|--------------------------------------|------------------|--------|
+| ------------------------------------ | ---------------- | ------ |
 | Acertar quién gana                   | Ambos dan España | 5      |
 | Resultado exacto                     | Fallas           | 0      |
 | Goles de España (predices 3, real 2) | Fallas por 1     | 2      |
@@ -62,11 +62,11 @@ Real: **España 2 - Inglaterra 1**. Tu predicción: **España 3 - Inglaterra 1**
 
 Acertar quién gana + resultado exacto da **15 puntos**:
 
-| Criterio              | Puntos |
-|-----------------------|--------|
-| Acertar quién gana    | 5      |
-| Resultado exacto      | 10     |
-| **Total**             | **15** |
+| Criterio           | Puntos |
+| ------------------ | ------ |
+| Acertar quién gana | 5      |
+| Resultado exacto   | 10     |
+| **Total**          | **15** |
 
 (Ni la cercanía por equipo ni la diferencia de goles aparecen porque el acierto exacto las absorbe.) Multiplicador x1 (fase de grupos).
 
@@ -92,15 +92,15 @@ El equipo que se clasifica a la siguiente fase.
 
 En el Mundial 2026 hay una ronda extra de **dieciseisavos (32 equipos)** antes de los octavos.
 
-| Ronda                       | Multiplicador |
-|-----------------------------|---------------|
-| Fase de grupos              | x1            |
-| Dieciseisavos (32 equipos)  | x2            |
-| Octavos (16 equipos)        | x2            |
-| Cuartos                     | x2            |
-| Tercer puesto               | x2            |
-| Semifinales                 | x3            |
-| Final                       | x5            |
+| Ronda                      | Multiplicador |
+| -------------------------- | ------------- |
+| Fase de grupos             | x1            |
+| Dieciseisavos (32 equipos) | x2            |
+| Octavos (16 equipos)       | x2            |
+| Cuartos                    | x2            |
+| Tercer puesto              | x2            |
+| Semifinales                | x3            |
+| Final                      | x5            |
 
 ### Ejemplos · partido de eliminatoria
 
@@ -110,7 +110,7 @@ Real: España 2 - Inglaterra 1 en 90'. Pasa España.
 Tu predicción: 2-1 a los 90', sin prórroga, sin penaltis, pasa España.
 
 | Criterio                  | Puntos |
-|---------------------------|--------|
+| ------------------------- | ------ |
 | Acertar quién gana        | 5      |
 | Resultado exacto          | 10     |
 | Acertar "no hay prórroga" | 5      |
@@ -141,16 +141,16 @@ Subtotal: 33 (acierto total, sin contar cercanía ni diferencia porque acertaste
 Real: España 1 - Inglaterra 1, prórroga, penaltis, pasa Inglaterra.
 Tu predicción: 1-1, prórroga, penaltis, pasa **España**.
 
-| Criterio              | Puntos |
-|-----------------------|--------|
-| Quién gana (empate90')| 5      |
-| Resultado exacto      | 10     |
-| Prórroga              | 5      |
-| Penaltis              | 5      |
-| Quién pasa            | 0 (falla) |
-| **Subtotal**          | **25** |
-| Multiplicador cuartos | x2     |
-| **Total**             | **50** |
+| Criterio               | Puntos    |
+| ---------------------- | --------- |
+| Quién gana (empate90') | 5         |
+| Resultado exacto       | 10        |
+| Prórroga               | 5         |
+| Penaltis               | 5         |
+| Quién pasa             | 0 (falla) |
+| **Subtotal**           | **25**    |
+| Multiplicador cuartos  | x2        |
+| **Total**              | **50**    |
 
 (Acertaste el exacto, así que ni la cercanía por equipo ni la diferencia de goles se cuentan.)
 
@@ -158,25 +158,25 @@ Tu predicción: 1-1, prórroga, penaltis, pasa **España**.
 
 Acertar todo (con resultado exacto) da **33 puntos** de subtotal:
 
-| Ronda                       | Máximo de un partido |
-|-----------------------------|----------------------|
-| Dieciseisavos (32 equipos)  | 66                   |
-| Octavos (16 equipos)        | 66                   |
-| Cuartos                     | 66                   |
-| Tercer puesto               | 66                   |
-| Semifinales                 | 99                   |
-| Final                       | 165                  |
+| Ronda                      | Máximo de un partido |
+| -------------------------- | -------------------- |
+| Dieciseisavos (32 equipos) | 66                   |
+| Octavos (16 equipos)       | 66                   |
+| Cuartos                    | 66                   |
+| Tercer puesto              | 66                   |
+| Semifinales                | 99                   |
+| Final                      | 165                  |
 
 ---
 
 ## 3 · Predicciones del inicio del torneo
 
-| Acierto                       | Puntos |
-|-------------------------------|--------|
-| Campeón del Mundial           | 200    |
-| Subcampeón del Mundial        | 150    |
-| Pichichi (máximo goleador)    | 100    |
-| Mejor jugador del Mundial     | 100    |
+| Acierto                    | Puntos |
+| -------------------------- | ------ |
+| Campeón del Mundial        | 200    |
+| Subcampeón del Mundial     | 150    |
+| Pichichi (máximo goleador) | 100    |
+| Mejor jugador del Mundial  | 100    |
 
 El campeón y el subcampeón se asignan automáticamente cuando termine la final. El pichichi y el mejor jugador los asigna el administrador a mano al cierre del torneo, comparando lo que escribiste con el ganador oficial.
 
