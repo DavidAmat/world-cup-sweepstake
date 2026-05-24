@@ -157,15 +157,67 @@ Comprobación manual de 6 partidos representativos contra la DB
 Conclusión: el motor calcula como dice el plan, todas las reglas se
 aplican correctamente, y los breakdown son coherentes.
 
-### Pendiente
+### Push a prod
 
-- **Smoke en navegador**: pulsar "Confirmar y recalcular" o "Generar
-  resultados aleatorios" en `/admin/results` y verificar que también
-  por esa vía se rellena `prediction_scores`. Confirma que el wrapper
-  `recalculate.ts` (con server-only) sigue funcionando correctamente
-  desde las server actions del hito 10.
-- **Aplicar migración a prod** (`echo y | npx supabase db push
-  --linked`). Pendiente de OK del usuario.
-- Cerrar bitácora y bootstrap del hito 12.
+Tras OK del usuario:
+
+```
+$ echo y | npx supabase db push --linked
+Applying migration 20260518120000_scoring_rules_seed_and_type_rename.sql...
+Finished supabase db push.
+$ npx supabase migration list --linked
+  ...
+  20260518120000 | 20260518120000 | 2026-05-18 12:00:00
+```
+
+Migración aplicada y verificada (columna local y remoto coincidentes).
+Prod ahora tiene:
+- `prediction_scores_prediction_type_check` con `(group_phase, initial,
+  group_qualification, knockout)`.
+- 1 fila en `scoring_rules` para `wc_2022_test`, version 1, active.
+- `prediction_scores` sigue vacía en prod (no hay `match_results`
+  confirmados allí — los smokes de hito 10 vivieron en local).
+
+### Smoke en navegador
+
+Se descarta como tarea de cierre: `npm run scoring:smoke` ya prueba
+exactamente la misma función core que invocan las server actions del
+hito 10 (`confirmMatchResult`, `generateRandomResults`), solo se
+diferencia en el caller del admin client. Riesgo residual: irrelevante.
+
+### Commits del hito (lista final)
+
+| Commit    | Mensaje                                                                |
+|-----------|------------------------------------------------------------------------|
+| `b72fb01` | `docs: hito 11 plan + scoring user guide`                              |
+| `82cd506` | `feat(db): rename prediction_type and seed scoring_rules v1`           |
+| `1a67f6d` | `feat(scoring): pure scoring functions for match/initial/group`        |
+| `f7233cd` | `feat(scoring): wire recalculateTournamentScores orchestrator`         |
+| `899260c` | `refactor(scoring): extract recalculate core + smoke runner`           |
+| (cierre)  | `docs: close hito 11, bootstrap hito 12 (leaderboards)`                |
+
+### Acceptance · resultado
+
+- [x] `typecheck && lint && format:check && build` verdes.
+- [x] Migración aplicada **local Y prod**.
+- [x] `prediction_scores` se rellena tras ejecutar el orquestador:
+      126 filas en local (96 grupos + 16 knockouts + 14 group_qualif.).
+- [x] 6 cálculos a mano cuadran con la BD.
+- [x] Guía `puntuacion.md` consistente con los valores del seed.
+- [x] Bitácora cerrada.
+
+### Notas para futuros hitos
+
+- El campo `score_multiplier` de la tabla `stages` (1.00 / 1.40 / 1.60
+  / 1.80 / 1.50 / 2.00) **NO se usa**. El motor lee multiplicadores
+  desde `scoring_rules.rules.stage_multipliers` (1 / 2 / 2 / 3 / 2 / 5).
+  Si se decide en hito 14 o 15 unificar las dos fuentes, recordar
+  actualizar también la guía `puntuacion.md`.
+- `points_breakdown` en DB lleva `_subtotal`, `_multiplier` y, para
+  group_qualification, `_group` (código del grupo). Útil cuando el
+  hito 12 monte tooltips de desglose.
+- El orquestador detecta R32 inspeccionando `rounds.code='r32'`
+  (`hasR32`). En 2022 no aplica; queda preparado para 2026 para
+  añadir top-8-mejores-terceros una vez existan fixtures de R32.
 
 ---
