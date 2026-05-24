@@ -15,6 +15,7 @@ import { fatal, info, step } from "../wc2022/lib/log";
 import {
   upsertFixtures,
   upsertRounds,
+  upsertScoringRulesV1,
   upsertStages,
   upsertTeams,
   upsertTournament,
@@ -35,6 +36,7 @@ async function main() {
   const supabase = createScriptAdminClient();
 
   const tournamentRow = await upsertTournament(supabase, tournament);
+  await upsertScoringRulesV1(supabase, tournamentRow.id);
   const stagesByCode = await upsertStages(supabase, tournamentRow.id);
   const roundsByCode = await upsertRounds(supabase, tournamentRow.id, stagesByCode);
   const teamRows = await upsertTeams(supabase, tournamentRow.id, teams);

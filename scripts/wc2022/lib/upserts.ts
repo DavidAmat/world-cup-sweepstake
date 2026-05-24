@@ -1,4 +1,5 @@
 import type { Database } from "../../../src/lib/supabase/database.types";
+import { DEFAULT_SCORING_RULES_V1 } from "../../../src/lib/scoring/rules";
 import { ROUNDS, STAGES, type RoundCode, type StageCode } from "./catalogs";
 import { madridLocalToUtcIso, resolveRound, resolveStage, type Fase } from "./maps";
 import type { PythonMatch, TeamInput, TournamentInput } from "./schemas";
@@ -75,6 +76,24 @@ export async function upsertRounds(
   const byCode = new Map<RoundCode, RoundRow>();
   for (const row of data) byCode.set(row.code as RoundCode, row);
   return byCode;
+}
+
+export async function upsertScoringRulesV1(
+  supabase: AdminSupabase,
+  tournamentId: string,
+): Promise<void> {
+  step("scoring_rules");
+  const { error } = await supabase.from("scoring_rules").upsert(
+    {
+      tournament_id: tournamentId,
+      version: 1,
+      rules: DEFAULT_SCORING_RULES_V1,
+      active: true,
+    },
+    { onConflict: "tournament_id,version" },
+  );
+  if (error) throw new Error(`upsertScoringRulesV1: ${error.message}`);
+  done("scoring_rules v1 active");
 }
 
 export async function upsertTeams(

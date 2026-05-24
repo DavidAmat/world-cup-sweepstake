@@ -268,8 +268,9 @@ export async function recalculateTournamentScoresCore(
     await supabase.from("prediction_scores").insert(rowsToInsert);
   }
 
-  // hasR32 reserved for wc_2026 (top 2 + 8 best thirds). Not used in wc_2022_test
-  // because R32 fixtures do not exist. Keep the variable read so lint stays clean.
+  // hasR32 will gate the "top 2 + 8 best thirds" logic for wc_2026 once
+  // group_qualification scoring needs it. For now the orchestrator only
+  // reads it as a marker; the value is computed above for future use.
   void hasR32;
 
   return { inserted: rowsToInsert.length };

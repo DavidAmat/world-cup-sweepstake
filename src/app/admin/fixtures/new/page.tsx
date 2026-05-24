@@ -121,8 +121,8 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
             type="text"
             name="group_code"
             maxLength={1}
-            pattern="[A-H]"
-            placeholder="A–H (vacío para eliminatorias)"
+            pattern="[A-L]"
+            placeholder="A–L (vacío para eliminatorias)"
             className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
           />
         </label>

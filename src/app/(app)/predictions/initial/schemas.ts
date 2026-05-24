@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-// The 8 groups of the tournament. `group_qualifiers_per_group` is 2 for
-// wc_2022_test: per group the user picks EXACTLY 2 teams (order does not
-// matter — predicted_position is stored as null). If a future tournament
-// changes the count, GROUP_QUALIFIERS + the form grid is what grows.
-export const GROUP_CODES = ["A", "B", "C", "D", "E", "F", "G", "H"] as const;
+// 12 groups for wc_2026 (was 8 in wc_2022_test, removed). Per group the
+// user picks EXACTLY `GROUP_QUALIFIERS` teams (order does not matter —
+// `predicted_position` is stored as null). The 2026 format also passes
+// the 8 best thirds to R32; that lives in the scoring engine, not here.
+export const GROUP_CODES = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"] as const;
 export type GroupCode = (typeof GROUP_CODES)[number];
 
 export const GROUP_QUALIFIERS = 2;

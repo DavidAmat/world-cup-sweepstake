@@ -18,7 +18,7 @@ import { done, fatal, info, step } from "../wc2022/lib/log";
 function parseSlug(): string {
   const idx = process.argv.indexOf("--slug");
   if (idx !== -1 && process.argv[idx + 1]) return process.argv[idx + 1];
-  return process.env.NEXT_PUBLIC_DEFAULT_TOURNAMENT_SLUG ?? "wc_2022_test";
+  return process.env.NEXT_PUBLIC_DEFAULT_TOURNAMENT_SLUG ?? "wc_2026";
 }
 
 async function main() {

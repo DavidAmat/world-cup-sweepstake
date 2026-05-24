@@ -42,7 +42,7 @@ export const CreateFixturePayloadSchema = z.object({
   group_code: z
     .string()
     .trim()
-    .regex(/^[A-H]$/)
+    .regex(/^[A-L]$/)
     .nullable(),
   home: SidePayloadSchema,
   away: SidePayloadSchema,
