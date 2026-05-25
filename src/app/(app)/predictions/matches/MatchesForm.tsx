@@ -4,7 +4,12 @@ import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { saveAllMatchPredictions } from "./actions";
-import { LockedFixturePanel, type LockedEntry, type LockedRealResult } from "./LockedFixturePanel";
+import {
+  LockedFixturePanel,
+  type LockedBulkSignal,
+  type LockedEntry,
+  type LockedRealResult,
+} from "./LockedFixturePanel";
 
 export type SavedVM = {
   h90: number;
@@ -129,6 +134,14 @@ export function MatchesForm({
     (f) => !f.locked && !f.noTeams && !isSaved(values[f.id], savedById[f.id]),
   ).length;
 
+  const lockedCount = allFixtures.filter((f) => f.locked && !f.noTeams).length;
+
+  // Broadcast object for the per-fixture ranking dropdowns. Each click
+  // on the global button bumps `n` so panels re-apply the intent even
+  // if the user had previously toggled some of them individually.
+  const [bulkSignal, setBulkSignal] = useState<LockedBulkSignal>({ open: false, n: 0 });
+  const toggleAll = () => setBulkSignal((s) => ({ open: !s.open, n: s.n + 1 }));
+
   return (
     <form action={saveAllMatchPredictions} className="mt-4">
       <div className="sticky top-0 z-10 -mx-10 border-b border-zinc-200 bg-white/90 px-10 py-3 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90">
@@ -142,12 +155,25 @@ export function MatchesForm({
               </span>
             )}
           </p>
-          <button
-            type="submit"
-            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
-            Guardar predicciones
-          </button>
+          <div className="flex items-center gap-2">
+            {lockedCount > 0 && (
+              <button
+                type="button"
+                onClick={toggleAll}
+                className="rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              >
+                {bulkSignal.open
+                  ? "Ocultar todas las predicciones"
+                  : "Mostrar todas las predicciones"}
+              </button>
+            )}
+            <button
+              type="submit"
+              className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            >
+              Guardar predicciones
+            </button>
+          </div>
         </div>
         <nav className="mt-2 flex flex-wrap gap-1.5">
           {rounds.map((r) => (
@@ -215,6 +241,7 @@ export function MatchesForm({
                           score: f.score,
                         }}
                         otherEntries={f.otherEntries}
+                        bulkSignal={bulkSignal}
                       />
                     ) : (
                       <Editable f={f} v={v} set={set} />

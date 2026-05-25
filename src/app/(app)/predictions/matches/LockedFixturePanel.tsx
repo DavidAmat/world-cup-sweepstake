@@ -37,6 +37,13 @@ export type LockedRealResult = {
   qualifiedTeamId: string | null;
 };
 
+// `bulkSignal` is a controlled "broadcast" from the parent form. Every
+// time the user clicks the global "Mostrar/Ocultar todas las
+// predicciones" button the parent bumps `n` and sets `open`. Each panel
+// reacts via useEffect to apply that intent, while still allowing
+// individual toggles in between broadcasts.
+export type LockedBulkSignal = { open: boolean; n: number };
+
 type Props = {
   homeTeam: string;
   awayTeam: string;
@@ -47,6 +54,7 @@ type Props = {
   realResult: LockedRealResult | null;
   myEntry: LockedEntry;
   otherEntries: LockedEntry[];
+  bulkSignal: LockedBulkSignal;
 };
 
 function teamName(id: string | null, homeId: string, awayId: string, home: string, away: string) {
@@ -180,8 +188,16 @@ export function LockedFixturePanel({
   realResult,
   myEntry,
   otherEntries,
+  bulkSignal,
 }: Props) {
-  const [expanded, setExpanded] = useState(false);
+  // Derived state: the panel follows the parent broadcast (`bulkSignal`)
+  // unless the user has toggled it individually since that broadcast. We
+  // remember the override along with the `n` it was set against, so a
+  // new broadcast automatically supersedes it without needing useEffect.
+  const [override, setOverride] = useState<{ open: boolean; n: number } | null>(null);
+  const expanded = override && override.n === bulkSignal.n ? override.open : bulkSignal.open;
+  const toggle = () => setOverride({ open: !expanded, n: bulkSignal.n });
+
   const teamFor = (id: string | null) => teamName(id, homeId, awayId, homeTeam, awayTeam);
 
   const buildExtra = (p: Prediction | null): ReactNode => {
@@ -268,7 +284,7 @@ export function LockedFixturePanel({
         <>
           <button
             type="button"
-            onClick={() => setExpanded((v) => !v)}
+            onClick={toggle}
             className="flex w-full items-center justify-between gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-300 dark:hover:bg-zinc-900"
             aria-expanded={expanded}
           >
