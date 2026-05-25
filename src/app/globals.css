@@ -3,24 +3,89 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Primary — Blue */
+  --color-primary: #4681ff;
+  --color-primary-light: #a2c0ff;
+  --color-primary-fg: #ffffff;
+
+  /* Success — Green */
+  --color-success: #3cdcb4;
+  --color-success-light: #9dedd9;
+  --color-success-fg: #0a4a3a;
+
+  /* Warning — Yellow */
+  --color-warning: #ffc83c;
+  --color-warning-light: #ffe39d;
+  --color-warning-fg: #5a3c00;
+
+  /* Danger — Red */
+  --color-danger: #fe6060;
+  --color-danger-light: #feafaf;
+  --color-danger-fg: #7a0000;
+
+  /* Info — Cyan */
+  --color-info: #00e7e7;
+  --color-info-light: #b2f7f7;
+  --color-info-fg: #004a4a;
+
+  /* Special / Admin — Lavender */
+  --color-special: #816eff;
+  --color-special-light: #c0b6ff;
+  --color-special-fg: #ffffff;
+
+  /* Orange */
+  --color-orange: #ff8b32;
+  --color-orange-light: #ffc598;
+  --color-orange-fg: #5a2800;
+
+  /* Muted */
+  --color-muted: #9c9c9c;
+  --color-muted-strong: #393939;
+  --color-muted-bg: #f4f4f5;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-primary: var(--color-primary);
+  --color-primary-light: var(--color-primary-light);
+  --color-primary-fg: var(--color-primary-fg);
+
+  --color-success: var(--color-success);
+  --color-success-light: var(--color-success-light);
+  --color-success-fg: var(--color-success-fg);
+
+  --color-warning: var(--color-warning);
+  --color-warning-light: var(--color-warning-light);
+  --color-warning-fg: var(--color-warning-fg);
+
+  --color-danger: var(--color-danger);
+  --color-danger-light: var(--color-danger-light);
+  --color-danger-fg: var(--color-danger-fg);
+
+  --color-info: var(--color-info);
+  --color-info-light: var(--color-info-light);
+  --color-info-fg: var(--color-info-fg);
+
+  --color-special: var(--color-special);
+  --color-special-light: var(--color-special-light);
+  --color-special-fg: var(--color-special-fg);
+
+  --color-orange: var(--color-orange);
+  --color-orange-light: var(--color-orange-light);
+  --color-orange-fg: var(--color-orange-fg);
+
+  --color-muted: var(--color-muted);
+  --color-muted-strong: var(--color-muted-strong);
+  --color-muted-bg: var(--color-muted-bg);
+
+  --font-sans: var(--font-plus-jakarta-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }

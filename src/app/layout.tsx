@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -26,12 +28,13 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${plusJakartaSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
+      <body className="flex min-h-full flex-col bg-white text-zinc-900">
         <Header />
         <div className="flex flex-1 flex-col">{children}</div>
+        <Footer />
       </body>
     </html>
   );

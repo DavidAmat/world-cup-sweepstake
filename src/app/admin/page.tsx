@@ -7,35 +7,47 @@ export default async function AdminPage() {
   return (
     <main className="mx-auto max-w-3xl p-10">
       <h1 className="text-2xl font-bold">Administración</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-2 text-sm text-zinc-600">
         Hola {profile.display_name}. Desde aquí gestionas el torneo.
       </p>
 
       <section className="mt-6 grid gap-3 sm:grid-cols-2">
         <Link
           href="/admin/fixtures"
-          className="rounded-md border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/60"
+          className="rounded-md border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:bg-zinc-50"
         >
           <h2 className="text-sm font-semibold">Fixtures</h2>
-          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+          <p className="mt-1 text-xs text-zinc-600">
             Ver, editar y crear partidos. Importar eliminatorias en lote desde JSON.
           </p>
         </Link>
         <Link
           href="/admin/results"
-          className="rounded-md border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/60"
+          className="rounded-md border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:bg-zinc-50"
         >
           <h2 className="text-sm font-semibold">Resultados</h2>
-          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+          <p className="mt-1 text-xs text-zinc-600">
             Introducir marcadores, prórroga, penaltis y goleadores. Confirmar para recalcular.
           </p>
         </Link>
-        <div className="rounded-md border border-dashed border-zinc-200 p-4 text-sm text-zinc-500 dark:border-zinc-800">
-          <h2 className="font-semibold">Próximamente</h2>
-          <p className="mt-1 text-xs">
-            Reglas de puntuación y reset de datos de prueba (hitos 11 y 14).
+        <Link
+          href="/admin/reset"
+          className="rounded-md border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:bg-zinc-50"
+        >
+          <h2 className="text-sm font-semibold">Reset de datos</h2>
+          <p className="mt-1 text-xs text-zinc-600">
+            Borra predicciones, resultados y puntuaciones de prueba. El master data nunca se toca.
           </p>
-        </div>
+        </Link>
+        <Link
+          href="/admin/reglas"
+          className="rounded-md border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:bg-zinc-50"
+        >
+          <h2 className="text-sm font-semibold">Reglas de puntuación</h2>
+          <p className="mt-1 text-xs text-zinc-600">
+            Versiona, activa y recalcula las reglas del motor de puntuación por torneo.
+          </p>
+        </Link>
       </section>
     </main>
   );
