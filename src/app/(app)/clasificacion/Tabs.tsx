@@ -15,7 +15,7 @@ const TABS: { key: TabKey; href: string; label: string }[] = [
 
 export function ClasificacionTabs({ active }: { active: TabKey }) {
   return (
-    <nav className="mt-4 flex flex-wrap gap-1.5 border-b border-zinc-200 pb-2 dark:border-zinc-800">
+    <nav className="mt-4 flex flex-wrap gap-1.5 border-b border-zinc-200 pb-2">
       {TABS.map((t) => {
         const isActive = t.key === active;
         return (
@@ -24,9 +24,7 @@ export function ClasificacionTabs({ active }: { active: TabKey }) {
             href={t.href}
             className={
               "rounded-md px-3 py-1.5 text-sm font-medium transition " +
-              (isActive
-                ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-                : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800")
+              (isActive ? "bg-primary text-primary-fg" : "text-zinc-700 hover:bg-zinc-100")
             }
           >
             {t.label}

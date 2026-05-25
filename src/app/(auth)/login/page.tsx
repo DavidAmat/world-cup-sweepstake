@@ -8,12 +8,12 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
   return (
     <main className="mx-auto w-full max-w-md p-10">
       <h1 className="text-2xl font-bold">Iniciar sesión</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-2 text-sm text-zinc-600">
         Introduce tu email y contraseña para acceder a la porra.
       </p>
 
       {error && (
-        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300">
+        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
           {error}
         </p>
       )}
@@ -26,7 +26,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
             name="email"
             autoComplete="email"
             required
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
           />
         </label>
 
@@ -37,19 +37,19 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
             name="password"
             autoComplete="current-password"
             required
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
           />
         </label>
 
         <button
           type="submit"
-          className="mt-2 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="mt-2 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
         >
           Entrar
         </button>
       </form>
 
-      <p className="mt-6 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-6 text-sm text-zinc-600">
         ¿No tienes cuenta?{" "}
         <a href="/register" className="underline">
           Crea una

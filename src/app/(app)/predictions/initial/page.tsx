@@ -9,8 +9,7 @@ import { saveInitialPredictions } from "./actions";
 
 type SearchParams = Promise<{ error?: string; ok?: string }>;
 
-const INPUT_CLS =
-  "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950";
+const INPUT_CLS = "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm";
 
 export default async function InitialPredictionsPage({
   searchParams,
@@ -67,14 +66,14 @@ export default async function InitialPredictionsPage({
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Predicciones iniciales</h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-zinc-600">
             Campeón, subcampeón, pichichi, mejor jugador y clasificados de cada grupo.
           </p>
         </div>
-        <Badge tone={locked ? "amber" : "emerald"}>{locked ? "Bloqueado" : "Abierto"}</Badge>
+        <Badge tone={locked ? "warning" : "success"}>{locked ? "Bloqueado" : "Abierto"}</Badge>
       </div>
 
-      <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-3 text-sm text-zinc-600">
         {locked ? (
           <>
             Las predicciones se cerraron al empezar el torneo
@@ -94,7 +93,7 @@ export default async function InitialPredictionsPage({
       </p>
 
       {overriding && (
-        <p className="mt-4 rounded-md border border-sky-300 bg-sky-50 p-3 text-xs text-sky-800 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-200">
+        <p className="border-info-light bg-info-light text-info-fg mt-4 rounded-md border p-3 text-xs">
           🧪 Fecha simulada (FECHA_ACTUAL):{" "}
           <strong>{fechaActual ? formatMadridDateTime(fechaActual) : "—"} (Madrid)</strong>. El
           bloqueo se evalúa contra esta fecha, no la real.
@@ -102,12 +101,12 @@ export default async function InitialPredictionsPage({
       )}
 
       {error && (
-        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300">
+        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
           {error}
         </p>
       )}
       {ok === "saved" && (
-        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Predicciones guardadas.
         </p>
       )}
@@ -123,7 +122,7 @@ export default async function InitialPredictionsPage({
         />
       ) : (
         <form action={saveInitialPredictions} className="mt-6 flex flex-col gap-6">
-          <fieldset className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+          <fieldset className="rounded-md border border-zinc-200 p-4">
             <legend className="px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
               Ganadores del torneo
             </legend>
@@ -161,7 +160,7 @@ export default async function InitialPredictionsPage({
             </div>
           </fieldset>
 
-          <fieldset className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+          <fieldset className="rounded-md border border-zinc-200 p-4">
             <legend className="px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
               Premios individuales
             </legend>
@@ -195,7 +194,7 @@ export default async function InitialPredictionsPage({
             </p>
           </fieldset>
 
-          <fieldset className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+          <fieldset className="rounded-md border border-zinc-200 p-4">
             <legend className="px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
               Clasificados de cada grupo
             </legend>
@@ -208,10 +207,7 @@ export default async function InitialPredictionsPage({
                 const groupTeams = teamsByGroup.get(g) ?? [];
                 const selected = qualByGroup.get(g) ?? new Set<string>();
                 return (
-                  <fieldset
-                    key={g}
-                    className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
-                  >
+                  <fieldset key={g} className="rounded-md border border-zinc-200 p-3">
                     <legend className="px-1 text-sm font-semibold">Grupo {g}</legend>
                     <div className="flex flex-col gap-1.5">
                       {groupTeams.map((t) => (
@@ -221,7 +217,7 @@ export default async function InitialPredictionsPage({
                             name={`qual_${g}`}
                             value={t.id}
                             defaultChecked={selected.has(t.id)}
-                            className="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700"
+                            className="h-4 w-4 rounded border-zinc-300"
                           />
                           <span>{t.display_name}</span>
                         </label>
@@ -236,13 +232,13 @@ export default async function InitialPredictionsPage({
           <div className="flex items-center gap-3">
             <button
               type="submit"
-              className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
             >
               Guardar predicciones
             </button>
             <Link
               href="/predictions/initial/public"
-              className="text-sm text-zinc-600 underline hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              className="text-sm text-zinc-600 underline hover:text-zinc-900"
             >
               Ver vista pública
             </Link>
@@ -275,13 +271,13 @@ function ReadOnlyView({
 }) {
   return (
     <section className="mt-6 flex flex-col gap-6">
-      <div className="grid gap-4 rounded-md border border-zinc-200 bg-white p-4 text-sm sm:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="grid gap-4 rounded-md border border-zinc-200 bg-white p-4 text-sm sm:grid-cols-2">
         <Field label="Campeón" value={championName} />
         <Field label="Subcampeón" value={runnerUpName} />
         <Field label="Pichichi" value={topScorer} />
         <Field label="Mejor jugador" value={bestPlayer} />
       </div>
-      <div className="rounded-md border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="rounded-md border border-zinc-200 bg-white p-4">
         <p className="mb-3 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
           Clasificados de grupo
         </p>
@@ -291,7 +287,7 @@ function ReadOnlyView({
             return (
               <div key={g} className="text-sm">
                 <span className="font-semibold">Grupo {g}: </span>
-                <span className="text-zinc-600 dark:text-zinc-400">
+                <span className="text-zinc-600">
                   {ids.length ? ids.map((id) => teamName(id)).join(" · ") : "—"}
                 </span>
               </div>

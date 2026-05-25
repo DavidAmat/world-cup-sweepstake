@@ -72,35 +72,35 @@ export default async function EditFixturePage({
       </div>
 
       {errMsg && (
-        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300">
+        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
           {errMsg}
         </p>
       )}
       {ok === "updated" && (
-        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Cambios guardados.
         </p>
       )}
       {ok === "created" && (
-        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Fixture creado correctamente.
         </p>
       )}
 
       {isRoundLocked && (
-        <p className="mt-4 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+        <p className="border-warning-light bg-warning-light text-warning-fg mt-4 rounded-md border p-3 text-sm">
           Esta jornada ({fixture.round?.name}) está bloqueada para predicciones. Cambios en{" "}
           <code>kickoff_at</code> o equipos afectan a las predicciones que se hagan a partir de
           ahora. Desbloquéala en <code>/admin/results</code> si necesitas reabrirla.
         </p>
       )}
       {isFinalState && (
-        <p className="mt-4 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+        <p className="border-warning-light bg-warning-light text-warning-fg mt-4 rounded-md border p-3 text-sm">
           Este fixture está en estado <strong>{fixture.status}</strong>. Edita con cuidado.
         </p>
       )}
 
-      <section className="mt-6 grid grid-cols-2 gap-3 rounded-md border border-zinc-200 bg-white p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="mt-6 grid grid-cols-2 gap-3 rounded-md border border-zinc-200 bg-white p-4 text-sm">
         <div>
           <p className="text-xs text-zinc-500">Fase</p>
           <p>{fixture.stage?.name}</p>
@@ -122,7 +122,7 @@ export default async function EditFixturePage({
       <form action={updateFixture} className="mt-6 flex flex-col gap-5">
         <input type="hidden" name="id" value={fixture.id} />
 
-        <fieldset className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+        <fieldset className="rounded-md border border-zinc-200 p-4">
           <legend className="px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
             Equipo local
           </legend>
@@ -131,7 +131,7 @@ export default async function EditFixturePage({
             <select
               name="home_team_id"
               defaultValue={fixture.home_team_id ?? ""}
-              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
             >
               <option value="">— (usar placeholder)</option>
               {teams?.map((t) => (
@@ -148,13 +148,13 @@ export default async function EditFixturePage({
               name="home_placeholder"
               defaultValue={fixture.home_placeholder ?? ""}
               placeholder="p.ej. Ganador A"
-              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
             />
             <span className="text-xs text-zinc-500">Solo se usa si dejas el equipo en blanco.</span>
           </label>
         </fieldset>
 
-        <fieldset className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+        <fieldset className="rounded-md border border-zinc-200 p-4">
           <legend className="px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
             Equipo visitante
           </legend>
@@ -163,7 +163,7 @@ export default async function EditFixturePage({
             <select
               name="away_team_id"
               defaultValue={fixture.away_team_id ?? ""}
-              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
             >
               <option value="">— (usar placeholder)</option>
               {teams?.map((t) => (
@@ -180,7 +180,7 @@ export default async function EditFixturePage({
               name="away_placeholder"
               defaultValue={fixture.away_placeholder ?? ""}
               placeholder="p.ej. 2.º Grupo C"
-              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
             />
             <span className="text-xs text-zinc-500">Solo se usa si dejas el equipo en blanco.</span>
           </label>
@@ -193,7 +193,7 @@ export default async function EditFixturePage({
             name="kickoff_at"
             defaultValue={utcIsoToMadridInput(fixture.kickoff_at)}
             required
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
           />
         </label>
 
@@ -204,7 +204,7 @@ export default async function EditFixturePage({
             name="venue"
             defaultValue={fixture.venue ?? ""}
             placeholder="Opcional"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
           />
         </label>
 
@@ -213,7 +213,7 @@ export default async function EditFixturePage({
           <select
             name="status"
             defaultValue={fixture.status}
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
           >
             <option value="scheduled">Programado</option>
             <option value="locked">Bloqueado</option>
@@ -229,13 +229,13 @@ export default async function EditFixturePage({
         <div className="flex items-center gap-3">
           <button
             type="submit"
-            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
           >
             Guardar cambios
           </button>
           <Link
             href="/admin/fixtures"
-            className="text-sm text-zinc-600 underline hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            className="text-sm text-zinc-600 underline hover:text-zinc-900"
           >
             Cancelar
           </Link>

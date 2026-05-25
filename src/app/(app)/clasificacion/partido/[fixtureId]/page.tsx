@@ -112,14 +112,14 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
     <main className="mx-auto max-w-4xl p-10">
       <div className="flex items-baseline justify-between gap-2">
         <div>
-          <p className="text-xs text-zinc-500 uppercase dark:text-zinc-400">
+          <p className="text-xs text-zinc-500 uppercase">
             {fixture.stage?.name ?? "Partido"} · {fixture.round?.name ?? ""}
             {fixture.group_code ? ` · Grupo ${fixture.group_code}` : ""}
           </p>
           <h1 className="text-2xl font-bold">
             {homeTeam} vs {awayTeam}
           </h1>
-          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-xs text-zinc-500">
             {formatMadridDateTime(fixture.kickoff_at)} (Madrid)
           </p>
         </div>
@@ -128,30 +128,26 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
         </Link>
       </div>
 
-      <section className="mt-6 rounded-md border border-zinc-200 bg-white p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <p className="text-xs font-semibold text-zinc-500 uppercase dark:text-zinc-400">
-          Resultado oficial
-        </p>
+      <section className="mt-6 rounded-md border border-zinc-200 bg-white p-4 text-sm">
+        <p className="text-xs font-semibold text-zinc-500 uppercase">Resultado oficial</p>
         {result && result.result_status === "confirmed" ? (
           <>
             <p className="mt-1 text-lg font-bold">
               {homeTeam} {result.home_goals_90} - {result.away_goals_90} {awayTeam}
             </p>
             {isKnockout && (
-              <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+              <p className="mt-1 text-xs text-zinc-600">
                 {result.went_extra_time ? "Con prórroga" : "Sin prórroga"} ·{" "}
                 {result.went_penalties ? "Decidido en penaltis" : "Sin penaltis"}
                 {qualifiedTeamName ? ` · Pasa: ${qualifiedTeamName}` : ""}
               </p>
             )}
-            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="mt-2 text-xs text-zinc-500">
               Máximo posible por participante: <strong>{maxPts}</strong> pts.
             </p>
           </>
         ) : (
-          <p className="mt-1 text-zinc-600 dark:text-zinc-400">
-            Aún sin resultado oficial confirmado.
-          </p>
+          <p className="mt-1 text-zinc-600">Aún sin resultado oficial confirmado.</p>
         )}
       </section>
 
@@ -165,9 +161,7 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
               key={profile.user_id}
               className={
                 "rounded-md border p-4 " +
-                (isMe
-                  ? "border-sky-300 bg-sky-50 dark:border-sky-700 dark:bg-sky-950/30"
-                  : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900")
+                (isMe ? "border-info-light bg-info-light" : "border-zinc-200 bg-white")
               }
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -175,13 +169,13 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
                   <p className="font-semibold">
                     {profile.display_name}
                     {isMe && (
-                      <span className="ml-1 rounded bg-sky-200 px-1.5 text-xs font-medium text-sky-800 dark:bg-sky-800 dark:text-sky-100">
+                      <span className="bg-info-light text-info-fg ml-1 rounded px-1.5 text-xs font-medium">
                         tú
                       </span>
                     )}
                   </p>
                   {prediction ? (
-                    <p className="text-sm text-zinc-700 dark:text-zinc-300">
+                    <p className="text-sm text-zinc-700">
                       Predicción: <strong>{prediction.home_goals_90}</strong>-
                       <strong>{prediction.away_goals_90}</strong>
                       {isKnockout && (
@@ -196,9 +190,7 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
                       )}
                     </p>
                   ) : (
-                    <p className="text-sm text-zinc-500 italic dark:text-zinc-400">
-                      No envió predicción
-                    </p>
+                    <p className="text-sm text-zinc-500 italic">No envió predicción</p>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
@@ -210,7 +202,7 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
                       <BreakdownTable breakdown={score.breakdown} pointsTotal={pts} />
                     </BreakdownPopover>
                   ) : (
-                    <span className="rounded-md bg-zinc-100 px-2 py-1 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                    <span className="rounded-md bg-zinc-100 px-2 py-1 text-xs text-zinc-600">
                       sin puntos
                     </span>
                   )}

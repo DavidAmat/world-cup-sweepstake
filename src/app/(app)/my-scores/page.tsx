@@ -143,29 +143,23 @@ export default async function MyScoresPage() {
   return (
     <main className="mx-auto max-w-4xl p-10">
       <h1 className="text-2xl font-bold">Mi puntuación</h1>
-      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-1 text-sm text-zinc-600">
         {profile?.display_name ?? "Tu"} desglose personal en el torneo. Cada partido confirmado
         aparece como una barra; pulsa <strong>ⓘ</strong> para ver el detalle por criterio.
       </p>
 
       <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="rounded-md border border-emerald-300 bg-emerald-50 p-4 dark:border-emerald-700 dark:bg-emerald-950/30">
-          <p className="text-xs font-semibold text-emerald-700 uppercase dark:text-emerald-300">
-            Total
-          </p>
-          <p className="mt-1 font-mono text-3xl font-bold text-emerald-900 dark:text-emerald-100">
-            {grandTotal}
-          </p>
+        <div className="border-success-light bg-success-light rounded-md border p-4">
+          <p className="text-success-fg text-xs font-semibold uppercase">Total</p>
+          <p className="text-success-fg mt-1 font-mono text-3xl font-bold">{grandTotal}</p>
         </div>
         {CATEGORY_ORDER.map((cat) => (
           <div
             key={cat}
-            className="rounded-md border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
+            className="rounded-md border border-zinc-200 bg-white p-4"
             title={CATEGORY_DESCRIPTIONS[cat]}
           >
-            <p className="text-xs font-semibold text-zinc-500 uppercase dark:text-zinc-400">
-              {CATEGORY_LABELS[cat]}
-            </p>
+            <p className="text-xs font-semibold text-zinc-500 uppercase">{CATEGORY_LABELS[cat]}</p>
             <p className="mt-1 font-mono text-2xl font-bold">{totals[cat]}</p>
           </div>
         ))}
@@ -173,16 +167,13 @@ export default async function MyScoresPage() {
 
       <h2 className="mt-8 text-lg font-bold">Por partido</h2>
       {matchScores.length === 0 ? (
-        <p className="mt-3 rounded-md border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/40 dark:text-zinc-400">
+        <p className="mt-3 rounded-md border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
           Aún no hay partidos con resultado confirmado para mostrar.
         </p>
       ) : (
         <ul className="mt-3 flex flex-col gap-3">
           {matchScores.map((m) => (
-            <li
-              key={m.fixture_id}
-              className="rounded-md border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
-            >
+            <li key={m.fixture_id} className="rounded-md border border-zinc-200 bg-white p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="text-sm">
                   <Link
@@ -193,12 +184,12 @@ export default async function MyScoresPage() {
                     {" - "}
                     {m.result && <span className="font-mono">{m.result.a}</span>} {m.awayTeam}
                   </Link>
-                  <span className="ml-2 text-xs text-zinc-500 dark:text-zinc-400">
+                  <span className="ml-2 text-xs text-zinc-500">
                     {m.roundName} · {formatMadridDateTime(m.kickoff)}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                  <span className="text-xs text-zinc-500">
                     {m.points} / {m.max}
                   </span>
                   <BreakdownPopover pointsTotal={m.points}>
@@ -214,7 +205,7 @@ export default async function MyScoresPage() {
         </ul>
       )}
 
-      <p className="mt-6 text-xs text-zinc-500 dark:text-zinc-400">
+      <p className="mt-6 text-xs text-zinc-500">
         La barra muestra cuántos puntos sacaste respecto al máximo posible del partido (15 en
         grupos, 66 en eliminatorias hasta cuartos, 99 en semis, 165 en la final).
       </p>

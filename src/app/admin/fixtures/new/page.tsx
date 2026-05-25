@@ -42,7 +42,7 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
         / Nuevo
       </p>
       <h1 className="mt-1 text-2xl font-bold">Nuevo fixture</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-2 text-sm text-zinc-600">
         Pensado para crear fixtures de eliminatorias uno a uno. Para añadir varios a la vez, usa{" "}
         <Link href="/admin/fixtures/import" className="underline">
           Importar JSON
@@ -51,7 +51,7 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
       </p>
 
       {errMsg && (
-        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300">
+        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
           {errMsg}
         </p>
       )}
@@ -65,7 +65,7 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
             required
             placeholder="wc2022_r16_001"
             pattern="[a-z0-9_-]+"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 font-mono text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 font-mono text-sm"
           />
           <span className="text-xs text-zinc-500">
             Patrón sugerido: <code>wc2022_&lt;round&gt;_NNN</code> (round ∈ r16, qf, sf, third,
@@ -80,7 +80,7 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
               name="stage_id"
               required
               defaultValue=""
-              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
             >
               <option value="" disabled>
                 Elige una fase
@@ -98,7 +98,7 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
               name="round_id"
               required
               defaultValue=""
-              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
             >
               <option value="" disabled>
                 Elige una ronda
@@ -123,11 +123,11 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
             maxLength={1}
             pattern="[A-L]"
             placeholder="A–L (vacío para eliminatorias)"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
           />
         </label>
 
-        <fieldset className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+        <fieldset className="rounded-md border border-zinc-200 p-4">
           <legend className="px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
             Equipo local
           </legend>
@@ -136,7 +136,7 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
             <select
               name="home_team_id"
               defaultValue=""
-              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
             >
               <option value="">— (usar placeholder)</option>
               {teams.map((t) => (
@@ -152,13 +152,13 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
               type="text"
               name="home_placeholder"
               placeholder="p.ej. Ganador A"
-              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
             />
             <span className="text-xs text-zinc-500">Solo se usa si dejas el equipo en blanco.</span>
           </label>
         </fieldset>
 
-        <fieldset className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+        <fieldset className="rounded-md border border-zinc-200 p-4">
           <legend className="px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
             Equipo visitante
           </legend>
@@ -167,7 +167,7 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
             <select
               name="away_team_id"
               defaultValue=""
-              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
             >
               <option value="">— (usar placeholder)</option>
               {teams.map((t) => (
@@ -183,7 +183,7 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
               type="text"
               name="away_placeholder"
               placeholder="p.ej. 2.º Grupo C"
-              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
             />
             <span className="text-xs text-zinc-500">Solo se usa si dejas el equipo en blanco.</span>
           </label>
@@ -195,7 +195,7 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
             type="datetime-local"
             name="kickoff_at"
             required
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
           />
         </label>
 
@@ -205,7 +205,7 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
             type="text"
             name="venue"
             placeholder="Opcional"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
           />
         </label>
 
@@ -214,7 +214,7 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
           <select
             name="status"
             defaultValue="scheduled"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
           >
             <option value="scheduled">Programado</option>
             <option value="locked">Bloqueado</option>
@@ -226,13 +226,13 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
         <div className="flex items-center gap-3">
           <button
             type="submit"
-            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
           >
             Crear fixture
           </button>
           <Link
             href="/admin/fixtures"
-            className="text-sm text-zinc-600 underline hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            className="text-sm text-zinc-600 underline hover:text-zinc-900"
           >
             Cancelar
           </Link>

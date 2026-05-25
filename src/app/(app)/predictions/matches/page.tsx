@@ -238,7 +238,7 @@ export default async function MatchPredictionsPage({
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Predicciones de partidos</h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-zinc-600">
             Marcador a 90&apos;. En eliminatorias, además prórroga, penaltis y equipo que pasa. El
             administrador bloquea cada jornada antes de su primer partido; una vez bloqueada, no se
             pueden editar y las predicciones de todos se hacen públicas.
@@ -250,23 +250,23 @@ export default async function MatchPredictionsPage({
       </div>
 
       {overriding && (
-        <p className="mt-4 rounded-md border border-sky-300 bg-sky-50 p-3 text-xs text-sky-800 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-200">
+        <p className="border-info-light bg-info-light text-info-fg mt-4 rounded-md border p-3 text-xs">
           🧪 Fecha simulada (FECHA_ACTUAL):{" "}
           <strong>{fechaActual ? formatMadridDateTime(fechaActual) : "—"} (Madrid)</strong>.
         </p>
       )}
       {error && (
-        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300">
+        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
           {error}
         </p>
       )}
       {ok === "saved" && (
-        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Predicciones guardadas.
         </p>
       )}
       {ok === "random" && (
-        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Predicciones aleatorias generadas para todos tus partidos abiertos.
         </p>
       )}
@@ -274,7 +274,7 @@ export default async function MatchPredictionsPage({
       <form action={generateRandomMatchPredictions} className="mt-4">
         <button
           type="submit"
-          className="rounded-md border border-amber-400 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
+          className="border-warning bg-warning-light text-warning-fg hover:bg-warning-light rounded-md border px-4 py-2 text-sm font-medium"
           title="Rellena al azar todos tus partidos no bloqueados"
         >
           🎲 Generar predicciones aleatorias
@@ -282,7 +282,7 @@ export default async function MatchPredictionsPage({
       </form>
 
       {roundVMs.length === 0 ? (
-        <p className="mt-6 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-6 text-sm text-zinc-600">
           Todavía no hay partidos cargados para este torneo.
         </p>
       ) : (

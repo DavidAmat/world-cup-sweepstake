@@ -76,7 +76,7 @@ function teamName(id: string | null, homeId: string, awayId: string, home: strin
 
 function ExtraInfo({ et, pen, qual }: { et: boolean; pen: boolean; qual: string }) {
   return (
-    <span className="text-xs text-zinc-600 dark:text-zinc-400">
+    <span className="text-xs text-zinc-600">
       {et ? "Prórroga" : "Sin prórroga"} · {pen ? "penaltis" : "sin penaltis"} · pasa{" "}
       <strong>{qual}</strong>
     </span>
@@ -100,7 +100,7 @@ function PointsCell({
   // the admin. We display a flat "0 pts" so columns line up; there is no
   // breakdown to show in a popover.
   if (!score) {
-    return <span className="font-mono text-xs text-zinc-500 dark:text-zinc-400">0 pts</span>;
+    return <span className="font-mono text-xs text-zinc-500">0 pts</span>;
   }
   return (
     <BreakdownPopover
@@ -171,22 +171,18 @@ function RankingRow({
   onOpenChange: (next: string | null) => void;
 }) {
   const points = entry.score?.points ?? 0;
-  const accent = isMe
-    ? "bg-sky-50/70 dark:bg-sky-950/20"
-    : zebra
-      ? "bg-zinc-50 dark:bg-zinc-950/40"
-      : "bg-white dark:bg-zinc-900";
+  const accent = isMe ? "bg-info-light/70" : zebra ? "bg-zinc-50" : "bg-white";
   return (
-    <div className={`border-t border-zinc-200 px-0 pt-1.5 pb-2 dark:border-zinc-800 ${accent}`}>
+    <div className={`border-t border-zinc-200 px-0 pt-1.5 pb-2 ${accent}`}>
       <Row
         label={
           <span className="flex items-center gap-1.5">
-            <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[10px] font-bold text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200">
+            <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[10px] font-bold text-zinc-700">
               {position}
             </span>
             <span className="truncate">{entry.display_name}</span>
             {isMe && (
-              <span className="ml-0.5 rounded bg-sky-200 px-1 text-[10px] font-bold text-sky-800 uppercase dark:bg-sky-800 dark:text-sky-100">
+              <span className="bg-info-light text-info-fg ml-0.5 rounded px-1 text-[10px] font-bold uppercase">
                 tú
               </span>
             )}
@@ -209,7 +205,7 @@ function RankingRow({
         <div className="flex-1">
           <PointsBar value={points} max={maxPoints} />
         </div>
-        <span className="font-mono text-[10px] text-zinc-500 dark:text-zinc-400">
+        <span className="font-mono text-[10px] text-zinc-500">
           {points} / {maxPoints}
         </span>
       </div>
@@ -268,10 +264,10 @@ export function LockedFixturePanel({
   }, [fixtureId, myEntry, otherEntries]);
 
   return (
-    <div className="mt-3 rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="mt-3 rounded-md border border-zinc-200 bg-white">
       {/* Column header */}
       <div
-        className={`${ROW_CLS} border-b border-zinc-200 bg-zinc-50 text-xs tracking-wide text-zinc-500 uppercase dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-400`}
+        className={`${ROW_CLS} border-b border-zinc-200 bg-zinc-50 text-xs tracking-wide text-zinc-500 uppercase`}
       >
         <span></span>
         <span className="truncate text-center font-semibold">{homeTeam}</span>
@@ -284,7 +280,7 @@ export function LockedFixturePanel({
       {/* Real result */}
       {realResult ? (
         <Row
-          label={<span className="text-amber-700 dark:text-amber-300">🏁 Real</span>}
+          label={<span className="text-warning-fg">🏁 Real</span>}
           h={realResult.h}
           a={realResult.a}
           extra={
@@ -297,10 +293,10 @@ export function LockedFixturePanel({
             ) : null
           }
           rightCell={null}
-          accent="border-b border-amber-200 bg-amber-50/70 dark:border-amber-900/40 dark:bg-amber-950/20"
+          accent="border-b border-warning-light bg-warning-light/70"
         />
       ) : (
-        <p className="border-b border-zinc-200 px-3 py-2 text-xs text-zinc-500 italic dark:border-zinc-800 dark:text-zinc-400">
+        <p className="border-b border-zinc-200 px-3 py-2 text-xs text-zinc-500 italic">
           Aún sin resultado oficial confirmado.
         </p>
       )}
@@ -310,7 +306,7 @@ export function LockedFixturePanel({
         label={
           <span>
             {myEntry.display_name}{" "}
-            <span className="ml-1 rounded bg-sky-200 px-1.5 text-[10px] font-bold text-sky-800 uppercase dark:bg-sky-800 dark:text-sky-100">
+            <span className="bg-info-light text-info-fg ml-1 rounded px-1.5 text-[10px] font-bold uppercase">
               tú
             </span>
           </span>
@@ -327,7 +323,7 @@ export function LockedFixturePanel({
             onOpenChange={setOpenPopoverId}
           />
         }
-        accent="bg-sky-50/70 dark:bg-sky-950/20"
+        accent="bg-info-light/70"
       />
 
       {/* Ranking dropdown */}
@@ -336,7 +332,7 @@ export function LockedFixturePanel({
           <button
             type="button"
             onClick={toggle}
-            className="flex w-full items-center justify-between gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            className="flex w-full items-center justify-between gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-100"
             aria-expanded={expanded}
           >
             <span>

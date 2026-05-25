@@ -91,15 +91,12 @@ export default async function ResultEntryPage({
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div>
         <h1 className="text-2xl font-bold">{matchupTitle}</h1>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-sm text-zinc-600">
           {fixture.round?.name} · {fixture.stage?.name} · {formatMadridDateTime(fixture.kickoff_at)}{" "}
           (Madrid)
         </p>
       </div>
-      <Link
-        href="/admin/results"
-        className="text-sm text-zinc-600 underline hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-      >
+      <Link href="/admin/results" className="text-sm text-zinc-600 underline hover:text-zinc-900">
         ← Volver al listado
       </Link>
     </div>
@@ -109,7 +106,7 @@ export default async function ResultEntryPage({
     return (
       <main className="mx-auto max-w-3xl p-10">
         {header}
-        <p className="mt-6 rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+        <p className="border-warning-light bg-warning-light text-warning-fg mt-6 rounded-md border p-4 text-sm">
           Este partido todavía no tiene los dos equipos asignados. Asígnalos en{" "}
           <Link href="/admin/fixtures" className="underline">
             Fixtures
@@ -166,17 +163,17 @@ export default async function ResultEntryPage({
   const banners = (
     <>
       {ok === "draft" && (
-        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Borrador guardado.
         </p>
       )}
       {ok === "confirmed" && (
-        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Resultado confirmado. El recálculo de puntuaciones se hará en el hito 11.
         </p>
       )}
       {errMsg && (
-        <p className="mt-4 rounded-md border border-rose-300 bg-rose-50 p-3 text-sm text-rose-700 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-300">
+        <p className="border-danger-light bg-danger-light text-danger-fg mt-4 rounded-md border p-3 text-sm">
           {errMsg}
         </p>
       )}
@@ -204,23 +201,23 @@ export default async function ResultEntryPage({
         {header}
         {banners}
         <div className="mt-6 flex items-center gap-3">
-          <Badge tone="emerald">Confirmado</Badge>
+          <Badge tone="success">Confirmado</Badge>
           <Link
             href={`/admin/results/${fixtureId}?edit=1`}
-            className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+            className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100"
           >
             Editar resultado
           </Link>
         </div>
 
-        <section className="mt-6 rounded-md border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="mt-6 rounded-md border border-zinc-200 bg-white p-5">
           <h2 className="text-sm font-semibold">Marcador</h2>
           <p className="mt-2 font-mono text-lg">
             {homeTeam.display_name} {result.home_goals_90} – {result.away_goals_90}{" "}
             {awayTeam.display_name}
           </p>
           {result.went_extra_time && (
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-1 text-sm text-zinc-600">
               Hubo prórroga
               {result.went_penalties && (
                 <> · Penaltis: ganó {teamName(result.penalty_winner_team_id)}</>
@@ -228,13 +225,13 @@ export default async function ResultEntryPage({
             </p>
           )}
           {isKnockout && (
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-1 text-sm text-zinc-600">
               Equipo que pasa: <strong>{teamName(result.qualified_team_id)}</strong>
             </p>
           )}
         </section>
 
-        <section className="mt-4 rounded-md border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="mt-4 rounded-md border border-zinc-200 bg-white p-5">
           <h2 className="text-sm font-semibold">Goles ({existingGoals.length})</h2>
           {existingGoals.length === 0 ? (
             <p className="mt-2 text-sm text-zinc-500">No se han registrado goles.</p>
@@ -257,7 +254,7 @@ export default async function ResultEntryPage({
       {header}
       {banners}
       {isConfirmed && (
-        <p className="mt-4 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+        <p className="border-warning-light bg-warning-light text-warning-fg mt-4 rounded-md border p-3 text-sm">
           Estás editando un resultado ya confirmado. Al guardar volverá a borrador; al confirmar se
           recalculará.
         </p>

@@ -19,23 +19,23 @@ export default async function ImportFixturesPage({ searchParams }: { searchParam
         / Importar JSON
       </p>
       <h1 className="mt-1 text-2xl font-bold">Importar fixtures</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-2 text-sm text-zinc-600">
         Pega un array JSON con N fixtures generado por ChatGPT siguiendo el prompt en{" "}
         <code>prompts/admin-fixtures-import.md</code>. Torneo destino:{" "}
         <strong>{tournament.name}</strong>.
       </p>
 
       {errMsg && (
-        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300">
+        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
           {errMsg}
         </p>
       )}
 
       <ImportClient />
 
-      <details className="mt-8 rounded-md border border-zinc-200 bg-zinc-50 p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <details className="mt-8 rounded-md border border-zinc-200 bg-zinc-50 p-4 text-sm">
         <summary className="cursor-pointer font-medium">Formato esperado</summary>
-        <pre className="mt-3 overflow-x-auto rounded-md bg-white p-3 text-xs leading-relaxed dark:bg-zinc-950">
+        <pre className="mt-3 overflow-x-auto rounded-md bg-white p-3 text-xs leading-relaxed">
           {`[
   {
     "external_id": "wc2022_r16_001",
@@ -50,7 +50,7 @@ export default async function ImportFixturesPage({ searchParams }: { searchParam
   }
 ]`}
         </pre>
-        <ul className="mt-3 list-inside list-disc space-y-1 text-zinc-600 dark:text-zinc-400">
+        <ul className="mt-3 list-inside list-disc space-y-1 text-zinc-600">
           <li>
             <code>fase</code> ∈{" "}
             <code>fase_grupos | octavos | cuartos | semis | tercer_puesto | final</code>.

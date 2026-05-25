@@ -32,13 +32,13 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
   return (
     <main className="mx-auto max-w-3xl p-10">
       <h1 className="text-2xl font-bold">Normas y puntuación</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-2 text-sm text-zinc-600">
         Versión preliminar. El sistema definitivo de puntos se publicará antes del primer partido.
       </p>
 
       <section className="mt-6 space-y-3 text-sm leading-relaxed">
         <h2 className="text-lg font-semibold">Resumen del sistema</h2>
-        <ul className="list-inside list-disc space-y-1 text-zinc-700 dark:text-zinc-300">
+        <ul className="list-inside list-disc space-y-1 text-zinc-700">
           <li>Cada partido se predice con resultado a 90 minutos.</li>
           <li>
             En eliminatorias, además, indicas si habrá prórroga, si habrá penaltis y qué equipo pasa
@@ -61,12 +61,12 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
       </section>
 
       {error && (
-        <p className="mt-6 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300">
+        <p className="mt-6 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
           {error}
         </p>
       )}
       {ok && (
-        <p className="mt-6 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <p className="border-success-light bg-success-light text-success-fg mt-6 rounded-md border p-3 text-sm">
           ¡Aceptación registrada! Ya puedes seguir.
         </p>
       )}
@@ -86,7 +86,7 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
             <input type="hidden" name="tournamentId" value={activeTournament.id} />
             <button
               type="submit"
-              className="self-start rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="self-start rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
             >
               Acepto las normas
             </button>

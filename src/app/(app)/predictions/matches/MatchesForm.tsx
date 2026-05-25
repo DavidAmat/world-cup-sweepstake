@@ -49,8 +49,7 @@ export type RoundVM = {
 
 type Values = { h90: string; a90: string; et: boolean; pen: boolean; qual: string };
 
-const INPUT_CLS =
-  "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950";
+const INPUT_CLS = "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm";
 const GOAL_CLS = `${INPUT_CLS} w-16 text-center`;
 
 type Meta = { isKnockout: boolean; homeId: string; awayId: string };
@@ -148,13 +147,13 @@ export function MatchesForm({
 
   return (
     <form action={saveAllMatchPredictions} className="mt-4">
-      <div className="sticky top-0 z-10 -mx-10 border-b border-zinc-200 bg-white/90 px-10 py-3 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90">
+      <div className="sticky top-0 z-10 -mx-10 border-b border-zinc-200 bg-white/90 px-10 py-3 backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm">
             {unsavedCount === 0 ? (
-              <span className="text-emerald-700 dark:text-emerald-300">Todo guardado ✓</span>
+              <span className="text-success-fg">Todo guardado ✓</span>
             ) : (
-              <span className="text-amber-700 dark:text-amber-300">
+              <span className="text-warning-fg">
                 {unsavedCount} partido{unsavedCount === 1 ? "" : "s"} sin guardar
               </span>
             )}
@@ -164,7 +163,7 @@ export function MatchesForm({
               <button
                 type="button"
                 onClick={toggleAll}
-                className="rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                className="rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
               >
                 {bulkSignal.open
                   ? "Ocultar todas las predicciones"
@@ -173,7 +172,7 @@ export function MatchesForm({
             )}
             <button
               type="submit"
-              className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
             >
               Guardar predicciones
             </button>
@@ -184,7 +183,7 @@ export function MatchesForm({
             <a
               key={r.code}
               href={`#r-${r.code}`}
-              className="rounded-full border border-zinc-300 px-2.5 py-1 text-xs hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+              className="rounded-full border border-zinc-300 px-2.5 py-1 text-xs hover:bg-zinc-100"
             >
               {r.name}
             </a>
@@ -195,18 +194,13 @@ export function MatchesForm({
       <div className="mt-4 flex flex-col gap-8">
         {rounds.map((r) => (
           <section key={r.code} id={`r-${r.code}`} className="scroll-mt-32">
-            <h2 className="border-b-2 border-zinc-300 pb-1 text-lg font-bold dark:border-zinc-700">
-              {r.name}
-            </h2>
+            <h2 className="border-b-2 border-zinc-300 pb-1 text-lg font-bold">{r.name}</h2>
             <ul className="mt-3 flex flex-col gap-3">
               {r.fixtures.map((f) => {
                 const v = values[f.id];
                 const status = f.locked ? "blocked" : isSaved(v, f.saved) ? "saved" : "unsaved";
                 return (
-                  <li
-                    key={f.id}
-                    className="rounded-md border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
-                  >
+                  <li key={f.id} className="rounded-md border border-zinc-200 bg-white p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="text-sm">
                         <span className="font-semibold">
@@ -219,9 +213,9 @@ export function MatchesForm({
                       {status === "blocked" ? (
                         <Badge tone="zinc">Bloqueado</Badge>
                       ) : status === "saved" ? (
-                        <Badge tone="emerald">Guardado</Badge>
+                        <Badge tone="success">Guardado</Badge>
                       ) : (
-                        <Badge tone="amber">Sin guardar</Badge>
+                        <Badge tone="warning">Sin guardar</Badge>
                       )}
                     </div>
 
@@ -262,7 +256,7 @@ export function MatchesForm({
       <div className="mt-8 flex items-center gap-3">
         <button
           type="submit"
-          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
         >
           Guardar predicciones
         </button>
@@ -316,7 +310,7 @@ function Editable({
       </div>
 
       {f.isKnockout && (
-        <div className="flex flex-col gap-2 rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm dark:border-zinc-800 dark:bg-zinc-950/40">
+        <div className="flex flex-col gap-2 rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm">
           <p className="text-xs text-zinc-500">
             La prórroga es automática: si predices empate a 90&apos; en eliminatoria, hay prórroga.
             No se predice el resultado de la prórroga, solo si hay penaltis y qué equipo pasa.

@@ -100,9 +100,7 @@ export default async function JornadaDetallePage({ params }: { params: RoutePara
     <main className="mx-auto max-w-5xl p-10">
       <div className="flex items-baseline justify-between gap-2">
         <div>
-          <p className="text-xs text-zinc-500 uppercase dark:text-zinc-400">
-            Clasificación · jornada
-          </p>
+          <p className="text-xs text-zinc-500 uppercase">Clasificación · jornada</p>
           <h1 className="text-2xl font-bold">{round.name}</h1>
         </div>
         <Link href="/clasificacion/jornada" className="text-sm underline">
@@ -114,11 +112,9 @@ export default async function JornadaDetallePage({ params }: { params: RoutePara
 
       <div className="mt-6 overflow-x-auto">
         <table className="min-w-full border-collapse text-sm">
-          <thead className="bg-zinc-50 text-left text-xs text-zinc-500 uppercase dark:bg-zinc-900 dark:text-zinc-400">
+          <thead className="bg-zinc-50 text-left text-xs text-zinc-500 uppercase">
             <tr>
-              <th className="sticky left-0 bg-zinc-50 px-3 py-2 font-semibold dark:bg-zinc-900">
-                Partido
-              </th>
+              <th className="sticky left-0 bg-zinc-50 px-3 py-2 font-semibold">Partido</th>
               {sortedProfiles.map((p) => (
                 <th key={p.user_id} className="px-3 py-2 text-center font-semibold">
                   {p.initials || p.display_name.slice(0, 2)}
@@ -130,8 +126,8 @@ export default async function JornadaDetallePage({ params }: { params: RoutePara
             {fixtures.map((f) => {
               const result = resultByFixture.get(f.id);
               return (
-                <tr key={f.id} className="border-t border-zinc-100 dark:border-zinc-800">
-                  <td className="sticky left-0 bg-white px-3 py-2 dark:bg-zinc-950">
+                <tr key={f.id} className="border-t border-zinc-100">
+                  <td className="sticky left-0 bg-white px-3 py-2">
                     <div className="flex flex-col">
                       <Link
                         href={`/clasificacion/partido/${f.id}`}
@@ -139,7 +135,7 @@ export default async function JornadaDetallePage({ params }: { params: RoutePara
                       >
                         {f.home_team?.display_name ?? "TBD"} vs {f.away_team?.display_name ?? "TBD"}
                       </Link>
-                      <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <span className="text-xs text-zinc-500">
                         {formatMadridDateTime(f.kickoff_at)}
                         {result ? ` · ${result.h}-${result.a}` : " · sin resultado"}
                       </span>
@@ -152,8 +148,7 @@ export default async function JornadaDetallePage({ params }: { params: RoutePara
                       <td
                         key={p.user_id}
                         className={
-                          "px-3 py-2 text-center font-mono " +
-                          (isMe ? "bg-sky-50 dark:bg-sky-950/30" : "")
+                          "px-3 py-2 text-center font-mono " + (isMe ? "bg-info-light" : "")
                         }
                       >
                         {pts === undefined ? <span className="text-zinc-400">—</span> : pts}
@@ -163,8 +158,8 @@ export default async function JornadaDetallePage({ params }: { params: RoutePara
                 </tr>
               );
             })}
-            <tr className="border-t-2 border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900/40">
-              <td className="sticky left-0 bg-zinc-50 px-3 py-2 text-xs font-semibold text-zinc-500 uppercase dark:bg-zinc-900 dark:text-zinc-400">
+            <tr className="border-t-2 border-zinc-300 bg-zinc-50">
+              <td className="sticky left-0 bg-zinc-50 px-3 py-2 text-xs font-semibold text-zinc-500 uppercase">
                 Total jornada
               </td>
               {sortedProfiles.map((p) => {
@@ -183,7 +178,7 @@ export default async function JornadaDetallePage({ params }: { params: RoutePara
         </table>
       </div>
 
-      <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400">
+      <p className="mt-4 text-xs text-zinc-500">
         Pulsa un partido para ver el desglose detallado y comparar las predicciones de cada
         participante.
       </p>

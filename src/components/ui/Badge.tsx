@@ -1,13 +1,14 @@
 import type { ReactNode } from "react";
 
-type Tone = "zinc" | "amber" | "emerald" | "rose" | "sky";
+type Tone = "zinc" | "warning" | "success" | "danger" | "info" | "special";
 
 const TONE_STYLES: Record<Tone, string> = {
-  zinc: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-  amber: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200",
-  emerald: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200",
-  rose: "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-200",
-  sky: "bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-200",
+  zinc: "bg-zinc-100 text-zinc-700",
+  warning: "bg-warning-light text-warning-fg",
+  success: "bg-success-light text-success-fg",
+  danger: "bg-danger-light text-danger-fg",
+  info: "bg-info-light text-info-fg",
+  special: "bg-special-light text-special-fg",
 };
 
 export function Badge({ tone = "zinc", children }: { tone?: Tone; children: ReactNode }) {
@@ -22,9 +23,9 @@ export function Badge({ tone = "zinc", children }: { tone?: Tone; children: Reac
 
 const STATUS_TONES: Record<string, Tone> = {
   scheduled: "zinc",
-  locked: "amber",
-  completed: "emerald",
-  cancelled: "rose",
+  locked: "warning",
+  completed: "success",
+  cancelled: "danger",
 };
 
 const STATUS_LABELS: Record<string, string> = {

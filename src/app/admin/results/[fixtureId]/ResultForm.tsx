@@ -34,8 +34,7 @@ type Props = {
   existingGoals: GoalEntry[];
 };
 
-const INPUT_CLS =
-  "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950";
+const INPUT_CLS = "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm";
 const GOAL_NUM_CLS = `${INPUT_CLS} w-20 text-center`;
 
 const PERIOD_LABELS: Record<GoalPeriod, string> = {
@@ -104,7 +103,7 @@ export function ResultForm({
       {knockoutDraw && wentPen && <input type="hidden" name="went_penalties" value="1" />}
       {knockoutDraw && <input type="hidden" name="qualified_team_id" value={qual} />}
 
-      <section className="rounded-md border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="rounded-md border border-zinc-200 bg-white p-5">
         <h2 className="text-sm font-semibold">Resultado a 90&apos;</h2>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
           <span className="min-w-28 font-medium">{homeTeam.display_name}</span>
@@ -134,7 +133,7 @@ export function ResultForm({
       </section>
 
       {isKnockout && (
-        <section className="rounded-md border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded-md border border-zinc-200 bg-white p-5">
           <h2 className="text-sm font-semibold">Eliminatoria</h2>
 
           {!bothFilled && (
@@ -144,7 +143,7 @@ export function ResultForm({
           )}
 
           {decidedWinner && (
-            <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-3 text-sm text-zinc-600">
               Resuelto en el tiempo reglamentario. Pasa{" "}
               <strong>{decidedWinner.display_name}</strong>.
             </p>
@@ -152,7 +151,7 @@ export function ResultForm({
 
           {knockoutDraw && (
             <div className="mt-3 space-y-3">
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="text-sm text-zinc-600">
                 Empate a 90&apos; → prórroga (automático). No se anota el resultado a 120&apos;.
               </p>
               <label className="flex items-center gap-2 text-sm">
@@ -183,13 +182,13 @@ export function ResultForm({
         </section>
       )}
 
-      <section className="rounded-md border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="rounded-md border border-zinc-200 bg-white p-5">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold">Goles ({goals.length})</h2>
           <button
             type="button"
             onClick={addGoal}
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium hover:bg-zinc-100"
           >
             + Añadir gol
           </button>
@@ -206,7 +205,7 @@ export function ResultForm({
               return (
                 <li
                   key={i}
-                  className="flex flex-wrap items-end gap-2 rounded-md border border-zinc-100 p-3 dark:border-zinc-800"
+                  className="flex flex-wrap items-end gap-2 rounded-md border border-zinc-100 p-3"
                 >
                   <label className="flex flex-col gap-1 text-xs">
                     <span className="font-medium">Equipo</span>
@@ -289,7 +288,7 @@ export function ResultForm({
                   <button
                     type="button"
                     onClick={() => removeGoal(i)}
-                    className="ml-auto rounded-md border border-rose-300 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-50 dark:border-rose-800 dark:text-rose-300 dark:hover:bg-rose-950/40"
+                    className="border-danger-light text-danger-fg hover:bg-danger-light ml-auto rounded-md border px-2 py-1 text-xs font-medium"
                   >
                     ✕ Quitar
                   </button>
@@ -304,14 +303,14 @@ export function ResultForm({
         <button
           type="submit"
           formAction={saveMatchResult}
-          className="rounded-md border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+          className="rounded-md border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-100"
         >
           Guardar borrador
         </button>
         <button
           type="submit"
           formAction={confirmMatchResult}
-          className="rounded-md bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-700"
+          className="bg-success-light hover:bg-success-light rounded-md px-5 py-2.5 text-sm font-medium text-white"
         >
           Confirmar y recalcular
         </button>

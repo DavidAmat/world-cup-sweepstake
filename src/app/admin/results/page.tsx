@@ -91,61 +91,58 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Resultados</h1>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-2 text-sm text-zinc-600">
             Torneo: <strong>{tournament.name}</strong>. {confirmedCount} confirmados · {draftCount}{" "}
             en borrador.
           </p>
         </div>
-        <Link
-          href="/admin"
-          className="text-sm text-zinc-600 underline hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-        >
+        <Link href="/admin" className="text-sm text-zinc-600 underline hover:text-zinc-900">
           ← Volver a administración
         </Link>
       </div>
 
       {params.ok === "draft" && (
-        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Borrador guardado.
         </p>
       )}
       {params.ok === "confirmed" && (
-        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Resultado confirmado.
         </p>
       )}
       {params.ok === "random" && (
-        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Resultados aleatorios generados y confirmados para esta jornada.
         </p>
       )}
       {params.ok === "pairings" && (
-        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Cruces generados. Predicciones, resultados y goles previos de esta ronda fueron
           eliminados; el motor de puntuación se ha recalculado.
         </p>
       )}
       {params.ok === "locked" && (
-        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Jornada bloqueada. Las predicciones de esa jornada quedan congeladas y son visibles para
           todos los participantes.
         </p>
       )}
       {params.ok === "unlocked" && (
-        <p className="mt-4 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+        <p className="border-warning-light bg-warning-light text-warning-fg mt-4 rounded-md border p-3 text-sm">
           Jornada desbloqueada. Los participantes pueden volver a editar sus predicciones y dejan de
           ser visibles para los demás.
         </p>
       )}
       {params.error && (
-        <p className="mt-4 rounded-md border border-rose-300 bg-rose-50 p-3 text-sm text-rose-700 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-300">
+        <p className="border-danger-light bg-danger-light text-danger-fg mt-4 rounded-md border p-3 text-sm">
           {params.error}
         </p>
       )}
 
-      <section className="mt-6 rounded-md border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="mt-6 rounded-md border border-zinc-200 bg-white p-4">
         <h2 className="text-sm font-semibold">Bloqueo de predicciones por jornada</h2>
-        <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+        <p className="mt-1 text-xs text-zinc-600">
           Mientras una jornada esté abierta, los participantes pueden seguir editando sus
           predicciones de sus partidos y nadie ve las de los demás. Cuando la bloquees, esas
           predicciones quedan congeladas y son visibles para todos los participantes (ya no se
@@ -160,13 +157,13 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
                 className={
                   "flex items-center justify-between rounded-md border px-3 py-2 text-sm " +
                   (locked
-                    ? "border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30"
-                    : "border-emerald-300 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30")
+                    ? "border-warning-light bg-warning-light"
+                    : "border-success-light bg-success-light")
                 }
               >
                 <div className="flex flex-col">
                   <span className="font-medium">{r.name}</span>
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                  <span className="text-xs text-zinc-500">
                     {locked ? `🔒 Bloqueada` : "🟢 Abierta"}
                   </span>
                 </div>
@@ -177,8 +174,8 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
                     className={
                       "rounded-md px-3 py-1 text-xs font-medium " +
                       (locked
-                        ? "border border-amber-400 bg-white text-amber-800 hover:bg-amber-100 dark:border-amber-600 dark:bg-zinc-900 dark:text-amber-200 dark:hover:bg-amber-950/50"
-                        : "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200")
+                        ? "border-warning text-warning-fg hover:bg-warning-light border bg-white"
+                        : "bg-primary text-primary-fg hover:opacity-90")
                     }
                   >
                     {locked ? "Desbloquear" : "Bloquear"}
@@ -192,14 +189,14 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
 
       <form
         method="get"
-        className="mt-6 flex flex-wrap items-end gap-3 rounded-md border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
+        className="mt-6 flex flex-wrap items-end gap-3 rounded-md border border-zinc-200 bg-white p-4"
       >
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium">Jornada / ronda</span>
           <select
             name="round"
             defaultValue={roundCode}
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
           >
             {ROUNDS.map((r) => (
               <option key={r.code} value={r.code}>
@@ -210,7 +207,7 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
         </label>
         <button
           type="submit"
-          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
         >
           Ver jornada
         </button>
@@ -222,7 +219,7 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
             <input type="hidden" name="round" value={roundCode} />
             <button
               type="submit"
-              className="rounded-md border border-sky-400 bg-sky-50 px-4 py-2 text-sm font-medium text-sky-800 hover:bg-sky-100 dark:border-sky-700 dark:bg-sky-950/40 dark:text-sky-200"
+              className="border-info bg-info-light text-info-fg hover:bg-info-light rounded-md border px-4 py-2 text-sm font-medium"
               title="Empareja al azar los equipos del torneo para esta ronda. Borra predicciones, resultados y goles existentes de esta ronda."
             >
               🎲 Generar cruces (esta ronda)
@@ -233,7 +230,7 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
           <input type="hidden" name="round" value={roundCode} />
           <button
             type="submit"
-            className="rounded-md border border-amber-400 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
+            className="border-warning bg-warning-light text-warning-fg hover:bg-warning-light rounded-md border px-4 py-2 text-sm font-medium"
             title="Genera y confirma resultados al azar para todos los partidos con equipos de esta jornada (ayuda de desarrollo)"
           >
             🎲 Generar resultados aleatorios (esta jornada)
@@ -244,7 +241,7 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
       <div className="mt-6 overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b border-zinc-200 text-left text-xs font-semibold tracking-wide text-zinc-500 uppercase dark:border-zinc-800">
+            <tr className="border-b border-zinc-200 text-left text-xs font-semibold tracking-wide text-zinc-500 uppercase">
               <th className="py-2 pr-3">Partido</th>
               <th className="py-2 pr-3">Fecha (Madrid)</th>
               <th className="py-2 pr-3">Marcador</th>
@@ -256,10 +253,7 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
           <tbody>
             {fixtures.length === 0 ? (
               <tr>
-                <td
-                  colSpan={isKnockoutRound ? 6 : 5}
-                  className="py-6 text-center text-zinc-500 dark:text-zinc-400"
-                >
+                <td colSpan={isKnockoutRound ? 6 : 5} className="py-6 text-center text-zinc-500">
                   No hay partidos en esta jornada.
                 </td>
               </tr>
@@ -280,16 +274,13 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
                 const statusBadge = !result ? (
                   <Badge tone="zinc">Sin resultado</Badge>
                 ) : result.result_status === "confirmed" ? (
-                  <Badge tone="emerald">Confirmado</Badge>
+                  <Badge tone="success">Confirmado</Badge>
                 ) : (
-                  <Badge tone="amber">Borrador</Badge>
+                  <Badge tone="warning">Borrador</Badge>
                 );
 
                 return (
-                  <tr
-                    key={f.id}
-                    className="border-b border-zinc-100 hover:bg-zinc-50 dark:border-zinc-900 dark:hover:bg-zinc-900/40"
-                  >
+                  <tr key={f.id} className="border-b border-zinc-100 hover:bg-zinc-50">
                     <td className="py-2 pr-3">
                       {home} <span className="text-zinc-400">vs</span> {away}
                     </td>
@@ -315,7 +306,7 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
                       {hasTeams ? (
                         <Link
                           href={`/admin/results/${f.id}`}
-                          className="text-sm text-zinc-600 underline hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                          className="text-sm text-zinc-600 underline hover:text-zinc-900"
                         >
                           {result ? "Ver / editar" : "Introducir"}
                         </Link>
