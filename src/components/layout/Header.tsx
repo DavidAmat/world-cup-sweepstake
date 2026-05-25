@@ -38,6 +38,12 @@ export async function Header() {
               <Link href="/predictions/matches" className="hover:underline">
                 Partidos
               </Link>
+              <Link href="/clasificacion" className="hover:underline">
+                Clasificación
+              </Link>
+              <Link href="/my-scores" className="hover:underline">
+                Mi puntuación
+              </Link>
               {isAdmin && (
                 <Link href="/admin" className="hover:underline">
                   Administración

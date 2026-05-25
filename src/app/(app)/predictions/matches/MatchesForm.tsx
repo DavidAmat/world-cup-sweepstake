@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
+import { BreakdownTable } from "@/components/scoring/BreakdownTable";
+import { BreakdownPopover } from "@/components/scoring/BreakdownPopover";
 import { saveAllMatchPredictions } from "./actions";
 
 export type SavedVM = {
@@ -11,6 +13,11 @@ export type SavedVM = {
   et: boolean;
   pen: boolean;
   qual: string | null;
+};
+
+export type ScoreVM = {
+  points: number;
+  breakdown: Record<string, unknown>;
 };
 
 export type FixtureVM = {
@@ -24,6 +31,7 @@ export type FixtureVM = {
   locked: boolean;
   noTeams: boolean;
   saved: SavedVM | null;
+  score: ScoreVM | null;
 };
 
 export type RoundVM = {
@@ -170,13 +178,26 @@ export function MatchesForm({ rounds }: { rounds: RoundVM[] }) {
                           {formatMadridDateTime(f.kickoff)} (Madrid)
                         </span>
                       </div>
-                      {status === "blocked" ? (
-                        <Badge tone="zinc">Bloqueado</Badge>
-                      ) : status === "saved" ? (
-                        <Badge tone="emerald">Guardado</Badge>
-                      ) : (
-                        <Badge tone="amber">Sin guardar</Badge>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {f.score && (
+                          <BreakdownPopover
+                            pointsTotal={f.score.points}
+                            label={`Ver desglose de ${f.home} vs ${f.away}`}
+                          >
+                            <BreakdownTable
+                              breakdown={f.score.breakdown}
+                              pointsTotal={f.score.points}
+                            />
+                          </BreakdownPopover>
+                        )}
+                        {status === "blocked" ? (
+                          <Badge tone="zinc">Bloqueado</Badge>
+                        ) : status === "saved" ? (
+                          <Badge tone="emerald">Guardado</Badge>
+                        ) : (
+                          <Badge tone="amber">Sin guardar</Badge>
+                        )}
+                      </div>
                     </div>
 
                     {f.noTeams ? (

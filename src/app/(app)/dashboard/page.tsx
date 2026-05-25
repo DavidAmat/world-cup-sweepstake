@@ -53,6 +53,24 @@ export default async function DashboardPage() {
             Predicciones de cada partido una vez bloqueado.
           </p>
         </a>
+        <a
+          href="/clasificacion"
+          className="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm hover:border-emerald-400 dark:border-emerald-800 dark:bg-emerald-950/30 dark:hover:border-emerald-600"
+        >
+          <p className="font-semibold">Clasificación</p>
+          <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+            Ranking general, por jornada, por fase y por categoría. Y un gráfico de evolución.
+          </p>
+        </a>
+        <a
+          href="/my-scores"
+          className="rounded-md border border-sky-200 bg-sky-50 p-4 text-sm hover:border-sky-400 dark:border-sky-800 dark:bg-sky-950/30 dark:hover:border-sky-600"
+        >
+          <p className="font-semibold">Mi puntuación</p>
+          <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+            Tu desglose personal: barras horizontales por partido y detalle por criterio.
+          </p>
+        </a>
       </div>
       {profile?.role === "admin" && (
         <p className="mt-4 rounded-md border border-zinc-200 bg-zinc-100 p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">

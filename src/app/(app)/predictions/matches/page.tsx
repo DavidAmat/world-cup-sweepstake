@@ -30,33 +30,51 @@ export default async function MatchPredictionsPage({
   const tournament = await getDefaultTournament();
   const { appNow, overriding, fechaActual } = await getMatchLockState();
 
-  const [{ data: rounds }, { data: fxData }, { data: preds }] = await Promise.all([
-    supabase
-      .from("rounds")
-      .select("id, code, name, sort_order")
-      .eq("tournament_id", tournament.id)
-      .order("sort_order", { ascending: true }),
-    supabase
-      .from("fixtures")
-      .select(
-        `id, kickoff_at, round_id, home_team_id, away_team_id,
+  const [{ data: rounds }, { data: fxData }, { data: preds }, { data: scoresRaw }] =
+    await Promise.all([
+      supabase
+        .from("rounds")
+        .select("id, code, name, sort_order")
+        .eq("tournament_id", tournament.id)
+        .order("sort_order", { ascending: true }),
+      supabase
+        .from("fixtures")
+        .select(
+          `id, kickoff_at, round_id, home_team_id, away_team_id,
          home_team:teams!fixtures_home_team_id_fkey ( display_name, code ),
          away_team:teams!fixtures_away_team_id_fkey ( display_name, code ),
          stage:stages ( code )`,
-      )
-      .eq("tournament_id", tournament.id)
-      .order("kickoff_at", { ascending: true }),
-    supabase
-      .from("match_predictions")
-      .select(
-        "fixture_id, home_goals_90, away_goals_90, predicts_extra_time, predicts_penalties, predicted_qualified_team_id",
-      )
-      .eq("tournament_id", tournament.id)
-      .eq("user_id", userId),
-  ]);
+        )
+        .eq("tournament_id", tournament.id)
+        .order("kickoff_at", { ascending: true }),
+      supabase
+        .from("match_predictions")
+        .select(
+          "fixture_id, home_goals_90, away_goals_90, predicts_extra_time, predicts_penalties, predicted_qualified_team_id",
+        )
+        .eq("tournament_id", tournament.id)
+        .eq("user_id", userId),
+      supabase
+        .from("prediction_scores")
+        .select("fixture_id, points_total, points_breakdown")
+        .eq("tournament_id", tournament.id)
+        .eq("user_id", userId)
+        .in("prediction_type", ["group_phase", "knockout"]),
+    ]);
 
   const fixtures = (fxData ?? []) as unknown as Fixture[];
   const predByFixture = new Map((preds ?? []).map((p) => [p.fixture_id, p]));
+  const scoreByFixture = new Map(
+    (scoresRaw ?? [])
+      .filter((s) => s.fixture_id)
+      .map((s) => [
+        s.fixture_id as string,
+        {
+          points: Number(s.points_total),
+          breakdown: (s.points_breakdown ?? {}) as Record<string, unknown>,
+        },
+      ]),
+  );
 
   // Rounds already come ordered group → r16 → qf → sf → third → final
   // (sort_order), so the final is always last. Keep only rounds that have
@@ -94,6 +112,7 @@ export default async function MatchPredictionsPage({
                 qual: p.predicted_qualified_team_id,
               }
             : null,
+          score: scoreByFixture.get(f.id) ?? null,
         };
       }),
     }));
