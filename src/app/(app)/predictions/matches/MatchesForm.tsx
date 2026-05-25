@@ -3,9 +3,8 @@
 import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
-import { BreakdownTable } from "@/components/scoring/BreakdownTable";
-import { BreakdownPopover } from "@/components/scoring/BreakdownPopover";
 import { saveAllMatchPredictions } from "./actions";
+import { LockedFixturePanel, type LockedEntry, type LockedRealResult } from "./LockedFixturePanel";
 
 export type SavedVM = {
   h90: number;
@@ -32,6 +31,8 @@ export type FixtureVM = {
   noTeams: boolean;
   saved: SavedVM | null;
   score: ScoreVM | null;
+  realResult: LockedRealResult | null;
+  otherEntries: LockedEntry[];
 };
 
 export type RoundVM = {
@@ -89,7 +90,13 @@ function isSaved(v: Values, s: SavedVM | null): boolean {
   );
 }
 
-export function MatchesForm({ rounds }: { rounds: RoundVM[] }) {
+export function MatchesForm({
+  rounds,
+  myDisplayName,
+}: {
+  rounds: RoundVM[];
+  myDisplayName: string;
+}) {
   const allFixtures = useMemo(() => rounds.flatMap((r) => r.fixtures), [rounds]);
 
   const [values, setValues] = useState<Record<string, Values>>(() => {
@@ -178,26 +185,13 @@ export function MatchesForm({ rounds }: { rounds: RoundVM[] }) {
                           {formatMadridDateTime(f.kickoff)} (Madrid)
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        {f.score && (
-                          <BreakdownPopover
-                            pointsTotal={f.score.points}
-                            label={`Ver desglose de ${f.home} vs ${f.away}`}
-                          >
-                            <BreakdownTable
-                              breakdown={f.score.breakdown}
-                              pointsTotal={f.score.points}
-                            />
-                          </BreakdownPopover>
-                        )}
-                        {status === "blocked" ? (
-                          <Badge tone="zinc">Bloqueado</Badge>
-                        ) : status === "saved" ? (
-                          <Badge tone="emerald">Guardado</Badge>
-                        ) : (
-                          <Badge tone="amber">Sin guardar</Badge>
-                        )}
-                      </div>
+                      {status === "blocked" ? (
+                        <Badge tone="zinc">Bloqueado</Badge>
+                      ) : status === "saved" ? (
+                        <Badge tone="emerald">Guardado</Badge>
+                      ) : (
+                        <Badge tone="amber">Sin guardar</Badge>
+                      )}
                     </div>
 
                     {f.noTeams ? (
@@ -205,7 +199,21 @@ export function MatchesForm({ rounds }: { rounds: RoundVM[] }) {
                         ⏳ Equipos por definir — no se puede predecir todavía.
                       </p>
                     ) : f.locked ? (
-                      <ReadOnly f={f} />
+                      <LockedFixturePanel
+                        homeTeam={f.home}
+                        awayTeam={f.away}
+                        homeId={f.homeId}
+                        awayId={f.awayId}
+                        isKnockout={f.isKnockout}
+                        realResult={f.realResult}
+                        myEntry={{
+                          user_id: "me",
+                          display_name: myDisplayName,
+                          prediction: f.saved,
+                          score: f.score,
+                        }}
+                        otherEntries={f.otherEntries}
+                      />
                     ) : (
                       <Editable f={f} v={v} set={set} />
                     )}
@@ -337,23 +345,6 @@ function Editable({
           </label>
         </div>
       )}
-    </div>
-  );
-}
-
-function ReadOnly({ f }: { f: FixtureVM }) {
-  const s = f.saved;
-  if (!s) {
-    return <p className="mt-3 text-sm text-zinc-500">— sin predicción —</p>;
-  }
-  const qualified = s.qual === f.homeId ? f.home : s.qual === f.awayId ? f.away : "—";
-  return (
-    <div className="mt-3 text-sm text-zinc-700 dark:text-zinc-300">
-      <p>
-        90&apos;: <strong>{s.h90}</strong> - <strong>{s.a90}</strong>
-      </p>
-      {f.isKnockout && s.et && <p>Prórroga{s.pen ? " · penaltis" : ""}</p>}
-      {f.isKnockout && <p className="text-zinc-500">Pasa: {qualified}</p>}
     </div>
   );
 }
