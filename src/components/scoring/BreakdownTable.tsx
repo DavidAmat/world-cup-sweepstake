@@ -48,44 +48,44 @@ export function BreakdownTable({
 
   return (
     <table className="w-full text-sm">
-      <thead className="text-left text-xs text-zinc-500 dark:text-zinc-400">
+      <thead className="text-left text-xs font-semibold tracking-wide text-zinc-500 uppercase dark:text-zinc-400">
         <tr>
-          <th className="py-1 pr-2 font-medium">Criterio</th>
-          <th className="py-1 pr-2 text-right font-medium">Puntos</th>
+          <th className="py-1.5 pr-2">Criterio</th>
+          <th className="py-1.5 pr-2 text-right">Puntos</th>
         </tr>
       </thead>
       <tbody>
         {rows.map(({ entry, value }) => (
           <tr key={entry.key} className="border-t border-zinc-100 dark:border-zinc-800">
-            <td className="py-1 pr-2">{entry.label}</td>
-            <td className="py-1 pr-2 text-right font-mono">{value}</td>
+            <td className="py-1.5 pr-2">{entry.label}</td>
+            <td className="py-1.5 pr-2 text-right font-mono">{value}</td>
           </tr>
         ))}
         {extraRows.map((r) => (
           <tr key={r.key} className="border-t border-zinc-100 dark:border-zinc-800">
-            <td className="py-1 pr-2">{r.key}</td>
-            <td className="py-1 pr-2 text-right font-mono">{r.value}</td>
+            <td className="py-1.5 pr-2">{r.key}</td>
+            <td className="py-1.5 pr-2 text-right font-mono">{r.value}</td>
           </tr>
         ))}
       </tbody>
       <tfoot className="border-t-2 border-zinc-300 text-sm dark:border-zinc-700">
         <tr>
-          <td className="py-1 pr-2 text-zinc-600 dark:text-zinc-400">Subtotal</td>
-          <td className="py-1 pr-2 text-right font-mono">{sub}</td>
+          <td className="py-1.5 pr-2 text-zinc-600 dark:text-zinc-400">Subtotal</td>
+          <td className="py-1.5 pr-2 text-right font-mono">{sub}</td>
         </tr>
         {mult !== 1 && (
           <tr>
-            <td className="py-1 pr-2 text-zinc-600 dark:text-zinc-400">Multiplicador</td>
-            <td className="py-1 pr-2 text-right font-mono">×{mult}</td>
+            <td className="py-1.5 pr-2 text-zinc-600 dark:text-zinc-400">Multiplicador</td>
+            <td className="py-1.5 pr-2 text-right font-mono">×{mult}</td>
           </tr>
         )}
         <tr>
-          <td className="py-1 pr-2 font-semibold">Total</td>
-          <td className="py-1 pr-2 text-right font-mono font-semibold">{pointsTotal}</td>
+          <td className="py-1.5 pr-2 font-semibold">Total</td>
+          <td className="py-1.5 pr-2 text-right font-mono font-semibold">{pointsTotal}</td>
         </tr>
         {groupCode && (
           <tr>
-            <td className="py-1 pr-2 text-xs text-zinc-500 dark:text-zinc-400" colSpan={2}>
+            <td className="py-1.5 pr-2 text-xs text-zinc-500 dark:text-zinc-400" colSpan={2}>
               Grupo {groupCode}
             </td>
           </tr>

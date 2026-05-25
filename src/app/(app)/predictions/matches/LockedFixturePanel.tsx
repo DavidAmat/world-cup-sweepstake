@@ -83,7 +83,19 @@ function ExtraInfo({ et, pen, qual }: { et: boolean; pen: boolean; qual: string 
   );
 }
 
-function PointsCell({ score, popoverLabel }: { score: Score | null; popoverLabel: string }) {
+function PointsCell({
+  score,
+  popoverLabel,
+  popoverId,
+  openId,
+  onOpenChange,
+}: {
+  score: Score | null;
+  popoverLabel: string;
+  popoverId: string;
+  openId: string | null;
+  onOpenChange: (next: string | null) => void;
+}) {
   // No `prediction_scores` row yet — the result hasn't been confirmed by
   // the admin. We display a flat "0 pts" so columns line up; there is no
   // breakdown to show in a popover.
@@ -91,7 +103,12 @@ function PointsCell({ score, popoverLabel }: { score: Score | null; popoverLabel
     return <span className="font-mono text-xs text-zinc-500 dark:text-zinc-400">0 pts</span>;
   }
   return (
-    <BreakdownPopover pointsTotal={score.points} label={popoverLabel}>
+    <BreakdownPopover
+      pointsTotal={score.points}
+      label={popoverLabel}
+      isOpen={openId === popoverId}
+      onToggle={(next) => onOpenChange(next ? popoverId : null)}
+    >
       <BreakdownTable breakdown={score.breakdown} pointsTotal={score.points} />
     </BreakdownPopover>
   );
@@ -136,6 +153,9 @@ function RankingRow({
   awayTeam,
   buildExtra,
   zebra,
+  popoverId,
+  openId,
+  onOpenChange,
 }: {
   position: number;
   entry: LockedEntry;
@@ -146,6 +166,9 @@ function RankingRow({
   awayTeam: string;
   buildExtra: (p: Prediction | null) => ReactNode;
   zebra: boolean;
+  popoverId: string;
+  openId: string | null;
+  onOpenChange: (next: string | null) => void;
 }) {
   const points = entry.score?.points ?? 0;
   const accent = isMe
@@ -176,6 +199,9 @@ function RankingRow({
           <PointsCell
             score={entry.score}
             popoverLabel={`${entry.display_name} · ${homeTeam} vs ${awayTeam}`}
+            popoverId={popoverId}
+            openId={openId}
+            onOpenChange={onOpenChange}
           />
         }
       />
@@ -212,6 +238,10 @@ export function LockedFixturePanel({
   const expanded = override && override.n === bulkSignal.n ? override.open : bulkSignal.open;
   const toggle = () => setOverride({ open: !expanded, n: bulkSignal.n });
 
+  // Only one popover open at a time per fixture: opening any cell
+  // closes the previously open one. `null` means none open.
+  const [openPopoverId, setOpenPopoverId] = useState<string | null>(null);
+
   const teamFor = (id: string | null) => teamName(id, homeId, awayId, homeTeam, awayTeam);
 
   const buildExtra = (p: Prediction | null): ReactNode => {
@@ -238,7 +268,7 @@ export function LockedFixturePanel({
   }, [fixtureId, myEntry, otherEntries]);
 
   return (
-    <div className="mt-3 overflow-hidden rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="mt-3 rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
       {/* Column header */}
       <div
         className={`${ROW_CLS} border-b border-zinc-200 bg-zinc-50 text-xs tracking-wide text-zinc-500 uppercase dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-400`}
@@ -292,6 +322,9 @@ export function LockedFixturePanel({
           <PointsCell
             score={myEntry.score}
             popoverLabel={`Mi desglose · ${homeTeam} vs ${awayTeam}`}
+            popoverId="me-fixed"
+            openId={openPopoverId}
+            onOpenChange={setOpenPopoverId}
           />
         }
         accent="bg-sky-50/70 dark:bg-sky-950/20"
@@ -326,6 +359,9 @@ export function LockedFixturePanel({
                   awayTeam={awayTeam}
                   buildExtra={buildExtra}
                   zebra={idx % 2 === 1}
+                  popoverId={r.entry.user_id}
+                  openId={openPopoverId}
+                  onOpenChange={setOpenPopoverId}
                 />
               ))}
             </div>
