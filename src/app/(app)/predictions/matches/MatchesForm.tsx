@@ -139,7 +139,11 @@ export function MatchesForm({
   // Broadcast object for the per-fixture ranking dropdowns. Each click
   // on the global button bumps `n` so panels re-apply the intent even
   // if the user had previously toggled some of them individually.
-  const [bulkSignal, setBulkSignal] = useState<LockedBulkSignal>({ open: false, n: 0 });
+  // Default is OPEN: once a round is locked we want every participant's
+  // prediction visible by default (admin gates the lock manually), and
+  // the user can collapse them with this button if they prefer the
+  // compact view.
+  const [bulkSignal, setBulkSignal] = useState<LockedBulkSignal>({ open: true, n: 0 });
   const toggleAll = () => setBulkSignal((s) => ({ open: !s.open, n: s.n + 1 }));
 
   return (
@@ -227,6 +231,7 @@ export function MatchesForm({
                       </p>
                     ) : f.locked ? (
                       <LockedFixturePanel
+                        fixtureId={f.id}
                         homeTeam={f.home}
                         awayTeam={f.away}
                         homeId={f.homeId}

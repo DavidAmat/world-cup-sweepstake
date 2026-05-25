@@ -45,6 +45,7 @@ export type LockedRealResult = {
 export type LockedBulkSignal = { open: boolean; n: number };
 
 type Props = {
+  fixtureId: string;
   homeTeam: string;
   awayTeam: string;
   homeId: string;
@@ -56,6 +57,15 @@ type Props = {
   otherEntries: LockedEntry[];
   bulkSignal: LockedBulkSignal;
 };
+
+// Stable per-string hash. Used as a tiebreaker when several entries have
+// the same points (e.g. no real result yet → all scores are null) so the
+// order looks random but doesn't reshuffle between renders.
+function pseudoHash(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return h;
+}
 
 function teamName(id: string | null, homeId: string, awayId: string, home: string, away: string) {
   if (!id) return "—";
@@ -74,8 +84,13 @@ function ExtraInfo({ et, pen, qual }: { et: boolean; pen: boolean; qual: string 
 }
 
 function PointsCell({ score, popoverLabel }: { score: Score | null; popoverLabel: string }) {
+  // No `prediction_scores` row yet — the result hasn't been confirmed by
+  // the admin. We display a flat "0 pts" so columns line up; there is no
+  // breakdown to show in a popover.
   if (!score) {
-    return <span className="text-right text-xs text-zinc-400">—</span>;
+    return (
+      <span className="font-mono text-xs text-zinc-500 dark:text-zinc-400">0 pts</span>
+    );
   }
   return (
     <BreakdownPopover pointsTotal={score.points} label={popoverLabel}>
@@ -179,6 +194,7 @@ function RankingRow({
 }
 
 export function LockedFixturePanel({
+  fixtureId,
   homeTeam,
   awayTeam,
   homeId,
@@ -205,7 +221,11 @@ export function LockedFixturePanel({
     return <ExtraInfo et={p.et} pen={p.pen} qual={teamFor(p.qual)} />;
   };
 
-  // Ranking = my entry + everyone else, sorted desc by points (then name).
+  // Ranking = my entry + everyone else, sorted desc by points. Tie-break
+  // is a deterministic hash of fixtureId+user_id so fixtures without a
+  // real result yet show participants in a pseudo-random order (a
+  // different order per fixture, but stable between renders of the same
+  // fixture — refreshing the page doesn't reshuffle).
   const ranking = useMemo(() => {
     const all: { entry: LockedEntry; isMe: boolean }[] = [
       { entry: myEntry, isMe: true },
@@ -215,9 +235,9 @@ export function LockedFixturePanel({
       const ap = a.entry.score?.points ?? -1;
       const bp = b.entry.score?.points ?? -1;
       if (ap !== bp) return bp - ap;
-      return a.entry.display_name.localeCompare(b.entry.display_name);
+      return pseudoHash(fixtureId + a.entry.user_id) - pseudoHash(fixtureId + b.entry.user_id);
     });
-  }, [myEntry, otherEntries]);
+  }, [fixtureId, myEntry, otherEntries]);
 
   return (
     <div className="mt-3 overflow-hidden rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">

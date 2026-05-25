@@ -246,8 +246,7 @@ export default async function MatchPredictionsPage({
       {overriding && (
         <p className="mt-4 rounded-md border border-sky-300 bg-sky-50 p-3 text-xs text-sky-800 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-200">
           🧪 Fecha simulada (FECHA_ACTUAL):{" "}
-          <strong>{fechaActual ? formatMadridDateTime(fechaActual) : "—"} (Madrid)</strong>. El
-          bloqueo de cada partido se evalúa contra esta fecha.
+          <strong>{fechaActual ? formatMadridDateTime(fechaActual) : "—"} (Madrid)</strong>.
         </p>
       )}
       {error && (
