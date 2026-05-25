@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 import { requireAdmin } from "@/lib/permissions/requireAdmin";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { formatMadridDateTime, utcIsoToMadridInput } from "@/lib/dates/madridTime";
@@ -10,8 +9,6 @@ import { updateFixture } from "../actions";
 type RouteParams = Promise<{ id: string }>;
 type SearchParams = Promise<{ error?: string; ok?: string }>;
 
-const LOCK_WINDOW_MS = 24 * 60 * 60 * 1000;
-
 export default async function EditFixturePage({
   params,
   searchParams,
@@ -19,7 +16,6 @@ export default async function EditFixturePage({
   params: RouteParams;
   searchParams: SearchParams;
 }) {
-  await connection(); // unblock Date.now() for the lock-window warning
   const { id } = await params;
   const { error: errMsg, ok } = await searchParams;
   const { supabase } = await requireAdmin();
@@ -40,7 +36,7 @@ export default async function EditFixturePage({
         home_placeholder,
         away_placeholder,
         stage:stages ( id, code, name ),
-        round:rounds ( id, code, name )
+        round:rounds ( id, code, name, predictions_locked_at )
       `,
     )
     .eq("id", id)
@@ -56,9 +52,7 @@ export default async function EditFixturePage({
     .eq("tournament_id", tournament.id)
     .order("display_name", { ascending: true });
 
-  const kickoffMs = new Date(fixture.kickoff_at).getTime();
-  // eslint-disable-next-line react-hooks/purity -- request-scoped; connection() above forces dynamic render
-  const isLockedByKickoff = Date.now() >= kickoffMs - LOCK_WINDOW_MS;
+  const isRoundLocked = fixture.round?.predictions_locked_at != null;
   const isFinalState = fixture.status === "completed" || fixture.status === "cancelled";
 
   return (
@@ -93,11 +87,11 @@ export default async function EditFixturePage({
         </p>
       )}
 
-      {isLockedByKickoff && (
+      {isRoundLocked && (
         <p className="mt-4 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
-          Este fixture ya está dentro de la ventana de bloqueo de 24h. Cambios en{" "}
+          Esta jornada ({fixture.round?.name}) está bloqueada para predicciones. Cambios en{" "}
           <code>kickoff_at</code> o equipos afectan a las predicciones que se hagan a partir de
-          ahora.
+          ahora. Desbloquéala en <code>/admin/results</code> si necesitas reabrirla.
         </p>
       )}
       {isFinalState && (
@@ -227,8 +221,8 @@ export default async function EditFixturePage({
             <option value="cancelled">Cancelado</option>
           </select>
           <span className="text-xs text-zinc-500">
-            Normalmente lo gestiona el sistema. El bloqueo por kickoff_at − 24h se evalúa
-            dinámicamente, no por este campo.
+            Es solo el estado interno del fixture. El bloqueo de predicciones se decide a nivel de
+            jornada desde <code>/admin/results</code>, no por este campo.
           </span>
         </label>
 

@@ -794,6 +794,8 @@ export type Database = {
           created_at: string;
           id: string;
           name: string;
+          predictions_locked_at: string | null;
+          predictions_locked_by: string | null;
           sort_order: number;
           stage_id: string;
           tournament_id: string;
@@ -804,6 +806,8 @@ export type Database = {
           created_at?: string;
           id?: string;
           name: string;
+          predictions_locked_at?: string | null;
+          predictions_locked_by?: string | null;
           sort_order: number;
           stage_id: string;
           tournament_id: string;
@@ -814,12 +818,21 @@ export type Database = {
           created_at?: string;
           id?: string;
           name?: string;
+          predictions_locked_at?: string | null;
+          predictions_locked_by?: string | null;
           sort_order?: number;
           stage_id?: string;
           tournament_id?: string;
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "rounds_predictions_locked_by_fkey";
+            columns: ["predictions_locked_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["user_id"];
+          },
           {
             foreignKeyName: "rounds_stage_id_fkey";
             columns: ["stage_id"];

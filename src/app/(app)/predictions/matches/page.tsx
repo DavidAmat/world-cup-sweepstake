@@ -57,7 +57,7 @@ export default async function MatchPredictionsPage({
   const { error, ok } = await searchParams;
   const { userId, supabase } = await requireAuth();
   const tournament = await getDefaultTournament();
-  const { appNow, overriding, fechaActual } = await getMatchLockState();
+  const { overriding, fechaActual, lockedRoundIds } = await getMatchLockState(tournament.id);
 
   const [
     { data: rounds },
@@ -208,7 +208,7 @@ export default async function MatchPredictionsPage({
           awayId: f.away_team_id ?? "",
           kickoff: f.kickoff_at,
           isKnockout: stageCode !== "group_stage",
-          locked: isFixtureLocked(f.kickoff_at, appNow),
+          locked: isFixtureLocked(f.round_id, lockedRoundIds),
           noTeams: !f.home_team_id || !f.away_team_id,
           maxPoints: maxPointsForStage(stageCode),
           saved: myP
@@ -233,8 +233,9 @@ export default async function MatchPredictionsPage({
         <div>
           <h1 className="text-2xl font-bold">Predicciones de partidos</h1>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            Marcador a 90&apos;. En eliminatorias, además prórroga, penaltis y equipo que pasa. Cada
-            partido se bloquea 24&nbsp;h antes del inicio.
+            Marcador a 90&apos;. En eliminatorias, además prórroga, penaltis y equipo que pasa. El
+            administrador bloquea cada jornada antes de su primer partido; una vez bloqueada, no se
+            pueden editar y las predicciones de todos se hacen públicas.
           </p>
         </div>
         <Link href="/predictions/matches/public" className="text-sm whitespace-nowrap underline">

@@ -16,6 +16,7 @@ function back(params: string): never {
 type FixtureRow = {
   id: string;
   kickoff_at: string;
+  round_id: string;
   home_team_id: string | null;
   away_team_id: string | null;
   stage: { code: string } | null;
@@ -52,17 +53,17 @@ export async function saveAllMatchPredictions(formData: FormData) {
 
   const { data: fixtures } = await supabase
     .from("fixtures")
-    .select("id, kickoff_at, home_team_id, away_team_id, stage:stages ( code )")
+    .select("id, kickoff_at, round_id, home_team_id, away_team_id, stage:stages ( code )")
     .eq("tournament_id", tournament.id);
 
-  const { appNow } = await getMatchLockState();
+  const { lockedRoundIds } = await getMatchLockState(tournament.id);
 
   const rows: PredictionRow[] = [];
   const errors: string[] = [];
 
   for (const f of (fixtures ?? []) as FixtureRow[]) {
     if (!hasTeams(f)) continue;
-    if (isFixtureLocked(f.kickoff_at, appNow)) continue; // RLS would reject too
+    if (isFixtureLocked(f.round_id, lockedRoundIds)) continue; // RLS would reject too
 
     const res = readFixturePayload(formData, {
       id: f.id,
@@ -133,15 +134,15 @@ export async function generateRandomMatchPredictions() {
 
   const { data: fixtures } = await supabase
     .from("fixtures")
-    .select("id, kickoff_at, home_team_id, away_team_id, stage:stages ( code )")
+    .select("id, kickoff_at, round_id, home_team_id, away_team_id, stage:stages ( code )")
     .eq("tournament_id", tournament.id);
 
-  const { appNow } = await getMatchLockState();
+  const { lockedRoundIds } = await getMatchLockState(tournament.id);
 
   const rows: PredictionRow[] = [];
   for (const f of (fixtures ?? []) as FixtureRow[]) {
     if (!hasTeams(f)) continue;
-    if (isFixtureLocked(f.kickoff_at, appNow)) continue;
+    if (isFixtureLocked(f.round_id, lockedRoundIds)) continue;
 
     const roll = Math.random();
     const bucket = roll < 0.4 ? HOME_WIN : roll < 0.7 ? DRAW : AWAY_WIN;

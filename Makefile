@@ -1,13 +1,19 @@
 # Dev helper: simular la "fecha actual" (FECHA_ACTUAL) y reiniciar Next.
 #
-# El bloqueo de predicciones iniciales se evalúa contra app_now()
-# (= FECHA_ACTUAL si está, si no now() real). El primer partido del
-# torneo de test es 2026-06-11 22:00 Madrid: una fecha POSTERIOR congela
-# las predicciones y las hace públicas; ANTERIOR (o vacía) = abiertas.
+# El bloqueo de predicciones de partidos YA NO depende de la fecha — lo
+# gestiona el administrador a mano desde /admin/results por jornada
+# (rounds.predictions_locked_at). Ver
+# `documentation/user_guides/bloqueo_predicciones.md`.
+#
+# `FECHA_ACTUAL` sigue siendo útil para simular el lock de predicciones
+# iniciales (campeón / subcampeón / pichichi / mejor jugador /
+# clasificados de grupo), que sí se cierra automáticamente cuando
+# app_now() llega a `initial_predictions_lock_at()` (por defecto, el
+# arranque del torneo).
 #
 # Uso:
-#   make fecha FECHA=2026-06-12T09:00   # simular (torneo empezado)
-#   make fecha FECHA=2026-06-01         # simular (aún abierto)
+#   make fecha FECHA=2026-06-12T09:00   # simular (predicciones iniciales bloqueadas)
+#   make fecha FECHA=2026-06-01         # simular (iniciales aún abiertas)
 #   make fecha FECHA=                   # volver a la fecha real
 #
 # Reescribe la línea FECHA_ACTUAL de .env.local y reinicia `npm run dev`

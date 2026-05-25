@@ -53,8 +53,9 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
             grupos) puntúan al final del torneo.
           </li>
           <li>
-            Las predicciones se bloquean 24 horas antes del partido y entonces se hacen públicas
-            para todos.
+            El administrador bloquea cada jornada antes de que empiece. Una vez bloqueada, las
+            predicciones de esa jornada quedan congeladas y son visibles para todos los
+            participantes.
           </li>
         </ul>
       </section>

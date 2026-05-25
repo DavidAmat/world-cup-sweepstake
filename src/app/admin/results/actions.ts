@@ -234,6 +234,48 @@ export async function generateRandomResults(formData: FormData) {
 
 const KNOCKOUT_ROUNDS = new Set<RoundCode>(["r32", "r16", "qf", "sf", "third", "final"]);
 
+// ── Per-round prediction lock toggle ─────────────────────────────────────────
+// Replaces the old "kickoff − 24h" auto-lock. The admin explicitly closes a
+// round before the first match of that round so participants can no longer
+// edit their predictions and RLS exposes the predictions of all users to
+// everyone authenticated.
+
+async function toggleRoundLock(formData: FormData, action: "lock" | "unlock") {
+  const { userId, supabase } = await requireAdmin();
+  const tournament = await getDefaultTournament();
+  const roundCode = String(formData.get("round") ?? "") as RoundCode;
+  if (!ROUNDS.some((r) => r.code === roundCode)) {
+    redirect(`/admin/results?error=${encodeURIComponent("Jornada no válida.")}`);
+  }
+
+  const update =
+    action === "lock"
+      ? { predictions_locked_at: new Date().toISOString(), predictions_locked_by: userId }
+      : { predictions_locked_at: null, predictions_locked_by: null };
+
+  const { error } = await supabase
+    .from("rounds")
+    .update(update)
+    .eq("tournament_id", tournament.id)
+    .eq("code", roundCode);
+  if (error) {
+    redirect(`/admin/results?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/admin/results");
+  revalidatePath("/predictions/matches");
+  revalidatePath("/predictions/matches/public");
+  redirect(`/admin/results?ok=${action === "lock" ? "locked" : "unlocked"}`);
+}
+
+export async function lockRoundPredictions(formData: FormData) {
+  await toggleRoundLock(formData, "lock");
+}
+
+export async function unlockRoundPredictions(formData: FormData) {
+  await toggleRoundLock(formData, "unlock");
+}
+
 export async function generateKnockoutPairings(formData: FormData) {
   const { supabase } = await requireAdmin();
   const tournament = await getDefaultTournament();

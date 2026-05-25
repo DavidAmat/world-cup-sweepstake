@@ -4,7 +4,12 @@ import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { Badge } from "@/components/ui/Badge";
 import { ROUNDS, type RoundCode } from "@/lib/fixtures/catalogs";
-import { generateKnockoutPairings, generateRandomResults } from "./actions";
+import {
+  generateKnockoutPairings,
+  generateRandomResults,
+  lockRoundPredictions,
+  unlockRoundPredictions,
+} from "./actions";
 
 type SearchParams = Promise<{ round?: string; ok?: string; error?: string }>;
 
@@ -38,12 +43,13 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
   const roundCode = (ROUNDS.find((r) => r.code === params.round)?.code ??
     DEFAULT_ROUND) as RoundCode;
 
-  const { data: round } = await supabase
+  const { data: allRounds } = await supabase
     .from("rounds")
-    .select("id")
+    .select("id, code, name, sort_order, predictions_locked_at")
     .eq("tournament_id", tournament.id)
-    .eq("code", roundCode)
-    .maybeSingle();
+    .order("sort_order", { ascending: true });
+
+  const round = (allRounds ?? []).find((r) => r.code === roundCode) ?? null;
 
   let fixtures: FixtureRow[] = [];
   if (round) {
@@ -119,11 +125,70 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
           eliminados; el motor de puntuación se ha recalculado.
         </p>
       )}
+      {params.ok === "locked" && (
+        <p className="mt-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+          Jornada bloqueada. Las predicciones de esa jornada quedan congeladas y son visibles para
+          todos los participantes.
+        </p>
+      )}
+      {params.ok === "unlocked" && (
+        <p className="mt-4 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+          Jornada desbloqueada. Los participantes pueden volver a editar sus predicciones y dejan de
+          ser visibles para los demás.
+        </p>
+      )}
       {params.error && (
         <p className="mt-4 rounded-md border border-rose-300 bg-rose-50 p-3 text-sm text-rose-700 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-300">
           {params.error}
         </p>
       )}
+
+      <section className="mt-6 rounded-md border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <h2 className="text-sm font-semibold">Bloqueo de predicciones por jornada</h2>
+        <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+          Mientras una jornada esté abierta, los participantes pueden seguir editando sus
+          predicciones de sus partidos y nadie ve las de los demás. Cuando la bloquees, esas
+          predicciones quedan congeladas y son visibles para todos los participantes (ya no se
+          pueden modificar ni copiar).
+        </p>
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {(allRounds ?? []).map((r) => {
+            const locked = r.predictions_locked_at !== null;
+            return (
+              <li
+                key={r.id}
+                className={
+                  "flex items-center justify-between rounded-md border px-3 py-2 text-sm " +
+                  (locked
+                    ? "border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30"
+                    : "border-emerald-300 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30")
+                }
+              >
+                <div className="flex flex-col">
+                  <span className="font-medium">{r.name}</span>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {locked ? `🔒 Bloqueada` : "🟢 Abierta"}
+                  </span>
+                </div>
+                <form action={locked ? unlockRoundPredictions : lockRoundPredictions}>
+                  <input type="hidden" name="round" value={r.code} />
+                  <button
+                    type="submit"
+                    className={
+                      "rounded-md px-3 py-1 text-xs font-medium " +
+                      (locked
+                        ? "border border-amber-400 bg-white text-amber-800 hover:bg-amber-100 dark:border-amber-600 dark:bg-zinc-900 dark:text-amber-200 dark:hover:bg-amber-950/50"
+                        : "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200")
+                    }
+                  >
+                    {locked ? "Desbloquear" : "Bloquear"}
+                  </button>
+                </form>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
 
       <form
         method="get"

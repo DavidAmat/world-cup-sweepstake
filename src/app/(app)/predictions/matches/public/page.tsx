@@ -14,6 +14,7 @@ type TeamRef = { display_name: string; code: string } | null;
 type Fixture = {
   id: string;
   kickoff_at: string;
+  round_id: string;
   home_team_id: string | null;
   away_team_id: string | null;
   home_team: TeamRef;
@@ -29,7 +30,7 @@ export default async function PublicMatchPredictionsPage({
   const { round: roundParam } = await searchParams;
   const { supabase } = await requireAuth();
   const tournament = await getDefaultTournament();
-  const { appNow, overriding, fechaActual } = await getMatchLockState();
+  const { overriding, fechaActual, lockedRoundIds } = await getMatchLockState(tournament.id);
 
   const [{ data: rounds }, { data: roundFixtures }, { data: profiles }] = await Promise.all([
     supabase
@@ -55,16 +56,17 @@ export default async function PublicMatchPredictionsPage({
     );
   }
 
-  const firstLocked = availableRounds.find((r) =>
-    (roundFixtures ?? []).some((f) => f.round_id === r.id && isFixtureLocked(f.kickoff_at, appNow)),
-  );
+  // Pre-select the first round the admin has already locked so the user
+  // lands on actionable data; if no round is locked yet we fall back to
+  // the first available round (the page will explain why nothing shows).
+  const firstLocked = availableRounds.find((r) => lockedRoundIds.has(r.id));
   const selectedRound =
     availableRounds.find((r) => r.code === roundParam) ?? firstLocked ?? availableRounds[0];
 
   const { data: fxData } = await supabase
     .from("fixtures")
     .select(
-      `id, kickoff_at, home_team_id, away_team_id,
+      `id, kickoff_at, round_id, home_team_id, away_team_id,
        home_team:teams!fixtures_home_team_id_fkey ( display_name, code ),
        away_team:teams!fixtures_away_team_id_fkey ( display_name, code ),
        stage:stages ( code )`,
@@ -103,8 +105,7 @@ export default async function PublicMatchPredictionsPage({
         <div>
           <h1 className="text-2xl font-bold">Predicciones de partidos · vista pública</h1>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            Las predicciones de cada partido se hacen públicas cuando se bloquea (24&nbsp;h antes
-            del inicio).
+            Las predicciones de cada jornada se hacen públicas cuando el administrador la bloquea.
           </p>
         </div>
         <Link href="/predictions/matches" className="text-sm underline whitespace-nowrap">
@@ -126,6 +127,7 @@ export default async function PublicMatchPredictionsPage({
             {availableRounds.map((r) => (
               <option key={r.id} value={r.code}>
                 {r.name}
+                {lockedRoundIds.has(r.id) ? " · 🔒" : ""}
               </option>
             ))}
           </select>
@@ -140,7 +142,7 @@ export default async function PublicMatchPredictionsPage({
 
       <section className="mt-6 flex flex-col gap-4">
         {fixtures.map((f) => {
-          const locked = isFixtureLocked(f.kickoff_at, appNow);
+          const locked = isFixtureLocked(f.round_id, lockedRoundIds);
           const kn = (f.stage?.code ?? "group_stage") !== "group_stage";
           const home = f.home_team?.display_name ?? f.home_team?.code ?? "—";
           const away = f.away_team?.display_name ?? f.away_team?.code ?? "—";
@@ -165,7 +167,8 @@ export default async function PublicMatchPredictionsPage({
 
               {!locked ? (
                 <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
-                  🔒 Se hará pública cuando se bloquee, 24&nbsp;h antes del partido.
+                  🔒 Esta jornada todavía no se ha bloqueado. Las predicciones se publicarán cuando
+                  el administrador la bloquee.
                 </p>
               ) : (
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
