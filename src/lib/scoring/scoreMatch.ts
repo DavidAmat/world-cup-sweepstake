@@ -78,10 +78,16 @@ export function scoreKnockoutMatch(
 ): ScoringOutput {
   const breakdown = scoreMatchCommon(p, r, rules);
 
-  if (p.predicts_extra_time === r.went_extra_time) {
+  // Extra-time and penalty points are awarded ONLY when the event
+  // actually happens AND the user predicted it (true && true). Matches
+  // decided in 90' do not give "free" 5+5 to whoever predicted "no
+  // extra time / no penalties" — the user can only opt into those
+  // checkboxes by predicting a draw at 90', so the points reward the
+  // commitment of predicting overtime, not the absence of it.
+  if (r.went_extra_time && p.predicts_extra_time) {
     breakdown.correct_extra_time = rules.knockout.correct_extra_time;
   }
-  if (p.predicts_penalties === r.went_penalties) {
+  if (r.went_penalties && p.predicts_penalties) {
     breakdown.correct_penalties = rules.knockout.correct_penalties;
   }
   if (r.qualified_team_id !== null && p.predicted_qualified_team_id === r.qualified_team_id) {

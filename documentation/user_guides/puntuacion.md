@@ -76,13 +76,13 @@ Acertar quién gana + resultado exacto da **15 puntos**:
 
 Suma todo lo de la fase de grupos, y además:
 
-### Acertar si habrá prórroga → 5 puntos
+### Acertar que habrá prórroga → 5 puntos
 
-Tanto si predices "sí habrá prórroga" y la hay, como si predices "no habrá" y no la hay.
+Solo se cobran si el partido **realmente va a prórroga** y has marcado la casilla "habrá prórroga" (lo que te obliga a haber predicho empate al 90&apos;). Si el partido se decide en 90&apos;, **nadie** gana estos 5 puntos, independientemente de lo que haya predicho.
 
-### Acertar si habrá penaltis → 5 puntos
+### Acertar que habrá penaltis → 5 puntos
 
-Misma lógica.
+Misma lógica: solo si el partido **realmente termina en penaltis** y has marcado "se decide en los penaltis". En cualquier otro caso (sin prórroga, o prórroga pero sin penaltis), nadie cobra este premio.
 
 ### Acertar qué equipo pasa de ronda → 8 puntos
 
@@ -109,32 +109,50 @@ En el Mundial 2026 hay una ronda extra de **dieciseisavos (32 equipos)** antes d
 Real: España 2 - Inglaterra 1 en 90'. Pasa España.
 Tu predicción: 2-1 a los 90', sin prórroga, sin penaltis, pasa España.
 
-| Criterio                  | Puntos |
-| ------------------------- | ------ |
-| Acertar quién gana        | 5      |
-| Resultado exacto          | 10     |
-| Acertar "no hay prórroga" | 5      |
-| Acertar "no hay penaltis" | 5      |
-| Acertar quién pasa        | 8      |
-| **Subtotal**              | **33** |
-| Multiplicador de octavos  | x2     |
-| **Total**                 | **66** |
+| Criterio                 | Puntos |
+| ------------------------ | ------ |
+| Acertar quién gana       | 5      |
+| Resultado exacto         | 10     |
+| Prórroga (no la hay)     | 0      |
+| Penaltis (no los hay)    | 0      |
+| Acertar quién pasa       | 8      |
+| **Subtotal**             | **23** |
+| Multiplicador de octavos | x2     |
+| **Total**                | **46** |
 
-(Ni la cercanía por equipo ni la diferencia de goles se cuentan porque acertaste el resultado exacto.)
+(Ni la cercanía por equipo ni la diferencia de goles se cuentan porque acertaste el resultado exacto. Y los premios de prórroga/penaltis solo se otorgan si el partido va a esas fases; en un partido decidido en 90' nadie los gana.)
 
 **Caso B · empate y se decide en la prórroga (cuartos)**
 
 Real: España 1 - Inglaterra 1 a los 90'. Hay prórroga, no hay penaltis. Pasa España.
 Tu predicción: 1-1 a los 90', con prórroga, sin penaltis, pasa España.
 
-Subtotal: 33 (acierto total, sin contar cercanía ni diferencia porque acertaste el exacto). Multiplicador x2 (cuartos) → **66**.
+| Criterio                    | Puntos |
+| --------------------------- | ------ |
+| Acertar quién gana (90')    | 5      |
+| Resultado exacto (90')      | 10     |
+| Prórroga (la hay, acertada) | 5      |
+| Penaltis (no los hay)       | 0      |
+| Acertar quién pasa          | 8      |
+| **Subtotal**                | **28** |
+| Multiplicador cuartos       | x2     |
+| **Total**                   | **56** |
 
 **Caso C · empate, prórroga y penaltis (semifinales)**
 
 Real: España 1 - Inglaterra 1 a los 90'. Hay prórroga (sigue 1-1) y penaltis. Pasa Inglaterra.
 Tu predicción: 1-1 a los 90', con prórroga, con penaltis, pasa Inglaterra.
 
-Subtotal: 33 (acierto total, sin contar cercanía ni diferencia porque acertaste el exacto). Multiplicador x3 (semifinales) → **99**.
+| Criterio                      | Puntos |
+| ----------------------------- | ------ |
+| Acertar quién gana (90')      | 5      |
+| Resultado exacto (90')        | 10     |
+| Prórroga (la hay, acertada)   | 5      |
+| Penaltis (los hay, acertados) | 5      |
+| Acertar quién pasa            | 8      |
+| **Subtotal**                  | **33** |
+| Multiplicador semifinales     | x3     |
+| **Total**                     | **99** |
 
 **Caso D · acierto parcial (cuartos)**
 
@@ -156,16 +174,26 @@ Tu predicción: 1-1, prórroga, penaltis, pasa **España**.
 
 ### Máximos posibles por ronda de eliminatoria
 
-Acertar todo (con resultado exacto) da **33 puntos** de subtotal:
+El techo depende de cómo se decida el partido:
 
-| Ronda                      | Máximo de un partido |
-| -------------------------- | -------------------- |
-| Dieciseisavos (32 equipos) | 66                   |
-| Octavos (16 equipos)       | 66                   |
-| Cuartos                    | 66                   |
-| Tercer puesto              | 66                   |
-| Semifinales                | 99                   |
-| Final                      | 165                  |
+| Tipo de partido              | Subtotal | Notas                            |
+| ---------------------------- | -------- | -------------------------------- |
+| Decidido en 90&apos;         | **23**   | 5 + 10 + 8 (sin extras)          |
+| Empate + prórroga sin pen.   | **28**   | 23 + 5 (prórroga)                |
+| Empate + prórroga + penaltis | **33**   | 23 + 5 (prórroga) + 5 (penaltis) |
+
+Aplicando el multiplicador de la ronda, el máximo absoluto por partido (asumiendo que va a penaltis) queda:
+
+| Ronda                      | Máximo absoluto (con penaltis) |
+| -------------------------- | ------------------------------ |
+| Dieciseisavos (32 equipos) | 66                             |
+| Octavos (16 equipos)       | 66                             |
+| Cuartos                    | 66                             |
+| Tercer puesto              | 66                             |
+| Semifinales                | 99                             |
+| Final                      | 165                            |
+
+Las barras horizontales de la app comparan tus puntos contra el máximo **realista** del partido (23 / 28 / 33 según el caso, multiplicado por la ronda) y no contra el máximo absoluto, así que un acierto perfecto en un partido decidido en 90&apos; sí marca 100%.
 
 ---
 

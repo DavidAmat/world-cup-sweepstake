@@ -5,7 +5,7 @@ import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { BreakdownTable } from "@/components/scoring/BreakdownTable";
 import { BreakdownPopover } from "@/components/scoring/BreakdownPopover";
 import { PointsBar } from "@/components/scoring/PointsBar";
-import { maxPointsForStage } from "@/lib/scoring/maxPoints";
+import { maxPointsForFixture } from "@/lib/scoring/maxPoints";
 import {
   bucketFromBreakdown,
   CATEGORY_LABELS,
@@ -45,7 +45,9 @@ export default async function MyScoresPage() {
         .eq("tournament_id", tournament.id),
       supabase
         .from("match_results")
-        .select("fixture_id, home_goals_90, away_goals_90, result_status")
+        .select(
+          "fixture_id, home_goals_90, away_goals_90, went_extra_time, went_penalties, result_status",
+        )
         .eq("tournament_id", tournament.id)
         .eq("result_status", "confirmed"),
     ]);
@@ -77,7 +79,12 @@ export default async function MyScoresPage() {
   const resultByFixture = new Map(
     (results ?? []).map((r) => [
       r.fixture_id as string,
-      { h: r.home_goals_90 ?? 0, a: r.away_goals_90 ?? 0 },
+      {
+        h: r.home_goals_90 ?? 0,
+        a: r.away_goals_90 ?? 0,
+        went_extra_time: r.went_extra_time ?? false,
+        went_penalties: r.went_penalties ?? false,
+      },
     ]),
   );
 
@@ -109,6 +116,7 @@ export default async function MyScoresPage() {
       const fx = fixtureById.get(s.fixture_id!);
       if (!fx) return null;
       const stageCode = (fx.stage?.code ?? "group_stage") as StageCode;
+      const result = resultByFixture.get(s.fixture_id!) ?? null;
       return {
         fixture_id: s.fixture_id!,
         stageCode,
@@ -117,10 +125,15 @@ export default async function MyScoresPage() {
         kickoff: fx.kickoff_at,
         homeTeam: fx.home_team?.display_name ?? "TBD",
         awayTeam: fx.away_team?.display_name ?? "TBD",
-        result: resultByFixture.get(s.fixture_id!) ?? null,
+        result,
         points: s.points_total,
         breakdown: s.points_breakdown,
-        max: maxPointsForStage(stageCode),
+        max: maxPointsForFixture(
+          stageCode,
+          result
+            ? { went_extra_time: result.went_extra_time, went_penalties: result.went_penalties }
+            : null,
+        ),
       };
     })
     .filter((r): r is NonNullable<typeof r> => r !== null);

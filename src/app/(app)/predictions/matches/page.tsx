@@ -6,7 +6,7 @@ import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { generateRandomMatchPredictions } from "./actions";
 import { MatchesForm, type RoundVM } from "./MatchesForm";
 import type { LockedEntry } from "./LockedFixturePanel";
-import { maxPointsForStage } from "@/lib/scoring/maxPoints";
+import { maxPointsForFixture } from "@/lib/scoring/maxPoints";
 import type { StageCode } from "@/lib/scoring/types";
 
 type SearchParams = Promise<{ error?: string; ok?: string }>;
@@ -200,6 +200,7 @@ export default async function MatchPredictionsPage({
           );
 
         const stageCode = (f.stage?.code ?? "group_stage") as StageCode;
+        const fixtureResult = resultByFixture.get(f.id) ?? null;
         return {
           id: f.id,
           home: f.home_team?.display_name ?? f.home_team?.code ?? "—",
@@ -210,7 +211,12 @@ export default async function MatchPredictionsPage({
           isKnockout: stageCode !== "group_stage",
           locked: isFixtureLocked(f.round_id, lockedRoundIds),
           noTeams: !f.home_team_id || !f.away_team_id,
-          maxPoints: maxPointsForStage(stageCode),
+          maxPoints: maxPointsForFixture(
+            stageCode,
+            fixtureResult
+              ? { went_extra_time: fixtureResult.et, went_penalties: fixtureResult.pen }
+              : null,
+          ),
           saved: myP
             ? {
                 h90: myP.home_goals_90,
@@ -221,7 +227,7 @@ export default async function MatchPredictionsPage({
               }
             : null,
           score: myScore,
-          realResult: resultByFixture.get(f.id) ?? null,
+          realResult: fixtureResult,
           otherEntries,
         };
       }),

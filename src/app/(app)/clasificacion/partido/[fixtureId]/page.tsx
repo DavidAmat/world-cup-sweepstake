@@ -6,7 +6,7 @@ import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { BreakdownTable } from "@/components/scoring/BreakdownTable";
 import { BreakdownPopover } from "@/components/scoring/BreakdownPopover";
 import { PointsBar } from "@/components/scoring/PointsBar";
-import { maxPointsForStage } from "@/lib/scoring/maxPoints";
+import { maxPointsForFixture } from "@/lib/scoring/maxPoints";
 import type { StageCode } from "@/lib/scoring/types";
 
 type RouteParams = Promise<{ fixtureId: string }>;
@@ -73,7 +73,14 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
       : qualifiedTeamId === fixture.away_team_id
         ? awayTeam
         : null;
-  const maxPts = maxPointsForStage(stageCode);
+  const confirmedResult =
+    result && result.result_status === "confirmed"
+      ? {
+          went_extra_time: result.went_extra_time ?? false,
+          went_penalties: result.went_penalties ?? false,
+        }
+      : null;
+  const maxPts = maxPointsForFixture(stageCode, confirmedResult);
 
   const predByUser = new Map((preds ?? []).map((p) => [p.user_id, p]));
   const scoreByUser = new Map(

@@ -88,9 +88,7 @@ function PointsCell({ score, popoverLabel }: { score: Score | null; popoverLabel
   // the admin. We display a flat "0 pts" so columns line up; there is no
   // breakdown to show in a popover.
   if (!score) {
-    return (
-      <span className="font-mono text-xs text-zinc-500 dark:text-zinc-400">0 pts</span>
-    );
+    return <span className="font-mono text-xs text-zinc-500 dark:text-zinc-400">0 pts</span>;
   }
   return (
     <BreakdownPopover pointsTotal={score.points} label={popoverLabel}>
