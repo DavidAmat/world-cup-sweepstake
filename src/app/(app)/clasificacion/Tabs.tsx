@@ -3,10 +3,17 @@ import Link from "next/link";
 // Static tab bar — server component, no client state. The active tab
 // is passed via prop so each subpage can mark itself.
 
-export type TabKey = "general" | "jornada" | "fase" | "categoria" | "evolucion";
+export type TabKey =
+  | "general"
+  | "jornada"
+  | "fase"
+  | "categoria"
+  | "evolucion"
+  | "mis-predicciones";
 
 const TABS: { key: TabKey; href: string; label: string }[] = [
   { key: "general", href: "/clasificacion", label: "General" },
+  { key: "mis-predicciones", href: "/my-scores", label: "Mis Predicciones" },
   { key: "jornada", href: "/clasificacion/jornada", label: "Por jornada" },
   { key: "fase", href: "/clasificacion/fase", label: "Por fase" },
   { key: "categoria", href: "/clasificacion/categoria", label: "Por categoría" },

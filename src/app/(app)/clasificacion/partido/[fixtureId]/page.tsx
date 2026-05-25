@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
+import { TeamName } from "@/components/ui/TeamName";
 import { BreakdownTable } from "@/components/scoring/BreakdownTable";
 import { BreakdownPopover } from "@/components/scoring/BreakdownPopover";
 import { PointsBar } from "@/components/scoring/PointsBar";
@@ -116,8 +117,8 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
             {fixture.stage?.name ?? "Partido"} · {fixture.round?.name ?? ""}
             {fixture.group_code ? ` · Grupo ${fixture.group_code}` : ""}
           </p>
-          <h1 className="text-2xl font-bold">
-            {homeTeam} vs {awayTeam}
+          <h1 className="text-2xl font-bold inline-flex flex-wrap items-center gap-2">
+            <TeamName name={homeTeam} /> vs <TeamName name={awayTeam} />
           </h1>
           <p className="mt-1 text-xs text-zinc-500">
             {formatMadridDateTime(fixture.kickoff_at)} (Madrid)
@@ -132,14 +133,17 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
         <p className="text-xs font-semibold text-zinc-500 uppercase">Resultado oficial</p>
         {result && result.result_status === "confirmed" ? (
           <>
-            <p className="mt-1 text-lg font-bold">
-              {homeTeam} {result.home_goals_90} - {result.away_goals_90} {awayTeam}
+            <p className="mt-1 text-lg font-bold inline-flex flex-wrap items-center gap-1.5">
+              <TeamName name={homeTeam} /> {result.home_goals_90} - {result.away_goals_90}{" "}
+              <TeamName name={awayTeam} />
             </p>
             {isKnockout && (
-              <p className="mt-1 text-xs text-zinc-600">
+              <p className="mt-1 text-xs text-zinc-600 inline-flex flex-wrap items-center gap-1">
                 {result.went_extra_time ? "Con prórroga" : "Sin prórroga"} ·{" "}
                 {result.went_penalties ? "Decidido en penaltis" : "Sin penaltis"}
-                {qualifiedTeamName ? ` · Pasa: ${qualifiedTeamName}` : ""}
+                {qualifiedTeamName ? (
+                  <> · Pasa: <TeamName name={qualifiedTeamName} /></>
+                ) : null}
               </p>
             )}
             <p className="mt-2 text-xs text-zinc-500">
@@ -185,7 +189,7 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
                           {" · "}
                           {prediction.predicts_penalties ? "penaltis" : "sin penaltis"}
                           {" · pasa "}
-                          {teamFromId(prediction.predicted_qualified_team_id)}
+                          <TeamName name={teamFromId(prediction.predicted_qualified_team_id)} />
                         </>
                       )}
                     </p>

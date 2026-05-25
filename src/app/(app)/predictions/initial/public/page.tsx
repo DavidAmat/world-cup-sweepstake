@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TeamName } from "@/components/ui/TeamName";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getInitialLockState } from "@/lib/predictions/initialLock";
@@ -81,8 +82,8 @@ export default async function PublicInitialPredictionsPage({
 
   function renderValue(userId: string) {
     const p = predByUser.get(userId);
-    if (category === "campeon") return teamName(p?.champion_team_id);
-    if (category === "subcampeon") return teamName(p?.runner_up_team_id);
+    if (category === "campeon") return <TeamName name={teamName(p?.champion_team_id)} />;
+    if (category === "subcampeon") return <TeamName name={teamName(p?.runner_up_team_id)} />;
     if (category === "pichichi") return p?.top_scorer_text || "— sin predicción —";
     if (category === "mejor_jugador") return p?.best_player_text || "— sin predicción —";
     return null; // "clasificados" is rendered as a grid below, not a single value
@@ -153,8 +154,15 @@ export default async function PublicInitialPredictionsPage({
                       return (
                         <div key={g}>
                           <span className="font-semibold">Grupo {g}: </span>
-                          <span className="text-zinc-600">
-                            {ids.length ? ids.map((id) => teamName(id)).join(" · ") : "—"}
+                          <span className="text-zinc-600 inline-flex flex-wrap items-center gap-1">
+                            {ids.length
+                              ? ids.map((id, i) => (
+                                  <span key={id} className="inline-flex items-center gap-1">
+                                    {i > 0 && <span className="text-zinc-400">·</span>}
+                                    <TeamName name={teamName(id)} />
+                                  </span>
+                                ))
+                              : "—"}
                           </span>
                         </div>
                       );

@@ -1019,6 +1019,7 @@ export type Database = {
           created_at: string;
           group_qualifiers_per_group: number;
           id: string;
+          initial_predictions_locked_at: string | null;
           is_test: boolean;
           name: string;
           predictions_open_until: string | null;
@@ -1031,6 +1032,7 @@ export type Database = {
           created_at?: string;
           group_qualifiers_per_group?: number;
           id?: string;
+          initial_predictions_locked_at?: string | null;
           is_test?: boolean;
           name: string;
           predictions_open_until?: string | null;
@@ -1043,6 +1045,7 @@ export type Database = {
           created_at?: string;
           group_qualifiers_per_group?: number;
           id?: string;
+          initial_predictions_locked_at?: string | null;
           is_test?: boolean;
           name?: string;
           predictions_open_until?: string | null;

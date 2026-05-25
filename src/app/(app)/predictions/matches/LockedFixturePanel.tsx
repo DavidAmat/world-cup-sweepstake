@@ -1,16 +1,16 @@
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Flag } from "lucide-react";
+import { TeamName } from "@/components/ui/TeamName";
 import { BreakdownPopover } from "@/components/scoring/BreakdownPopover";
 import { BreakdownTable } from "@/components/scoring/BreakdownTable";
 import { PointsBar } from "@/components/scoring/PointsBar";
 
-// 6-column grid that vertically aligns the home/away goals across the
-// real result row, the current user's prediction and every ranking row.
-// The "Pts" column is fixed width so the ⓘ popover lines up.
+// 6-column grid: name | h-goal | separator | a-goal | extra | pts
+// Wider pts column so "56 pts" fits on one line.
 const ROW_CLS =
-  "grid grid-cols-[minmax(140px,1.4fr)_2.5rem_0.6rem_2.5rem_minmax(180px,1.6fr)_4.5rem] items-center gap-2 px-3 py-1.5 text-sm";
+  "grid grid-cols-[minmax(140px,1.4fr)_2.5rem_0.6rem_2.5rem_minmax(160px,1.5fr)_6rem] items-center gap-2 px-3 py-1.5 text-sm";
 
 type Prediction = {
   h90: number;
@@ -37,11 +37,6 @@ export type LockedRealResult = {
   qualifiedTeamId: string | null;
 };
 
-// `bulkSignal` is a controlled "broadcast" from the parent form. Every
-// time the user clicks the global "Mostrar/Ocultar todas las
-// predicciones" button the parent bumps `n` and sets `open`. Each panel
-// reacts via useEffect to apply that intent, while still allowing
-// individual toggles in between broadcasts.
 export type LockedBulkSignal = { open: boolean; n: number };
 
 type Props = {
@@ -58,9 +53,6 @@ type Props = {
   bulkSignal: LockedBulkSignal;
 };
 
-// Stable per-string hash. Used as a tiebreaker when several entries have
-// the same points (e.g. no real result yet → all scores are null) so the
-// order looks random but doesn't reshuffle between renders.
 function pseudoHash(s: string): number {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
@@ -74,12 +66,67 @@ function teamName(id: string | null, homeId: string, awayId: string, home: strin
   return "—";
 }
 
-function ExtraInfo({ et, pen, qual }: { et: boolean; pen: boolean; qual: string }) {
+function ExtraInfo({ et, pen, qual }: { et: boolean; pen: boolean; qual: ReactNode }) {
   return (
-    <span className="text-xs text-zinc-600">
+    <span className="inline-flex flex-wrap items-center gap-1 text-xs text-zinc-600">
       {et ? "Prórroga" : "Sin prórroga"} · {pen ? "penaltis" : "sin penaltis"} · pasa{" "}
       <strong>{qual}</strong>
     </span>
+  );
+}
+
+function ScoreBox({ value }: { value: number | string }) {
+  return (
+    <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-900 text-lg font-bold text-white shadow-sm">
+      {value}
+    </span>
+  );
+}
+
+function RealResultBanner({
+  homeTeam,
+  awayTeam,
+  realResult,
+  isKnockout,
+  qualTeamName,
+}: {
+  homeTeam: string;
+  awayTeam: string;
+  realResult: LockedRealResult;
+  isKnockout: boolean;
+  qualTeamName: string;
+}) {
+  return (
+    <div className="border-warning-light bg-warning-light/60 border-b px-4 py-3">
+      <div className="flex items-center justify-center gap-3">
+        <div className="flex min-w-0 flex-1 flex-col items-end gap-0.5">
+          <TeamName name={homeTeam} className="justify-end text-sm font-semibold" />
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <ScoreBox value={realResult.h} />
+          <span className="text-sm font-bold text-zinc-400">—</span>
+          <ScoreBox value={realResult.a} />
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
+          <TeamName name={awayTeam} className="text-sm font-semibold" />
+        </div>
+      </div>
+      {isKnockout && (
+        <div className="mt-1.5 flex justify-center">
+          <span className="bg-warning/20 text-warning-fg rounded-full px-3 py-0.5 text-xs">
+            {realResult.et
+              ? realResult.pen
+                ? `Penaltis · pasa ${qualTeamName}`
+                : `Prórroga · pasa ${qualTeamName}`
+              : `Pasa ${qualTeamName} (90′)`}
+          </span>
+        </div>
+      )}
+      <p className="text-warning-fg/70 mt-1 text-center text-[10px] font-semibold tracking-wide uppercase">
+        <Flag className="mr-1 inline h-3 w-3" aria-hidden />
+        Resultado oficial
+      </p>
+    </div>
   );
 }
 
@@ -96,11 +143,8 @@ function PointsCell({
   openId: string | null;
   onOpenChange: (next: string | null) => void;
 }) {
-  // No `prediction_scores` row yet — the result hasn't been confirmed by
-  // the admin. We display a flat "0 pts" so columns line up; there is no
-  // breakdown to show in a popover.
   if (!score) {
-    return <span className="font-mono text-xs text-zinc-500">0 pts</span>;
+    return <span className="font-mono text-xs whitespace-nowrap text-zinc-500">0 pts</span>;
   }
   return (
     <BreakdownPopover
@@ -141,8 +185,6 @@ function Row({
   );
 }
 
-// One row inside the expanded ranking. Same 6-col grid for vertical
-// alignment, but adds a second sub-row with the horizontal points bar.
 function RankingRow({
   position,
   entry,
@@ -205,7 +247,7 @@ function RankingRow({
         <div className="flex-1">
           <PointsBar value={points} max={maxPoints} />
         </div>
-        <span className="font-mono text-[10px] text-zinc-500">
+        <span className="font-mono text-[10px] whitespace-nowrap text-zinc-500">
           {points} / {maxPoints}
         </span>
       </div>
@@ -226,30 +268,19 @@ export function LockedFixturePanel({
   otherEntries,
   bulkSignal,
 }: Props) {
-  // Derived state: the panel follows the parent broadcast (`bulkSignal`)
-  // unless the user has toggled it individually since that broadcast. We
-  // remember the override along with the `n` it was set against, so a
-  // new broadcast automatically supersedes it without needing useEffect.
   const [override, setOverride] = useState<{ open: boolean; n: number } | null>(null);
   const expanded = override && override.n === bulkSignal.n ? override.open : bulkSignal.open;
   const toggle = () => setOverride({ open: !expanded, n: bulkSignal.n });
 
-  // Only one popover open at a time per fixture: opening any cell
-  // closes the previously open one. `null` means none open.
   const [openPopoverId, setOpenPopoverId] = useState<string | null>(null);
 
   const teamFor = (id: string | null) => teamName(id, homeId, awayId, homeTeam, awayTeam);
 
   const buildExtra = (p: Prediction | null): ReactNode => {
     if (!isKnockout || !p) return null;
-    return <ExtraInfo et={p.et} pen={p.pen} qual={teamFor(p.qual)} />;
+    return <ExtraInfo et={p.et} pen={p.pen} qual={<TeamName name={teamFor(p.qual)} />} />;
   };
 
-  // Ranking = my entry + everyone else, sorted desc by points. Tie-break
-  // is a deterministic hash of fixtureId+user_id so fixtures without a
-  // real result yet show participants in a pseudo-random order (a
-  // different order per fixture, but stable between renders of the same
-  // fixture — refreshing the page doesn't reshuffle).
   const ranking = useMemo(() => {
     const all: { entry: LockedEntry; isMe: boolean }[] = [
       { entry: myEntry, isMe: true },
@@ -264,42 +295,37 @@ export function LockedFixturePanel({
   }, [fixtureId, myEntry, otherEntries]);
 
   return (
-    <div className="mt-3 rounded-md border border-zinc-200 bg-white">
+    <div className="mt-3 overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      {/* Real result scoreboard */}
+      {realResult ? (
+        <RealResultBanner
+          homeTeam={homeTeam}
+          awayTeam={awayTeam}
+          realResult={realResult}
+          isKnockout={isKnockout}
+          qualTeamName={teamFor(realResult.qualifiedTeamId)}
+        />
+      ) : (
+        <p className="border-b border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-xs text-zinc-500 italic">
+          Aún sin resultado oficial confirmado.
+        </p>
+      )}
+
       {/* Column header */}
       <div
         className={`${ROW_CLS} border-b border-zinc-200 bg-zinc-50 text-xs tracking-wide text-zinc-500 uppercase`}
       >
         <span></span>
-        <span className="truncate text-center font-semibold">{homeTeam}</span>
+        <span className="flex justify-center font-semibold">
+          <TeamName name={homeTeam} />
+        </span>
         <span></span>
-        <span className="truncate text-center font-semibold">{awayTeam}</span>
+        <span className="flex justify-center font-semibold">
+          <TeamName name={awayTeam} />
+        </span>
         <span>{isKnockout ? "Detalles" : ""}</span>
         <span className="text-right">Pts</span>
       </div>
-
-      {/* Real result */}
-      {realResult ? (
-        <Row
-          label={<span className="text-warning-fg">🏁 Real</span>}
-          h={realResult.h}
-          a={realResult.a}
-          extra={
-            isKnockout ? (
-              <ExtraInfo
-                et={realResult.et}
-                pen={realResult.pen}
-                qual={teamFor(realResult.qualifiedTeamId)}
-              />
-            ) : null
-          }
-          rightCell={null}
-          accent="border-b border-warning-light bg-warning-light/70"
-        />
-      ) : (
-        <p className="border-b border-zinc-200 px-3 py-2 text-xs text-zinc-500 italic">
-          Aún sin resultado oficial confirmado.
-        </p>
-      )}
 
       {/* My prediction (fixed on top) */}
       <Row

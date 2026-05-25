@@ -1,11 +1,18 @@
+import React from "react";
 import Link from "next/link";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getInitialLockState } from "@/lib/predictions/initialLock";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { Badge } from "@/components/ui/Badge";
+import { TeamName } from "@/components/ui/TeamName";
+import { Lock, Unlock } from "lucide-react";
 import { GROUP_CODES, GROUP_QUALIFIERS } from "./schemas";
-import { saveInitialPredictions } from "./actions";
+import {
+  saveInitialPredictions,
+  lockInitialPredictions,
+  unlockInitialPredictions,
+} from "./actions";
 
 type SearchParams = Promise<{ error?: string; ok?: string }>;
 
@@ -20,6 +27,22 @@ export default async function InitialPredictionsPage({
   const { userId, supabase } = await requireAuth();
   const tournament = await getDefaultTournament();
   const { lockAt, locked, overriding, fechaActual } = await getInitialLockState(tournament.id);
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("user_id", userId)
+    .single();
+  const isAdmin = profile?.role === "admin";
+
+  const { data: tournamentFull } = await supabase
+    .from("tournaments")
+    .select("initial_predictions_locked_at")
+    .eq("id", tournament.id)
+    .single();
+  const manuallyLocked = !!(
+    tournamentFull as { initial_predictions_locked_at: string | null } | null
+  )?.initial_predictions_locked_at;
 
   const { data: teams } = await supabase
     .from("teams")
@@ -70,14 +93,42 @@ export default async function InitialPredictionsPage({
             Campeón, subcampeón, pichichi, mejor jugador y clasificados de cada grupo.
           </p>
         </div>
-        <Badge tone={locked ? "warning" : "success"}>{locked ? "Bloqueado" : "Abierto"}</Badge>
+        <div className="flex items-center gap-2">
+          {isAdmin &&
+            (locked ? (
+              <form action={unlockInitialPredictions}>
+                <button
+                  type="submit"
+                  className="border-success/30 bg-success/10 text-success-fg hover:bg-success/20 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
+                >
+                  <Unlock className="h-3.5 w-3.5" aria-hidden />
+                  Desbloquear
+                </button>
+              </form>
+            ) : (
+              <form action={lockInitialPredictions}>
+                <button
+                  type="submit"
+                  className="border-danger/30 bg-danger/10 text-danger-fg hover:bg-danger/20 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
+                >
+                  <Lock className="h-3.5 w-3.5" aria-hidden />
+                  Bloquear
+                </button>
+              </form>
+            ))}
+          <Badge tone={locked ? "danger" : "success"}>{locked ? "Bloqueado" : "Abierto"}</Badge>
+        </div>
       </div>
 
       <p className="mt-3 text-sm text-zinc-600">
         {locked ? (
           <>
-            Las predicciones se cerraron al empezar el torneo
-            {lockAt ? ` (${formatMadridDateTime(lockAt)} Madrid)` : ""}. Ya no se pueden editar.{" "}
+            {manuallyLocked
+              ? "Bloqueadas por el administrador."
+              : "Se cerraron al empezar el torneo" +
+                (lockAt ? ` (${formatMadridDateTime(lockAt)})` : "") +
+                "."}{" "}
+            Ya no se pueden editar.{" "}
             <Link href="/predictions/initial/public" className="underline">
               Ver las de todos
             </Link>
@@ -85,9 +136,9 @@ export default async function InitialPredictionsPage({
           </>
         ) : (
           <>
-            Puedes editarlas hasta que empiece el primer partido del torneo
-            {lockAt ? ` — ${formatMadridDateTime(lockAt)} (Madrid)` : ""}. Después serán solo
-            lectura y públicas.
+            Puedes editarlas hasta que el administrador las bloquee
+            {lockAt ? ` o empiece el primer partido (${formatMadridDateTime(lockAt)})` : ""}.
+            Después serán solo lectura y públicas.
           </>
         )}
       </p>
@@ -108,6 +159,16 @@ export default async function InitialPredictionsPage({
       {ok === "saved" && (
         <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Predicciones guardadas.
+        </p>
+      )}
+      {ok === "locked" && (
+        <p className="border-danger/30 bg-danger/10 text-danger-fg mt-4 rounded-lg border p-3 text-sm">
+          Predicciones iniciales bloqueadas. Los usuarios ya no pueden modificarlas.
+        </p>
+      )}
+      {ok === "unlocked" && (
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-lg border p-3 text-sm">
+          Predicciones iniciales desbloqueadas. Los usuarios pueden volver a editarlas.
         </p>
       )}
 
@@ -219,7 +280,7 @@ export default async function InitialPredictionsPage({
                             defaultChecked={selected.has(t.id)}
                             className="h-4 w-4 rounded border-zinc-300"
                           />
-                          <span>{t.display_name}</span>
+                          <TeamName name={t.display_name} />
                         </label>
                       ))}
                     </div>
@@ -272,8 +333,8 @@ function ReadOnlyView({
   return (
     <section className="mt-6 flex flex-col gap-6">
       <div className="grid gap-4 rounded-md border border-zinc-200 bg-white p-4 text-sm sm:grid-cols-2">
-        <Field label="Campeón" value={championName} />
-        <Field label="Subcampeón" value={runnerUpName} />
+        <Field label="Campeón" value={<TeamName name={championName} />} />
+        <Field label="Subcampeón" value={<TeamName name={runnerUpName} />} />
         <Field label="Pichichi" value={topScorer} />
         <Field label="Mejor jugador" value={bestPlayer} />
       </div>
@@ -287,8 +348,15 @@ function ReadOnlyView({
             return (
               <div key={g} className="text-sm">
                 <span className="font-semibold">Grupo {g}: </span>
-                <span className="text-zinc-600">
-                  {ids.length ? ids.map((id) => teamName(id)).join(" · ") : "—"}
+                <span className="inline-flex flex-wrap items-center gap-1 text-zinc-600">
+                  {ids.length
+                    ? ids.map((id, i) => (
+                        <span key={id} className="inline-flex items-center gap-1">
+                          {i > 0 && <span className="text-zinc-400">·</span>}
+                          <TeamName name={teamName(id)} />
+                        </span>
+                      ))
+                    : "—"}
                 </span>
               </div>
             );
@@ -299,7 +367,7 @@ function ReadOnlyView({
   );
 }
 
-function Field({ label, value }: { label: string; value: string }) {
+function Field({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
       <p className="text-xs text-zinc-500">{label}</p>

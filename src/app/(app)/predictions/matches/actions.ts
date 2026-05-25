@@ -3,8 +3,10 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAuth } from "@/lib/permissions/requireAuth";
+import { requireAdmin } from "@/lib/permissions/requireAdmin";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getMatchLockState, isFixtureLocked } from "@/lib/predictions/matchLock";
+import { ROUNDS, type RoundCode } from "@/lib/fixtures/catalogs";
 import { readFixturePayload } from "./schemas";
 
 const SELF = "/predictions/matches";
@@ -196,4 +198,41 @@ export async function generateRandomMatchPredictions() {
   revalidatePath(SELF);
   revalidatePath(`${SELF}/public`);
   redirect(`${SELF}?ok=random`);
+}
+
+// Admin-only: lock or unlock predictions for a round, from the predictions page.
+async function toggleRoundLockFromPredictions(formData: FormData, action: "lock" | "unlock") {
+  const { userId, supabase } = await requireAdmin();
+  const tournament = await getDefaultTournament();
+  const roundCode = String(formData.get("round") ?? "") as RoundCode;
+  if (!ROUNDS.some((r) => r.code === roundCode)) {
+    redirect(`${SELF}?error=${encodeURIComponent("Jornada no válida.")}`);
+  }
+
+  const update =
+    action === "lock"
+      ? { predictions_locked_at: new Date().toISOString(), predictions_locked_by: userId }
+      : { predictions_locked_at: null, predictions_locked_by: null };
+
+  const { error } = await supabase
+    .from("rounds")
+    .update(update)
+    .eq("tournament_id", tournament.id)
+    .eq("code", roundCode);
+  if (error) {
+    redirect(`${SELF}?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/admin/results");
+  revalidatePath(SELF);
+  revalidatePath(`${SELF}/public`);
+  redirect(`${SELF}?ok=${action === "lock" ? "locked" : "unlocked"}`);
+}
+
+export async function lockRoundFromPredictions(formData: FormData) {
+  await toggleRoundLockFromPredictions(formData, "lock");
+}
+
+export async function unlockRoundFromPredictions(formData: FormData) {
+  await toggleRoundLockFromPredictions(formData, "unlock");
 }

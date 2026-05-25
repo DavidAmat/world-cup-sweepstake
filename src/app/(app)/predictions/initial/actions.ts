@@ -4,11 +4,38 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/permissions/requireAuth";
+import { requireAdmin } from "@/lib/permissions/requireAdmin";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getInitialLockState } from "@/lib/predictions/initialLock";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { GROUP_QUALIFIERS, readInitialPayload } from "./schemas";
 
 const SELF = "/predictions/initial";
+
+export async function lockInitialPredictions() {
+  await requireAdmin();
+  const tournament = await getDefaultTournament();
+  const admin = createAdminClient();
+  await admin
+    .from("tournaments")
+    .update({ initial_predictions_locked_at: new Date().toISOString() })
+    .eq("id", tournament.id);
+  revalidatePath(SELF);
+  revalidatePath(`${SELF}/public`);
+  redirect(`${SELF}?ok=locked`);
+}
+
+export async function unlockInitialPredictions() {
+  await requireAdmin();
+  const tournament = await getDefaultTournament();
+  const admin = createAdminClient();
+  await admin
+    .from("tournaments")
+    .update({ initial_predictions_locked_at: null })
+    .eq("id", tournament.id);
+  revalidatePath(SELF);
+  redirect(`${SELF}?ok=unlocked`);
+}
 
 function flatten(err: z.ZodError): string {
   return err.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`).join("; ");

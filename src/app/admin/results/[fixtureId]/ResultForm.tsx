@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { TeamName } from "@/components/ui/TeamName";
 import { saveMatchResult, confirmMatchResult } from "../actions";
 import { GOAL_PERIODS, type GoalPeriod } from "../schemas";
 
@@ -106,7 +107,7 @@ export function ResultForm({
       <section className="rounded-md border border-zinc-200 bg-white p-5">
         <h2 className="text-sm font-semibold">Resultado a 90&apos;</h2>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
-          <span className="min-w-28 font-medium">{homeTeam.display_name}</span>
+          <span className="min-w-28 font-medium"><TeamName name={homeTeam.display_name} /></span>
           <input
             name="home_goals_90"
             type="number"
@@ -128,7 +129,7 @@ export function ResultForm({
             className={GOAL_NUM_CLS}
             required
           />
-          <span className="min-w-28 font-medium">{awayTeam.display_name}</span>
+          <span className="min-w-28 font-medium"><TeamName name={awayTeam.display_name} /></span>
         </div>
       </section>
 

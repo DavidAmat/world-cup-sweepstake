@@ -27,6 +27,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.3",
+    "country-flag-icons": "^1.6.17",
     "date-fns": "^4.1.0",
     "lucide-react": "^1.14.0",
     "next": "16.2.6",

@@ -59,6 +59,13 @@ export default async function MatchPredictionsPage({
   const tournament = await getDefaultTournament();
   const { overriding, fechaActual, lockedRoundIds } = await getMatchLockState(tournament.id);
 
+  const { data: profileData } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("user_id", userId)
+    .single();
+  const isAdmin = profileData?.role === "admin";
+
   const [
     { data: rounds },
     { data: fxData },
@@ -165,11 +172,26 @@ export default async function MatchPredictionsPage({
     fixturesByRound.set(f.round_id, arr);
   }
 
+  // Collect all distinct team names for the filter dropdown
+  const allTeams = Array.from(
+    new Set(
+      fixtures
+        .map((f) => [
+          f.home_team?.display_name ?? f.home_team?.code ?? "",
+          f.away_team?.display_name ?? f.away_team?.code ?? "",
+        ])
+        .flat()
+        .filter(Boolean),
+    ),
+  ).sort((a, b) => a.localeCompare(b, "es"));
+
   const roundVMs: RoundVM[] = (rounds ?? [])
     .filter((r) => (fixturesByRound.get(r.id)?.length ?? 0) > 0)
     .map((r) => ({
+      id: r.id,
       code: r.code,
       name: r.name,
+      locked: lockedRoundIds.has(r.id),
       fixtures: (fixturesByRound.get(r.id) ?? []).map((f) => {
         const myP = myPredByFixture.get(f.id);
         const myScore = myScoreByFixture.get(f.id) ?? null;
@@ -286,7 +308,12 @@ export default async function MatchPredictionsPage({
           Todavía no hay partidos cargados para este torneo.
         </p>
       ) : (
-        <MatchesForm rounds={roundVMs} myDisplayName={myDisplayName} />
+        <MatchesForm
+          rounds={roundVMs}
+          myDisplayName={myDisplayName}
+          isAdmin={isAdmin}
+          allTeams={allTeams}
+        />
       )}
     </main>
   );

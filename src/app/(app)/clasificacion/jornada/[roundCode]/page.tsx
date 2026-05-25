@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
+import { TeamName } from "@/components/ui/TeamName";
 import { ClasificacionTabs } from "../../Tabs";
 
 type RouteParams = Promise<{ roundCode: string }>;
@@ -133,7 +134,11 @@ export default async function JornadaDetallePage({ params }: { params: RoutePara
                         href={`/clasificacion/partido/${f.id}`}
                         className="font-medium hover:underline"
                       >
-                        {f.home_team?.display_name ?? "TBD"} vs {f.away_team?.display_name ?? "TBD"}
+                        <span className="inline-flex flex-wrap items-center gap-1.5">
+                          <TeamName name={f.home_team?.display_name ?? "TBD"} />
+                          {" vs "}
+                          <TeamName name={f.away_team?.display_name ?? "TBD"} />
+                        </span>
                       </Link>
                       <span className="text-xs text-zinc-500">
                         {formatMadridDateTime(f.kickoff_at)}

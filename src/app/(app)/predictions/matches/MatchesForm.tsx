@@ -2,8 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
+import { TeamName } from "@/components/ui/TeamName";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
-import { saveAllMatchPredictions } from "./actions";
+import { Lock, Unlock, ChevronDown } from "lucide-react";
+import {
+  saveAllMatchPredictions,
+  lockRoundFromPredictions,
+  unlockRoundFromPredictions,
+} from "./actions";
 import {
   LockedFixturePanel,
   type LockedBulkSignal,
@@ -42,8 +48,10 @@ export type FixtureVM = {
 };
 
 export type RoundVM = {
+  id: string;
   code: string;
   name: string;
+  locked: boolean;
   fixtures: FixtureVM[];
 };
 
@@ -98,10 +106,36 @@ function isSaved(v: Values, s: SavedVM | null): boolean {
 export function MatchesForm({
   rounds,
   myDisplayName,
+  isAdmin = false,
+  allTeams = [],
 }: {
   rounds: RoundVM[];
   myDisplayName: string;
+  isAdmin?: boolean;
+  allTeams?: string[];
 }) {
+  const [teamFilter, setTeamFilter] = useState<string>("");
+  const [filterSearch, setFilterSearch] = useState<string>("");
+  const [filterOpen, setFilterOpen] = useState(false);
+
+  const filteredTeams = useMemo(
+    () =>
+      allTeams.filter(
+        (t) => filterSearch.trim() === "" || t.toLowerCase().includes(filterSearch.toLowerCase()),
+      ),
+    [allTeams, filterSearch],
+  );
+
+  const filteredRounds = useMemo(() => {
+    if (!teamFilter) return rounds;
+    return rounds
+      .map((r) => ({
+        ...r,
+        fixtures: r.fixtures.filter((f) => f.home === teamFilter || f.away === teamFilter),
+      }))
+      .filter((r) => r.fixtures.length > 0);
+  }, [rounds, teamFilter]);
+
   const allFixtures = useMemo(() => rounds.flatMap((r) => r.fixtures), [rounds]);
 
   const [values, setValues] = useState<Record<string, Values>>(() => {
@@ -147,17 +181,75 @@ export function MatchesForm({
 
   return (
     <form action={saveAllMatchPredictions} className="mt-4">
-      <div className="sticky top-0 z-10 -mx-10 border-b border-zinc-200 bg-white/90 px-10 py-3 backdrop-blur">
+      <div className="sticky top-14 z-10 -mx-10 border-b border-zinc-200 bg-white/90 px-10 py-3 backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm">
-            {unsavedCount === 0 ? (
-              <span className="text-success-fg">Todo guardado ✓</span>
-            ) : (
-              <span className="text-warning-fg">
-                {unsavedCount} partido{unsavedCount === 1 ? "" : "s"} sin guardar
-              </span>
+          <div className="flex items-center gap-3">
+            <p className="text-sm">
+              {unsavedCount === 0 ? (
+                <span className="text-success-fg">Todo guardado ✓</span>
+              ) : (
+                <span className="text-warning-fg">
+                  {unsavedCount} partido{unsavedCount === 1 ? "" : "s"} sin guardar
+                </span>
+              )}
+            </p>
+
+            {/* Team filter dropdown */}
+            {allTeams.length > 0 && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setFilterOpen((v) => !v)}
+                  className="flex items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+                >
+                  {teamFilter ? teamFilter : "Filtrar selección"}
+                  <ChevronDown className="h-3 w-3" aria-hidden />
+                </button>
+                {filterOpen && (
+                  <div className="absolute top-full left-0 z-20 mt-1 w-56 rounded-xl border border-zinc-200 bg-white shadow-lg">
+                    <div className="p-2">
+                      <input
+                        type="text"
+                        placeholder="Buscar..."
+                        value={filterSearch}
+                        onChange={(e) => setFilterSearch(e.target.value)}
+                        className="focus:ring-primary w-full rounded-md border border-zinc-300 px-2.5 py-1.5 text-xs focus:ring-1 focus:outline-none"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="max-h-56 overflow-y-auto pb-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTeamFilter("");
+                          setFilterOpen(false);
+                          setFilterSearch("");
+                        }}
+                        className={`w-full px-3 py-2 text-left text-xs hover:bg-zinc-100 ${!teamFilter ? "text-primary font-medium" : "text-zinc-600"}`}
+                      >
+                        Todas las selecciones
+                      </button>
+                      {filteredTeams.map((t) => (
+                        <button
+                          type="button"
+                          key={t}
+                          onClick={() => {
+                            setTeamFilter(t);
+                            setFilterOpen(false);
+                            setFilterSearch("");
+                          }}
+                          className={`w-full px-3 py-2 text-left text-xs hover:bg-zinc-100 ${teamFilter === t ? "text-primary font-medium" : "text-zinc-600"}`}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
-          </p>
+          </div>
+
           <div className="flex items-center gap-2">
             {lockedCount > 0 && (
               <button
@@ -183,8 +275,13 @@ export function MatchesForm({
             <a
               key={r.code}
               href={`#r-${r.code}`}
-              className="rounded-full border border-zinc-300 px-2.5 py-1 text-xs hover:bg-zinc-100"
+              className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition-colors hover:bg-zinc-100 ${
+                r.locked
+                  ? "border-danger/30 bg-danger/5 text-danger-fg"
+                  : "border-zinc-300 text-zinc-600"
+              }`}
             >
+              {r.locked && <Lock className="h-2.5 w-2.5" aria-hidden />}
               {r.name}
             </a>
           ))}
@@ -192,26 +289,70 @@ export function MatchesForm({
       </div>
 
       <div className="mt-4 flex flex-col gap-8">
-        {rounds.map((r) => (
+        {filteredRounds.map((r) => (
           <section key={r.code} id={`r-${r.code}`} className="scroll-mt-32">
-            <h2 className="border-b-2 border-zinc-300 pb-1 text-lg font-bold">{r.name}</h2>
+            <div className="flex items-center justify-between gap-3 border-b-2 border-zinc-300 pb-1">
+              <h2
+                className={`flex items-center gap-2 text-lg font-bold ${r.locked ? "text-danger-fg" : ""}`}
+              >
+                {r.locked && <Lock className="h-4 w-4" aria-hidden />}
+                {r.name}
+                {r.locked && (
+                  <span className="bg-danger/10 text-danger-fg border-danger/20 ml-1 rounded-full border px-2 py-0.5 text-xs font-semibold">
+                    Bloqueado
+                  </span>
+                )}
+              </h2>
+              {isAdmin &&
+                (r.locked ? (
+                  <form action={unlockRoundFromPredictions}>
+                    <input type="hidden" name="round" value={r.code} />
+                    <button
+                      type="submit"
+                      className="border-success/30 bg-success/10 text-success-fg hover:bg-success/20 flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
+                    >
+                      <Unlock className="h-3 w-3" aria-hidden />
+                      Desbloquear jornada
+                    </button>
+                  </form>
+                ) : (
+                  <form action={lockRoundFromPredictions}>
+                    <input type="hidden" name="round" value={r.code} />
+                    <button
+                      type="submit"
+                      className="border-danger/30 bg-danger/10 text-danger-fg hover:bg-danger/20 flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
+                    >
+                      <Lock className="h-3 w-3" aria-hidden />
+                      Bloquear jornada
+                    </button>
+                  </form>
+                ))}
+            </div>
             <ul className="mt-3 flex flex-col gap-3">
               {r.fixtures.map((f) => {
                 const v = values[f.id];
                 const status = f.locked ? "blocked" : isSaved(v, f.saved) ? "saved" : "unsaved";
                 return (
-                  <li key={f.id} className="rounded-md border border-zinc-200 bg-white p-4">
+                  <li
+                    key={f.id}
+                    className={`rounded-xl border bg-white p-4 transition-colors ${
+                      f.locked ? "border-danger/20 bg-danger/5" : "border-zinc-200"
+                    }`}
+                  >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="text-sm">
-                        <span className="font-semibold">
-                          {f.home} <span className="text-zinc-400">vs</span> {f.away}
-                        </span>
-                        <span className="ml-2 text-xs text-zinc-500">
-                          {formatMadridDateTime(f.kickoff)} (Madrid)
+                      <div className="flex min-w-0 flex-wrap items-center gap-1.5 text-sm font-semibold">
+                        <TeamName name={f.home} />
+                        <span className="text-xs font-normal text-zinc-400">vs.</span>
+                        <TeamName name={f.away} />
+                        <span className="ml-1 text-xs font-normal whitespace-nowrap text-zinc-400">
+                          {formatMadridDateTime(f.kickoff)}
                         </span>
                       </div>
                       {status === "blocked" ? (
-                        <Badge tone="zinc">Bloqueado</Badge>
+                        <span className="bg-danger/10 text-danger-fg border-danger/20 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold">
+                          <Lock className="h-3 w-3" aria-hidden />
+                          Bloqueado
+                        </span>
                       ) : status === "saved" ? (
                         <Badge tone="success">Guardado</Badge>
                       ) : (
@@ -261,8 +402,8 @@ export function MatchesForm({
           Guardar predicciones
         </button>
         <span className="text-xs text-zinc-500">
-          Guarda todas las jornadas a la vez. Cada partido editado vuelve a “Sin guardar” (amarillo)
-          hasta que pulses Guardar.
+          Guarda todas las jornadas a la vez. Cada partido editado vuelve a &ldquo;Sin
+          guardar&rdquo; (amarillo) hasta que pulses Guardar.
         </span>
       </div>
     </form>
@@ -280,13 +421,21 @@ function Editable({
 }) {
   const bothEntered = v.h90 !== "" && v.a90 !== "";
   const draw = bothEntered && v.h90 === v.a90;
-  // Knockout decided in 90' → the team that advances is the winner and is
-  // not user-editable. On a draw the user picks freely (ET/penalties).
   const autoQualified = f.isKnockout && bothEntered && !draw;
+
+  // Auto-width select: wraps an optionally-disabled native <select> with just
+  // enough width to show its current text. We do it with a hidden twin <span>
+  // that mirrors the selected text, kept off-screen but in DOM flow.
+  const SELECT_BASE = "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm";
+
   return (
     <div className="mt-3 flex flex-col gap-3">
-      <div className="flex items-center gap-2 text-sm">
-        <span className="w-40 truncate text-right">{f.home}</span>
+      {/* Score inputs: give each team name a fixed min-width so long names
+          like "Costa de Marfil" don't create a new line. */}
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <span className="min-w-[9rem] text-right font-medium whitespace-nowrap">
+          <TeamName name={f.home} />
+        </span>
         <input
           type="number"
           name={`h90_${f.id}`}
@@ -296,7 +445,7 @@ function Editable({
           className={GOAL_CLS}
           aria-label={`Goles ${f.home} a 90'`}
         />
-        <span className="text-zinc-400">-</span>
+        <span className="text-zinc-400">—</span>
         <input
           type="number"
           name={`a90_${f.id}`}
@@ -306,7 +455,9 @@ function Editable({
           className={GOAL_CLS}
           aria-label={`Goles ${f.away} a 90'`}
         />
-        <span className="w-40 truncate">{f.away}</span>
+        <span className="min-w-[9rem] font-medium whitespace-nowrap">
+          <TeamName name={f.away} />
+        </span>
       </div>
 
       {f.isKnockout && (
@@ -345,7 +496,7 @@ function Editable({
             {autoQualified ? (
               <>
                 <input type="hidden" name={`qual_${f.id}`} value={v.qual} />
-                <select value={v.qual} disabled className={INPUT_CLS}>
+                <select value={v.qual} disabled className={`${SELECT_BASE} w-auto max-w-[220px]`}>
                   <option value={f.homeId}>{f.home}</option>
                   <option value={f.awayId}>{f.away}</option>
                 </select>
@@ -359,7 +510,7 @@ function Editable({
                   name={`qual_${f.id}`}
                   value={v.qual}
                   onChange={(e) => set(f.id, { qual: e.target.value })}
-                  className={INPUT_CLS}
+                  className={`${SELECT_BASE} w-auto max-w-[220px]`}
                 >
                   <option value="">— Sin elegir —</option>
                   <option value={f.homeId}>{f.home}</option>

@@ -2,10 +2,12 @@ import Link from "next/link";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
+import { TeamName } from "@/components/ui/TeamName";
 import { BreakdownTable } from "@/components/scoring/BreakdownTable";
 import { BreakdownPopover } from "@/components/scoring/BreakdownPopover";
 import { PointsBar } from "@/components/scoring/PointsBar";
 import { maxPointsForFixture } from "@/lib/scoring/maxPoints";
+import { ClasificacionTabs } from "@/app/(app)/clasificacion/Tabs";
 import {
   bucketFromBreakdown,
   CATEGORY_LABELS,
@@ -142,11 +144,13 @@ export default async function MyScoresPage() {
 
   return (
     <main className="mx-auto max-w-4xl p-10">
-      <h1 className="text-2xl font-bold">Mi puntuación</h1>
+      <h1 className="text-2xl font-bold">Clasificación</h1>
       <p className="mt-1 text-sm text-zinc-600">
-        {profile?.display_name ?? "Tu"} desglose personal en el torneo. Cada partido confirmado
+        Tu puntuación desglosada — {profile?.display_name ?? "jugador"}. Cada partido confirmado
         aparece como una barra; pulsa <strong>ⓘ</strong> para ver el detalle por criterio.
       </p>
+
+      <ClasificacionTabs active="mis-predicciones" />
 
       <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div className="border-success-light bg-success-light rounded-md border p-4">
@@ -180,9 +184,13 @@ export default async function MyScoresPage() {
                     href={`/clasificacion/partido/${m.fixture_id}`}
                     className="font-semibold hover:underline"
                   >
-                    {m.homeTeam} {m.result && <span className="font-mono">{m.result.h}</span>}
-                    {" - "}
-                    {m.result && <span className="font-mono">{m.result.a}</span>} {m.awayTeam}
+                    <span className="inline-flex flex-wrap items-center gap-1">
+                      <TeamName name={m.homeTeam} />{" "}
+                      {m.result && <span className="font-mono">{m.result.h}</span>}
+                      {" - "}
+                      {m.result && <span className="font-mono">{m.result.a}</span>}{" "}
+                      <TeamName name={m.awayTeam} />
+                    </span>
                   </Link>
                   <span className="ml-2 text-xs text-zinc-500">
                     {m.roundName} · {formatMadridDateTime(m.kickoff)}

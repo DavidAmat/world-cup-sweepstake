@@ -125,10 +125,26 @@ export function utcIsoToMadridInput(utcIso: string): string {
   return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
 }
 
-// Human-readable "11/06/2026 · 18:00" for table cells.
+const MONTHS_ES = [
+  "Ene",
+  "Feb",
+  "Mar",
+  "Abr",
+  "May",
+  "Jun",
+  "Jul",
+  "Ago",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dic",
+];
+
+// Human-readable "29-May 17h30" for table cells and badges.
 export function formatMadridDateTime(utcIso: string): string {
   const date = new Date(utcIso);
   if (Number.isNaN(date.getTime())) return "—";
   const p = readMadridParts(date);
-  return `${p.day}/${p.month}/${p.year} · ${p.hour}:${p.minute}`;
+  const month = MONTHS_ES[parseInt(p.month, 10) - 1] ?? p.month;
+  return `${parseInt(p.day, 10)}-${month} ${p.hour}h${p.minute}`;
 }
