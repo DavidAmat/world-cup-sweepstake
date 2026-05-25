@@ -6,6 +6,8 @@ import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { generateRandomMatchPredictions } from "./actions";
 import { MatchesForm, type RoundVM } from "./MatchesForm";
 import type { LockedEntry } from "./LockedFixturePanel";
+import { maxPointsForStage } from "@/lib/scoring/maxPoints";
+import type { StageCode } from "@/lib/scoring/types";
 
 type SearchParams = Promise<{ error?: string; ok?: string }>;
 
@@ -197,6 +199,7 @@ export default async function MatchPredictionsPage({
               a.display_name.localeCompare(b.display_name),
           );
 
+        const stageCode = (f.stage?.code ?? "group_stage") as StageCode;
         return {
           id: f.id,
           home: f.home_team?.display_name ?? f.home_team?.code ?? "—",
@@ -204,9 +207,10 @@ export default async function MatchPredictionsPage({
           homeId: f.home_team_id ?? "",
           awayId: f.away_team_id ?? "",
           kickoff: f.kickoff_at,
-          isKnockout: (f.stage?.code ?? "group_stage") !== "group_stage",
+          isKnockout: stageCode !== "group_stage",
           locked: isFixtureLocked(f.kickoff_at, appNow),
           noTeams: !f.home_team_id || !f.away_team_id,
+          maxPoints: maxPointsForStage(stageCode),
           saved: myP
             ? {
                 h90: myP.home_goals_90,

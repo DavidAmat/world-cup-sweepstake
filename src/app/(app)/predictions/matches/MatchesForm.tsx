@@ -29,6 +29,7 @@ export type FixtureVM = {
   isKnockout: boolean;
   locked: boolean;
   noTeams: boolean;
+  maxPoints: number;
   saved: SavedVM | null;
   score: ScoreVM | null;
   realResult: LockedRealResult | null;
@@ -205,6 +206,7 @@ export function MatchesForm({
                         homeId={f.homeId}
                         awayId={f.awayId}
                         isKnockout={f.isKnockout}
+                        maxPoints={f.maxPoints}
                         realResult={f.realResult}
                         myEntry={{
                           user_id: "me",

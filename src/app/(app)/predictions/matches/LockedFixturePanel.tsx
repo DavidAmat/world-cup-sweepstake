@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { BreakdownPopover } from "@/components/scoring/BreakdownPopover";
 import { BreakdownTable } from "@/components/scoring/BreakdownTable";
+import { PointsBar } from "@/components/scoring/PointsBar";
 
 // 6-column grid that vertically aligns the home/away goals across the
-// real result row, the current user's prediction and every other user's
-// prediction. The "Pts" column is fixed width so the ⓘ popover lines up.
+// real result row, the current user's prediction and every ranking row.
+// The "Pts" column is fixed width so the ⓘ popover lines up.
 const ROW_CLS =
-  "grid grid-cols-[minmax(110px,1.4fr)_2.5rem_0.6rem_2.5rem_minmax(180px,1.6fr)_4.5rem] items-center gap-2 px-3 py-1.5 text-sm";
+  "grid grid-cols-[minmax(140px,1.4fr)_2.5rem_0.6rem_2.5rem_minmax(180px,1.6fr)_4.5rem] items-center gap-2 px-3 py-1.5 text-sm";
 
 type Prediction = {
   h90: number;
@@ -42,6 +43,7 @@ type Props = {
   homeId: string;
   awayId: string;
   isKnockout: boolean;
+  maxPoints: number;
   realResult: LockedRealResult | null;
   myEntry: LockedEntry;
   otherEntries: LockedEntry[];
@@ -101,12 +103,80 @@ function Row({
   );
 }
 
+// One row inside the expanded ranking. Same 6-col grid for vertical
+// alignment, but adds a second sub-row with the horizontal points bar.
+function RankingRow({
+  position,
+  entry,
+  isMe,
+  maxPoints,
+  isKnockout,
+  homeTeam,
+  awayTeam,
+  buildExtra,
+  zebra,
+}: {
+  position: number;
+  entry: LockedEntry;
+  isMe: boolean;
+  maxPoints: number;
+  isKnockout: boolean;
+  homeTeam: string;
+  awayTeam: string;
+  buildExtra: (p: Prediction | null) => ReactNode;
+  zebra: boolean;
+}) {
+  const points = entry.score?.points ?? 0;
+  const accent = isMe
+    ? "bg-sky-50/70 dark:bg-sky-950/20"
+    : zebra
+      ? "bg-zinc-50 dark:bg-zinc-950/40"
+      : "bg-white dark:bg-zinc-900";
+  return (
+    <div className={`border-t border-zinc-200 px-0 pt-1.5 pb-2 dark:border-zinc-800 ${accent}`}>
+      <Row
+        label={
+          <span className="flex items-center gap-1.5">
+            <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[10px] font-bold text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200">
+              {position}
+            </span>
+            <span className="truncate">{entry.display_name}</span>
+            {isMe && (
+              <span className="ml-0.5 rounded bg-sky-200 px-1 text-[10px] font-bold text-sky-800 uppercase dark:bg-sky-800 dark:text-sky-100">
+                tú
+              </span>
+            )}
+          </span>
+        }
+        h={entry.prediction?.h90 ?? "—"}
+        a={entry.prediction?.a90 ?? "—"}
+        extra={isKnockout ? buildExtra(entry.prediction) : null}
+        rightCell={
+          <PointsCell
+            score={entry.score}
+            popoverLabel={`${entry.display_name} · ${homeTeam} vs ${awayTeam}`}
+          />
+        }
+      />
+      <div className="mt-1 flex items-center gap-2 px-3">
+        <div className="flex-1">
+          <PointsBar value={points} max={maxPoints} />
+        </div>
+        <span className="font-mono text-[10px] text-zinc-500 dark:text-zinc-400">
+          {points} / {maxPoints}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function LockedFixturePanel({
   homeTeam,
   awayTeam,
   homeId,
   awayId,
   isKnockout,
+  maxPoints,
   realResult,
   myEntry,
   otherEntries,
@@ -118,6 +188,20 @@ export function LockedFixturePanel({
     if (!isKnockout || !p) return null;
     return <ExtraInfo et={p.et} pen={p.pen} qual={teamFor(p.qual)} />;
   };
+
+  // Ranking = my entry + everyone else, sorted desc by points (then name).
+  const ranking = useMemo(() => {
+    const all: { entry: LockedEntry; isMe: boolean }[] = [
+      { entry: myEntry, isMe: true },
+      ...otherEntries.map((e) => ({ entry: e, isMe: false })),
+    ];
+    return all.sort((a, b) => {
+      const ap = a.entry.score?.points ?? -1;
+      const bp = b.entry.score?.points ?? -1;
+      if (ap !== bp) return bp - ap;
+      return a.entry.display_name.localeCompare(b.entry.display_name);
+    });
+  }, [myEntry, otherEntries]);
 
   return (
     <div className="mt-3 overflow-hidden rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
@@ -157,7 +241,7 @@ export function LockedFixturePanel({
         </p>
       )}
 
-      {/* My prediction */}
+      {/* My prediction (fixed on top) */}
       <Row
         label={
           <span>
@@ -179,8 +263,8 @@ export function LockedFixturePanel({
         accent="bg-sky-50/70 dark:bg-sky-950/20"
       />
 
-      {/* Toggle others */}
-      {otherEntries.length > 0 && (
+      {/* Ranking dropdown */}
+      {ranking.length > 0 && (
         <>
           <button
             type="button"
@@ -189,29 +273,25 @@ export function LockedFixturePanel({
             aria-expanded={expanded}
           >
             <span>
-              {expanded ? "Ocultar" : "Ver"} predicciones de otros ({otherEntries.length})
+              {expanded ? "Ocultar" : "Ver"} ranking de este partido ({ranking.length})
             </span>
             {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </button>
 
           {expanded && (
-            <div className="border-t border-zinc-200 dark:border-zinc-800">
-              {otherEntries.map((e, idx) => (
-                <Row
-                  key={e.user_id}
-                  label={<span>{e.display_name}</span>}
-                  h={e.prediction?.h90 ?? "—"}
-                  a={e.prediction?.a90 ?? "—"}
-                  extra={buildExtra(e.prediction)}
-                  rightCell={
-                    <PointsCell
-                      score={e.score}
-                      popoverLabel={`${e.display_name} · ${homeTeam} vs ${awayTeam}`}
-                    />
-                  }
-                  accent={
-                    idx % 2 === 0 ? "bg-white dark:bg-zinc-900" : "bg-zinc-50 dark:bg-zinc-950/40"
-                  }
+            <div>
+              {ranking.map((r, idx) => (
+                <RankingRow
+                  key={r.entry.user_id}
+                  position={idx + 1}
+                  entry={r.entry}
+                  isMe={r.isMe}
+                  maxPoints={maxPoints}
+                  isKnockout={isKnockout}
+                  homeTeam={homeTeam}
+                  awayTeam={awayTeam}
+                  buildExtra={buildExtra}
+                  zebra={idx % 2 === 1}
                 />
               ))}
             </div>
