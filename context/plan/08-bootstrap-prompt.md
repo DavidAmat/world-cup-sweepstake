@@ -1,65 +1,66 @@
 Hola. Continuamos un proyecto a mitad: una app web privada para gestionar
-una porra del Mundial de fútbol 2026 entre 10 amigos. Llevamos 11 hitos
-cerrados (02-11) + un hito intermedio 11b (migración a wc_2026 +
-generador de cruces eliminatorios). Ahora toca el hito 12: leaderboards,
-gráfico de evolución y desglose por partido para el usuario.
+una porra del Mundial de fútbol 2026 entre 10 amigos. Llevamos 12 hitos
+cerrados (02-12) + un hito intermedio 11b. El hito 13 (resultados
+públicos + stats por selección) **se eliminó** al cerrar el hito 12. Toca
+ahora abordar los **hitos 14 y 15 a la vez** (admin: reset/reglas + UI
+español pulida).
 
 UI en español. Código, SQL y nombres de tabla en inglés. Comunícate
 conmigo en español.
 
-# QUÉ HITO ES Y DÓNDE ESTÁ DEFINIDO TÉCNICAMENTE
+# QUÉ HITOS SON Y DÓNDE ESTÁN DEFINIDOS
 
-- **Hito 12 — Leaderboards, evolución y desglose por partido.**
-- Definición técnica de alto nivel (fuente para el plan detallado):
-  - `context/plan/01-plan.md` §7, sección "Hito 12 — Leaderboards y
-    gráfico de evolución" (scope, esqueleto, acceptance).
-  - `context/initial-setup/02-pid.md`: §4.2 (`prediction_scores`,
-    `leaderboard_snapshots`).
-  - **UX anotada en hito 11 §12** (`context/plan/11-scoring-engine.md`):
-    - §12.1 guía pública con pestañas (probablemente ya cubierta por
-      `documentation/user_guides/puntuacion.md`).
-    - §12.2 **tooltip "ⓘ" por partido** en la vista de predicciones del
-      usuario.
-    - §12.3 gráfico de barras horizontales por partido en página
-      personal.
-- El **plan detallado lo escribes tú** al empezar, en
-  `context/plan/12-leaderboards-and-visuals.md` (NO existe aún;
-  crearlo es tu primer entregable). Yo lo reviso y te digo "adelante".
-- La bitácora se va llenando **en paralelo** en
-  `context/implementations/12-leaderboards-and-visuals-implementation.md`.
+- **Hito 14 — Admin: reset y reglas.** `/admin/reset` (selector +
+  checkboxes + modal "BORRAR") y `/admin/reglas` (versionado de
+  `scoring_rules` por torneo, editor JSON, activar, recalcular).
+  Definición de alto nivel: `context/plan/01-plan.md` §"Hito 14 —
+  Admin: reset y reglas".
+- **Hito 15 — Diseño UI español.** Paleta definitiva, tokens
+  semánticos en Tailwind, header/footer consistentes, estados (empty
+  / loading / error) en español, accesibilidad básica. Definición de
+  alto nivel: `context/plan/01-plan.md` §"Hito 15 — Diseño UI
+  español".
+- Los **planes detallados los escribes tú** al empezar:
+  - `context/plan/14-admin-reset-and-rules.md` (no existe aún).
+  - `context/plan/15-ui-design-spanish.md` (no existe aún).
+- Las bitácoras se llenan **en paralelo** en
+  `context/implementations/14-admin-reset-and-rules-implementation.md`
+  y `context/implementations/15-ui-design-spanish-implementation.md`.
 
 # LEE ESTO ANTES DE NADA
 
 En este orden, hasta entender el estado actual:
 
-1. `context/initial-setup/02-pid.md` — §4.2 (estructura de
-   `prediction_scores` y `leaderboard_snapshots`).
-2. `context/plan/01-plan.md` — §7 hito 12 (vistas SQL o queries con
-   group by; Recharts vs alternativas; snapshots solo si hace falta).
-3. `context/plan/11-scoring-engine.md` §12 — UX anotada que el usuario
-   quiere ver en este hito (tooltip "ⓘ", gráfico personal). Está
-   pendiente y es parte del alcance ahora.
-4. `src/lib/scoring/recalculateCore.ts` — el motor del hito 11. Te
-   interesa qué pone en `prediction_scores.points_breakdown`:
-   - Match (grupos/knockout): `correct_outcome_90`, `exact_score_90`,
-     `home_goals_distance`, `away_goals_distance`,
-     `goal_difference_exact`, `correct_extra_time`,
-     `correct_penalties`, `correct_qualified_team`.
-   - Initial: `champion`, `runner_up`.
-   - Group qualification: `team_correct`.
-   - Meta (en todas): `_subtotal`, `_multiplier`, `_group` (solo gqp).
-5. Bitácoras relevantes (patrones que reutilizarás):
-   - `context/implementations/11-scoring-engine-implementation.md`
-     (CERRADO — motor de puntuación y forma del breakdown).
-   - `context/implementations/11b-wc2026-and-knockout-sampling-implementation.md`
-     (CERRADO — wc_2026 sembrado, R32 incluida, botón de cruces).
-   - `context/implementations/09-match-predictions-implementation.md`
-     (CERRADO — modelo y UI de predicciones de partido, útil para el
-     tooltip y la página `/predictions/matches`).
-6. `documentation/user_guides/puntuacion.md` — guía de usuario del
-   sistema de puntuación. Define máximos por partido (15 grupos / 66
-   r32-r16-cuartos-tercero / 99 semis / 165 final), referencia para
-   pintar barras y ejes Y.
+1. `context/plan/01-plan.md` — §7 hito 14 y hito 15 (scope original).
+2. `context/implementations/12-leaderboards-and-visuals-implementation.md`
+   — bitácora cerrada del hito 12. Te interesa especialmente:
+   - **D12-10** (lock manual por ronda → migración
+     `20260525120000`).
+   - **D12-12** (motor de scoring: prórroga/penaltis solo cuentan si
+     suceden de verdad; `maxPointsForFixture` en lugar del max
+     fijo).
+   - **D12-13** (popover en portal, modo controlado).
+3. `documentation/user_guides/bloqueo_predicciones.md` —
+   funcionamiento del lock manual por ronda.
+4. `documentation/user_guides/puntuacion.md` — regla de puntuación
+   actual (con la nueva regla de prórroga/penaltis).
+5. `src/lib/scoring/rules.ts` y `recalculateCore.ts` — fuente de las
+   reglas v1 y el orquestador del motor. El hito 14 va a permitir
+   versionarlas; el motor ya carga la `scoring_rules` activa del
+   torneo, así que añadir versiones es sobre todo UI + servidor.
+6. `src/app/admin/results/page.tsx` y `actions.ts` — patrón actual
+   de admin con server actions, badges, banners y revalidatePath.
+   Es el patrón a replicar en `/admin/reset` y `/admin/reglas`.
+7. `src/components/scoring/BreakdownPopover.tsx` — patrón de
+   componente cliente coordinable; sirve de plantilla si necesitas
+   modales en hito 14.
+8. Componentes UI existentes que el hito 15 va a unificar/extender:
+   - `src/components/ui/Badge.tsx` (`Badge`, `FixtureStatusBadge`).
+   - `src/components/layout/Header.tsx` (nav principal).
+   - `src/components/scoring/*` (BreakdownPopover, BreakdownTable,
+     PointsBar, EvolutionChart).
+   - `src/app/layout.tsx` (`<html suppressHydrationWarning>` —
+     ¡NO QUITAR!).
 
 # RESUMEN DE LOS HITOS CERRADOS
 
@@ -74,8 +75,8 @@ Hito 03 — Supabase local + migraciones
 
 Hito 04 — Esquema de BD
   Migraciones SQL → 17 tablas. Helpers SQL: `is_admin()`,
-  `is_fixture_locked(uuid)` (= `app_now() >= kickoff_at - 24h`),
-  `set_updated_at()`. RLS local+prod.
+  `is_fixture_locked(uuid)` (redefinido en hito 12 — ahora consulta
+  `rounds.predictions_locked_at`), `set_updated_at()`. RLS local+prod.
 
 Hito 05 — Auth + profiles + roles
   Trigger `handle_new_user`. Páginas /login /register /rules.
@@ -91,13 +92,10 @@ Hito 07 — Admin: fixtures (CERRADO)
   `/admin/fixtures` (listado/editar/crear/import JSON). Helpers
   reutilizables: `src/lib/dates/madridTime.ts`,
   `src/lib/tournament/getDefaultTournament.ts`,
-  `src/lib/fixtures/{pythonFormat,catalogs}.ts` (catalog ahora con
-  `round_of_32` y `r32`; multipliers alineados al JSON v1),
-  `src/components/ui/Badge.tsx`. Gate de `/admin/*` en `src/proxy.ts`.
+  `src/lib/fixtures/{pythonFormat,catalogs}.ts`. Gate de `/admin/*`
+  en `src/proxy.ts`.
 
 Hito 08 — Predicciones iniciales (CERRADO)
-  Plan: `context/plan/08-initial-predictions.md`
-  Bitácora: `context/implementations/08-initial-predictions-implementation.md`
   - `/predictions/initial` (form / solo lectura si lock — NO redirect)
     y `/predictions/initial/public` (card por usuario + dropdown por
     categoría, oculta hasta el lock).
@@ -108,17 +106,16 @@ Hito 08 — Predicciones iniciales (CERRADO)
   - Migración `20260516120000` — `FECHA_ACTUAL` / `app_now()`:
     `app_settings.fecha_actual` + función `public.app_now()`. La app
     sincroniza desde env `FECHA_ACTUAL` (`src/lib/dates/appNow.ts`).
-    Banner "🧪 Fecha simulada". `make fecha FECHA=<v>`.
+    Banner "🧪 Fecha simulada". `make fecha FECHA=<v>` solo afecta
+    al lock de iniciales (los partidos los bloquea ahora el admin
+    manualmente, no la fecha — ver hito 12).
   - Clasificados de grupo: multi-choice (checkboxes), exactamente 2
     por grupo (`GROUP_QUALIFIERS=2`), sin orden.
   - Grupos: `GROUP_CODES = [A..L]` (12 grupos para 2026).
 
 Hito 09 — Predicciones de partidos (CERRADO)
-  - Migración `20260517120000`: `is_fixture_locked` con `app_now()`.
   - Migración `20260517130000`: eliminado CHECK que ataba ET a goles
     a 120'; sin resultado a 120' en predicciones.
-  - `src/lib/predictions/matchLock.ts`: lock vía un único `rpc` +
-    `isFixtureLocked` en JS.
   - `src/app/(app)/predictions/matches/schemas.ts`: Zod con
     `superRefine` (penaltis⇒prórroga; prórroga⇒empate 90'; knockout
     draw⇒prórroga obligatoria; el que pasa ∈{home,away}).
@@ -126,7 +123,8 @@ Hito 09 — Predicciones de partidos (CERRADO)
     `generateRandomMatchPredictions` (dado 40/30/30; draw en knockout
     → ET + 70% pen + 50/50 ganador).
   - `MatchesForm.tsx` con `derive(values, meta)` para lógica derivada,
-    sticky bar + contador + botón global.
+    sticky bar + contador + botón global "Mostrar/Ocultar todas las
+    predicciones" (añadido en hito 12).
   - `/predictions/matches` server component con `RoundVM[]` (todas las
     jornadas apiladas, pills ancla `#r-{code}`).
   - `/predictions/matches/public`: card por fixture bloqueado.
@@ -139,113 +137,174 @@ Hito 10 — Admin: introducción de resultados (CERRADO)
     aleatorios (esta jornada)".
   - `/admin/results/[fixtureId]`: `ResultForm.tsx`. Modelo: 90' score
     + `went_penalties` + `qualified_team_id`. ET derivada
-    (knockout+empate90'⇒ET). Lista dinámica de goles.
+    (knockout+empate90'⇒ET). Lista dinámica de goles (la app NO
+    trackea goleadores por estadísticas, solo los guarda).
   - `actions.ts`: `saveMatchResult` (draft), `confirmMatchResult`
     (confirmed + recálculo), `generateRandomResults` (por ronda).
 
 Hito 11 — Motor de puntuación (CERRADO)
-  Plan: `context/plan/11-scoring-engine.md`
-  Bitácora: `context/implementations/11-scoring-engine-implementation.md`
   - Migración `20260518120000`: rename CHECK
     `prediction_scores.prediction_type` (`'match'` → `'group_phase'`).
-    El seed de `scoring_rules` ahora lo hace el uploader (no migración).
-  - Guía pública: `documentation/user_guides/puntuacion.md`
-    (criterios + multiplicadores + máximos).
+    El seed de `scoring_rules` lo hace el uploader (no migración).
+  - Guía pública: `documentation/user_guides/puntuacion.md`.
   - `src/lib/scoring/`:
     - `types.ts`, `rules.ts` (`DEFAULT_SCORING_RULES_V1`).
     - `applyMultiplier.ts` (`applyStageMultiplier`).
     - `scoreMatch.ts` (`scoreGroupMatch`, `scoreKnockoutMatch`).
       **Si `exact_score_90` aplica, NO se cobran cercanías ni
-      diff_exact** (D11-1). Acumulativo en lo demás.
+      diff_exact**. Acumulativo en lo demás. **ET/penaltis solo
+      cuentan si suceden de verdad** (D12-12).
     - `scoreInitial.ts` (`scoreInitialPrediction` — solo
-      campeón/subcampeón; pichichi/MVP los asigna el admin a mano en
-      hito 14).
+      campeón/subcampeón; pichichi/MVP los asigna el admin a mano).
     - `scoreGroup.ts` (`computeGroupTables`,
       `scoreGroupQualificationPrediction`). Tabla: pts → DG → GF →
       `team_code` asc.
     - `recalculateCore.ts`: orquestador puro (recibe supabase admin
       por parámetro). Borra y reinserta `prediction_scores` del
-      torneo.
+      torneo. **Lee la `scoring_rules` activa del torneo**.
     - `recalculate.ts`: wrapper con `server-only`. Llamado desde
-      `confirmMatchResult` y `generateRandomResults` y
+      `confirmMatchResult`, `generateRandomResults` y
       `generateKnockoutPairings`.
   - `points_breakdown` lleva siempre `_subtotal`, `_multiplier` y, en
     gqp, `_group`.
   - Smoke: `npm run scoring:smoke` ejecuta el core contra la DB local.
 
 Hito 11b — Migración a wc_2026 + generador de cruces (CERRADO)
-  Plan: `context/plan/11b-wc2026-and-knockout-sampling.md`
-  Bitácora: `context/implementations/11b-wc2026-and-knockout-sampling-implementation.md`
   - Catálogo `src/lib/fixtures/catalogs.ts`: +R32 (`round_of_32`,
     `r32`). Multipliers alineados al JSON v1 (1, 2, 2, 2, 3, 2, 5).
-  - `src/lib/fixtures/pythonFormat.ts`: +`dieciseisavos` en
-    `FASE_VALUES` y mapas. Grupos `[A-L]`.
   - Seeds `data/seeds/wc_2026/{tournament,teams,fixtures}.json`:
-    48 equipos en 12 grupos (A–L), 72 partidos de grupos (J1=29-may,
-    J2=03-jun, J3=10-jun a 18:00 Madrid; pares canónicos FIFA),
-    32 fixtures eliminatorias con placeholders `"TBD"` (R32=20-jun,
-    R16=24-jun, QF=28-jun, SF=30-jun, 3rd+Final=01-jul).
-  - `scripts/wc2026/upload.ts` (mirror de wc2022) +
-    `scripts/wc2026/gen-fixtures.ts` (generador del JSON desde un
-    manifest compacto, útil para ajustar fechas).
-  - `scripts/wc2022/lib/upserts.ts`: +`upsertScoringRulesV1` (siembra
-    `scoring_rules` v1 active del torneo) + soporte de placeholders
-    (`equipo_1==="TBD"` → `home_placeholder="TBD"`,
-    `home_team_id=null`).
-  - `scripts/wc2022/lib/schemas.ts`: `TeamsSchema` ahora `.min(1)`
-    (32 ↔ 48 equipos); `group_code` regex `[A-L]`.
+    48 equipos en 12 grupos (A–L), 72 partidos de grupos, 32 fixtures
+    eliminatorias con placeholders `"TBD"`.
+  - `scripts/wc2026/upload.ts`, `scripts/wc2026/gen-fixtures.ts`,
+    `upsertScoringRulesV1` (siembra `scoring_rules` v1 active).
   - Server action `generateKnockoutPairings` +
-    botón **🎲 Generar cruces (esta ronda)** en `/admin/results`
-    (solo rondas eliminatorias). Sample sin reposición de los 48
-    equipos. Borra predicciones/resultados/goles previos de la
-    ronda; dispara recálculo.
-  - `src/app/(app)/predictions/initial/schemas.ts`: `GROUP_CODES`
-    ahora 12 entradas (A–L).
-  - `src/app/admin/fixtures/{schemas.ts, new/page.tsx}`: regex
-    `[A-L]`.
+    botón **🎲 Generar cruces (esta ronda)** en `/admin/results`.
   - `.env.local` + Vercel: `NEXT_PUBLIC_DEFAULT_TOURNAMENT_SLUG=wc_2026`.
   - Prod: `wc_2022_test` borrado (CASCADE). `wc_2026` activo.
 
-# DECISIONES CERRADAS QUE AFECTAN AL HITO 12
+Hito 12 — Leaderboards, visuales y lock manual (CERRADO)
+  Plan: `context/plan/12-leaderboards-and-visuals.md`
+  Bitácora: `context/implementations/12-leaderboards-and-visuals-implementation.md`
+
+  ### Vistas nuevas
+  - `/clasificacion` — ranking general (top/bottom destacados,
+    chip "tú").
+  - `/clasificacion/jornada`, `.../jornada/[roundCode]`,
+    `/clasificacion/fase`, `/clasificacion/categoria`,
+    `/clasificacion/evolucion` — tablas pivotadas + gráfico SVG
+    inline (sin Recharts).
+  - `/clasificacion/partido/[fixtureId]` — comparativa de todos los
+    participantes en un partido + breakdown.
+  - `/my-scores` — vista personal con cards de categorías y barras
+    horizontales por partido.
+
+  ### Componentes nuevos
+  - `src/lib/scoring/maxPoints.ts` con `maxPointsForFixture(stage,
+    result)` — devuelve techo dinámico según ET/penaltis reales.
+  - `src/lib/scoring/breakdownLabels.ts` — labels ES + buckets
+    de categorías.
+  - `src/lib/scoring/leaderboard.ts` — pivotes reutilizables.
+  - `src/components/scoring/{BreakdownTable, BreakdownPopover,
+    PointsBar, EvolutionChart}.tsx`. `BreakdownPopover` se renderiza
+    con `createPortal` a `document.body` y soporta modo controlado
+    (`isOpen` + `onToggle`).
+
+  ### `/predictions/matches` enriquecida
+  - `LockedFixturePanel` (cliente) con grid de 6 cols alineando
+    "🏁 Real" + "Tú" + ranking expandido. Chevron por partido y
+    botón global "Mostrar/Ocultar todas las predicciones". Default:
+    expandido.
+  - Cuando no hay resultado oficial todavía: fila Real vacía, Pts
+    = "0 pts" en todas las filas, orden pseudo-aleatorio determinista
+    por `hash(fixtureId + user_id)`.
+
+  ### Cambio de paradigma: lock manual por ronda
+  - Migración `20260525120000_manual_round_predictions_lock.sql`:
+    `rounds.predictions_locked_at TIMESTAMPTZ NULL` +
+    `rounds.predictions_locked_by UUID NULL`. Redefine
+    `public.is_fixture_locked(uuid)` para que lea
+    `rounds.predictions_locked_at IS NOT NULL` en lugar de
+    `app_now() >= kickoff - 24h`. **La regla 24h desaparece.** RLS
+    propaga sin cambios.
+  - `/admin/results` gana sección "Bloqueo de predicciones por
+    jornada" con tarjeta por ronda y botón Bloquear/Desbloquear.
+    Server actions: `lockRoundPredictions`, `unlockRoundPredictions`.
+  - `src/lib/predictions/matchLock.ts`: `MatchLockState` ahora
+    incluye `lockedRoundIds: Set<string>`;
+    `isFixtureLocked(roundId, lockedRoundIds)` reemplaza la API
+    antigua. `getMatchLockState(tournamentId)` carga rondas.
+  - Documentación nueva:
+    `documentation/user_guides/bloqueo_predicciones.md`.
+
+  ### Fix de scoring
+  - `scoreKnockoutMatch`: ET/penaltis solo se conceden cuando
+    suceden de verdad Y el usuario los predijo (`&&`, no `===`). Un
+    partido decidido en 90' ya no regala 5+5 puntos.
+  - `puntuacion.md` actualizado con la nueva regla y subtotal
+    máximo 23/28/33 según tipo de partido.
+
+  ### Estado de datos en local
+  - 229 `prediction_scores` (group_phase 144, knockout 64,
+    group_qualification 20, initial 1).
+  - Lock manual en local: J1, J2, J3 y R32 bloqueadas; R16, QF, SF,
+    third, final abiertas.
+  - 3 profiles: David1 (admin), David2, David3.
+
+  ### Pendiente prod
+  - Migración `20260525120000` aplicada en **local** pero **NO en
+    prod**. Hay que aplicarla con
+    `echo y | npx supabase db push --linked` con OK explícito del
+    usuario antes de tocar nada del hito 14/15 que asuma su
+    presencia.
+
+Hito 13 — ELIMINADO
+  Las vistas `/resultados` y `/estadisticas/selecciones` se descartan:
+  el desglose por partido ya está en
+  `/clasificacion/partido/[fixtureId]` y la app no trackea goles por
+  jugador ni estadísticas de selección.
+
+# DECISIONES CERRADAS QUE AFECTAN A LOS HITOS 14 Y 15
 
 Vinculantes. No las cuestiones sin un motivo muy fuerte.
 
-- **`prediction_scores` ya está poblada en local** tras los smokes del
-  hito 11b. En prod sigue vacía hasta que algún usuario meta
-  predicciones contra `wc_2026` y se confirme un resultado.
-- **`points_breakdown` es la fuente para desgloses.** Claves:
-  - `correct_outcome_90`, `exact_score_90`, `home_goals_distance`,
-    `away_goals_distance`, `goal_difference_exact` (grupos y
-    eliminatorias).
-  - `correct_extra_time`, `correct_penalties`,
-    `correct_qualified_team` (solo eliminatorias).
-  - `champion`, `runner_up` (initial; `top_scorer` / `best_player`
-    los inserta el admin en hito 14).
-  - `team_correct` (group_qualification).
-  - Meta (siempre): `_subtotal`, `_multiplier`. En gqp además
-    `_group`.
-- **Visualización VISIBLE PARA TODOS LOS USUARIOS** autenticados,
-  no solo admin. Esto es **explícito del usuario**: cada uno ve sus
-  propios puntos + el ranking general. RLS de `prediction_scores`
-  ya lo permite (`SELECT` libre a `authenticated`).
-- **Cliente de usuario, no admin client.** Las queries del hito 12
-  son SELECT — usan el cliente de usuario (`createServerClient`) y
-  respetan RLS. Reservar el admin client para escrituras
-  privilegiadas (no aplica aquí).
-- **No añadir dependencias sin OK explícito.** Recharts está
-  sugerido en el plan §7 — pídeme aprobación antes de meterlo al
-  `package.json`. Una alternativa con HTML+CSS (`div + width%` para
-  barras horizontales; SVG inline para evolución) es preferible si
-  cubre el caso.
-- **Snapshots opcionales.** `leaderboard_snapshots` existe en BD
-  pero vacía. Solo materializar si los cálculos on-the-fly son
-  lentos (a 10 usuarios × ~104 partidos casi seguro NO hacen falta).
-- **Tooltip "ⓘ" por partido entra en este hito.** Es la pieza más
-  pequeña, da feedback inmediato a los usuarios y reusa el breakdown
-  que ya está en BD. Es prioridad alta dentro del hito 12.
-- **No tocar el motor del hito 11.** Si necesitas algo del breakdown
-  que no esté, primero plantéamelo: puede salir más limpio derivarlo
-  en JS desde el breakdown existente que añadir claves nuevas.
+- **`scoring_rules` ya existe y está activa por torneo.** El motor
+  (`recalculateCore.ts`) lee la fila `active = true` del torneo
+  actual. El hito 14 introduce versionado: nuevas filas con `active
+  = false`, botón "activar" que pone `active = true` y desactiva las
+  demás, botón "recalcular" que invoca `recalculateTournamentScores`.
+- **Reset NO toca master data.** `/admin/reset` borra solo
+  predicciones (initial/match/group_qualification), match_results,
+  match_goals, prediction_scores y leaderboard_snapshots del torneo
+  seleccionado. NO toca tournaments / teams / players / fixtures /
+  stages / rounds / scoring_rules.
+- **Confirmación literal "BORRAR".** Modal con input de texto que
+  exige el literal exacto antes de habilitar el botón submit. Server
+  action verifica de nuevo (defense in depth).
+- **`/admin/reset` y `/admin/reglas` viven bajo el gate de
+  `/admin/*`** (proxy.ts ya redirige al login / dashboard según
+  rol). No hace falta `requireAdmin()` adicional dentro de la
+  página, pero sí dentro de cada server action.
+- **Sin nuevas dependencias para hito 15.** Tailwind v4 ya está. La
+  paleta y los tokens los implementamos con `@theme` en
+  `globals.css` (Tailwind v4 ya no usa `tailwind.config.ts`). Si
+  necesitas añadir algo (p. ej. radix, headlessui), **pídelo
+  primero**.
+- **Iconos: lucide-react.** Ya está instalado. No añadir otro set
+  (heroicons, phosphor, etc.) — usar lucide consistente.
+- **UI en español, código en inglés.** Los textos visibles al
+  usuario en español (revisa también los errores de Zod y mensajes
+  de validación). Identificadores, server actions, columnas,
+  variables, etc. en inglés.
+- **No tocar el motor del hito 11.** Si necesitas que `/admin/reglas`
+  hable con `recalculateTournamentScores`, llama el wrapper de
+  `src/lib/scoring/recalculate.ts`, no rehagas la lógica.
+- **No usar `connection()` de `next/server` salvo necesidad.** Se
+  quitó en el hito 12 porque rompía el `react-hooks/purity` y no
+  añadía nada útil. Las páginas admin pueden ser dinámicas sin él
+  (Supabase con cookies ya forza dynamic).
+- **`Date.now()` / `Math.random()` en server components →
+  `react-hooks/purity`.** Si los necesitas, hazlo dentro de una
+  server action (event handler), no en el render.
 
 # ESTADO DE INFRAESTRUCTURA Y URLS
 
@@ -263,17 +322,22 @@ Local Supabase (quirk Docker):
 
 Env vars (.env.local local / Vercel prod):
   NEXT_PUBLIC_SUPABASE_URL · NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ·
-  SUPABASE_SECRET_KEY · **NEXT_PUBLIC_DEFAULT_TOURNAMENT_SLUG=wc_2026** ·
-  FECHA_ACTUAL (testing).
+  SUPABASE_SECRET_KEY · NEXT_PUBLIC_DEFAULT_TOURNAMENT_SLUG=wc_2026 ·
+  FECHA_ACTUAL (solo afecta al lock de predicciones iniciales).
 
-Migraciones aplicadas (local Y prod):
-  ...164810_predictions (match_predictions + RLS),
-  ...20260515120000_initial_predictions_freetext_and_lock,
-  ...20260516120000_app_now_override,
-  ...20260517120000_is_fixture_locked_app_now,
-  ...20260517130000_match_predictions_drop_120,
-  ...20260517140000_match_results_drop_120,
-  ...20260518120000_scoring_rules_seed_and_type_rename.
+Migraciones aplicadas:
+  - **Local y prod**:
+    ...164810_predictions (match_predictions + RLS),
+    ...20260515120000_initial_predictions_freetext_and_lock,
+    ...20260516120000_app_now_override,
+    ...20260517120000_is_fixture_locked_app_now (redefinida por la
+    siguiente; sigue existiendo como capa intermedia),
+    ...20260517130000_match_predictions_drop_120,
+    ...20260517140000_match_results_drop_120,
+    ...20260518120000_scoring_rules_seed_and_type_rename.
+  - **Solo local (pendiente prod)**:
+    ...20260525120000_manual_round_predictions_lock.
+
   Tras cualquier migración nueva: `npm run types:gen` y luego
   `npx prettier --write src/lib/supabase/database.types.ts`.
 
@@ -282,20 +346,21 @@ Datos cargados:
     7 stages, 9 rounds, 104 fixtures (72 grupos con equipos + 32
     eliminatoria con placeholders "TBD"). `scoring_rules` v1
     activa. `prediction_scores` vacía. Sin `match_results`.
-    `wc_2022_test` ya NO existe.
-  - **Local**: `wc_2026` con las mismas 104 fixtures. Tras los
-    smokes del hito 11b: cruces R32 generados con equipos reales,
-    resultados aleatorios confirmados, predicciones iniciales +
-    de partido para 2 usuarios (David1 admin, David2 no admin),
-    `prediction_scores` poblada por el motor. `FECHA_ACTUAL`
-    probablemente en null. Resto de rondas (R16, QF, SF, 3rd, Final)
-    aún con placeholders "TBD".
+    `wc_2022_test` ya NO existe. Sin `predictions_locked_at` en
+    rounds (la migración del hito 12 todavía no está aplicada).
+  - **Local**: `wc_2026` con las mismas 104 fixtures. Smokes del
+    hito 12: cruces R32 generados, resultados aleatorios
+    confirmados, predicciones iniciales + de partido para 2
+    usuarios (David1 admin, David2 no admin), `prediction_scores`
+    poblada (229 filas) con la nueva regla de scoring. J1/J2/J3 y
+    R32 bloqueadas; R16/QF/SF/third/final abiertas.
+    `FECHA_ACTUAL` probablemente null.
 
 Generadores admin que ya existen (úsalos para smokes locales):
   - `/admin/results` → "🎲 Generar cruces (esta ronda)" (R32 onwards).
   - `/admin/results` → "🎲 Generar resultados aleatorios (esta jornada)".
-  - `/predictions/matches` → "🎲 Generar predicciones aleatorias"
-    (cualquier usuario autenticado).
+  - `/admin/results` → tarjetas "Bloquear / Desbloquear" por jornada.
+  - `/predictions/matches` → "🎲 Generar predicciones aleatorias".
   - `/predictions/initial` → equivalente para predicciones iniciales.
 
 Gotchas Next 16 ya resueltos (replícalos, no los redescubras):
@@ -306,6 +371,12 @@ Gotchas Next 16 ya resueltos (replícalos, no los redescubras):
     `react-hooks/purity`. Usa el lock vía `rpc` (app_now() de la DB).
   - `<html>` lleva `suppressHydrationWarning` (extensiones). No lo
     quites.
+  - `setState` dentro de `useEffect` → React 19 lo prohíbe
+    (`react-hooks/set-state-in-effect`). En su lugar: setState en
+    handlers (click, scroll, resize) o derivar el estado.
+  - Componentes cliente con popover/modal: si los wrappers tienen
+    `overflow-hidden`, usa `createPortal` (patrón en
+    `BreakdownPopover.tsx`).
   - Migración local: `npx supabase migration up --local`. A prod:
     `echo y | npx supabase db push --linked`.
   - Commits: máximo 1 línea, Conventional Commits en inglés,
@@ -330,59 +401,149 @@ A producción (pide confirmación antes):
   Para `wc2026:upload` a prod: env vars de prod inline +
   `--confirm-prod` (lo hace el usuario, no el agente).
 
-# TAREA: HITO 12 — LEADERBOARDS Y DESGLOSE POR PARTIDO
+# TAREA: HITOS 14 + 15 EN PARALELO
 
-Objetivo: que cualquier usuario autenticado vea:
+Los dos hitos se atacan juntos porque comparten muchísima superficie:
+ambos tocan páginas admin nuevas (hito 14) y el shell visual de toda
+la app (hito 15). Hacer 14 sin pulir UI deja `/admin/reset` con
+estética inconsistente; hacer 15 sin las pantallas admin nuevas te
+fuerza a re-tocar después.
 
-1. Una **clasificación general** (todos los participantes con sus
-   puntos totales).
-2. **Desgloses** por jornada / fase / categoría.
-3. Una **vista de evolución** por jornadas (gráfico de burbujas con
-   iniciales según el plan §7, o alternativa más simple si el plan
-   detallado lo justifica).
-4. En la vista de sus predicciones, un **tooltip "ⓘ"** por partido
-   con el breakdown completo (criterio · valor · puntos), tomado de
-   `prediction_scores.points_breakdown`.
-5. Una vista personal `/my-scores` (o equivalente) con un gráfico de
-   barras horizontales por partido: longitud = `points_total /
-   max_possible_partido`.
+## Hito 14 — Admin: reset y reglas
 
-Decide en el plan si las 5 piezas entran en este hito o si algunas
-quedan para 13. Mi recomendación: **1, 2, 4** mínimo este hito; **3 y 5
-si el plan detallado se mantiene compacto**.
+Objetivo: que el admin pueda (a) resetear datos de un torneo con
+confirmación literal "BORRAR" y (b) versionar / activar reglas de
+puntuación.
 
-Pasos generales (sujetos a tu plan detallado en
-`context/plan/12-leaderboards-and-visuals.md`):
+Scope:
 
-1. Leer PID §4.2, `01-plan.md` §7 hito 12, y la sección §12 del plan
-   del hito 11.
-2. Inspeccionar el estado de `prediction_scores` en local (`select *
-   limit 10`) para ver las claves reales del breakdown.
-3. Proponer en el plan: rutas (`/clasificacion`,
-   `/clasificacion/desglose`, `/clasificacion/evolucion`,
-   `/my-scores` si entra); forma de computar acumulados (vista SQL vs
-   `group by` en JS); librería de gráficos (recomiendo CSS+SVG salvo
-   que justifiques Recharts); estructura del tooltip y dónde se
-   monta (probablemente en `/predictions/matches` y `/my-scores`).
-4. (Si decides ruta SQL) Migración con vista materializada o vista
-   normal. Aplicar local + prod tras confirmación.
-5. Server components para las páginas; islas client (`"use client"`)
-   solo donde haya estado interactivo (popup del tooltip, selector
-   de jornada con `useState`, gráfico interactivo).
-6. UI: top destacado, último destacado en colores consistentes con
-   los del hito 09 (sticky bar, badges).
-7. Verificar contra los `prediction_scores` de local: cuadres a mano
-   de top 3 por categoría.
-8. typecheck/lint/format/build verdes. Smoke local. Push master.
-9. Bitácora en paralelo desde el paso 1.
+1. `/admin/reset`
+   - Selector de torneo (UI: dropdown; por defecto el del slug por
+     defecto).
+   - Checkboxes de qué borrar:
+     - Predicciones iniciales (`initial_predictions`).
+     - Predicciones de partido (`match_predictions`).
+     - Clasificados de grupo (`group_qualification_predictions`).
+     - Resultados de partidos (`match_results` + `match_goals`).
+     - Puntuaciones (`prediction_scores`).
+     - Snapshots de leaderboard (`leaderboard_snapshots`).
+   - Modal de confirmación: input de texto que exige el literal
+     `BORRAR` antes de habilitar el submit.
+   - Server action `resetTournamentData(formData)` que:
+     - Llama a `requireAdmin()`.
+     - Re-valida el literal "BORRAR" desde formData (defense in
+       depth — no confiar solo en el cliente).
+     - Ejecuta los deletes con `tournament_id` como filtro, en el
+       orden correcto para no romper FKs (scores → predictions →
+       results → goals; o usar `ON DELETE CASCADE` ya existente).
+     - revalidatePath de las rutas afectadas
+       (`/clasificacion/*`, `/my-scores`, `/predictions/*`,
+       `/admin/results`, `/admin/reset`).
+   - NUNCA tocar `tournaments`, `teams`, `players`, `fixtures`,
+     `stages`, `rounds`, `scoring_rules`. Master data y reglas se
+     gestionan en flujos separados.
+   - Si quieres ser muy estricto: usar transacción RPC (SECURITY
+     DEFINER) para que todo pase o nada — pero ojo, con RLS esto
+     necesita el admin client (`src/lib/supabase/admin.ts`).
+     Decisión a tomar en el plan.
+
+2. `/admin/reglas`
+   - Lista de versiones de `scoring_rules` del torneo seleccionado.
+     Una fila por versión con: número de versión, badge "Activa" si
+     `active = true`, fecha de creación, botones.
+   - Botón "Duplicar y editar" → crea una nueva fila con `active =
+     false`, copiando el JSON de la versión origen e incrementando
+     `version`.
+   - Editor JSON con validación Zod (mismo shape que
+     `ScoringRulesV1`). Botón "Guardar borrador" que actualiza el
+     JSON en su fila (sigue `active = false`).
+   - Botón "Activar esta versión" → marca `active = true` en la
+     elegida y `active = false` en todas las demás del mismo torneo.
+     Server action transaccional.
+   - Botón "Recalcular ahora" → llama a
+     `recalculateTournamentScores(tournament.id)`. Banner de
+     progreso opcional.
+   - Tabla mínima útil en el editor JSON: si el shape se complica,
+     un par de inputs numéricos por categoría también funcionan;
+     decide en el plan.
+
+3. Acceptance:
+   - Un reset borra solo las tablas marcadas del torneo elegido y
+     deja intactas las del otro torneo (verificable en local con
+     `wc_2026` o creando un torneo de test efímero).
+   - Crear una nueva versión de reglas que cambie `correct_outcome_90
+     = 7` y activarla → recalcular → todos los `prediction_scores`
+     suben coherentemente.
+
+## Hito 15 — Diseño UI español
+
+Objetivo: dejar la app con una sensación visual coherente, paleta
+definitiva y copy en español revisado. No es un rediseño desde cero:
+es **consolidar** lo que ya hay (badges, panels, popovers, layout
+header) y pulir.
+
+Scope:
+
+1. **Paleta + tokens.** Tailwind v4 → variables CSS en `@theme` de
+   `src/app/globals.css`:
+   - `--color-primary`, `--color-accent`, `--color-success`,
+     `--color-warning`, `--color-danger`, `--color-muted`.
+   - Mapear a `bg-primary`, `text-primary-foreground`, etc.
+   - Reemplazar los `bg-emerald-*`, `bg-amber-*`, `bg-rose-*`,
+     `bg-sky-*` dispersos por estos tokens cuando aplique
+     (semántica: success / warning / danger / info).
+   - Si el usuario no ha entregado paleta, **propóntela tú** en el
+     plan y pídele OK antes de implementar. Sugerencia base:
+     primary oscuro azul/rojo + acentos neutros zinc.
+2. **Tipografía e iconos.**
+   - Mantener Geist (ya cargado en `src/app/layout.tsx`); revisar
+     escalas tipográficas con clases utilities.
+   - Iconos: estandarizar lucide-react donde haya emojis decorativos
+     (`🏁`, `🔒`, `🎲`, `ⓘ`). Mantener emojis solo en banners de
+     contexto fuerte (FECHA_ACTUAL).
+3. **Layout.**
+   - Header (`src/components/layout/Header.tsx`) ya existe — repasar
+     enlaces, espaciados, contraste en dark mode, comportamiento
+     responsive (menú hamburguesa si el viewport < md).
+   - Footer mínimo: enlace a `/rules`, copyright, versión.
+   - Decidir si la app tiene tema dark/light automático (ya está
+     todo con `dark:` variants) o un toggle explícito.
+4. **Estados consistentes.**
+   - Empty states (sin partidos, sin puntuaciones) → componente
+     reusable `EmptyState`.
+   - Errores → componente reusable `ErrorBanner` (ya hay rojo en
+     varias páginas).
+   - Loading → casi nada porque todo es SSR, pero los formularios
+     pueden mostrar `<button disabled>` en `useFormStatus`.
+5. **Revisión de copys.**
+   - Pasada general por todas las páginas. Detalles concretos:
+     - `/predictions/matches`: el copy del header se reescribió en
+       hito 12; revísalo.
+     - `/rules` (la página, no las reglas de puntuación): repasar.
+     - Mensajes de Zod (en `schemas.ts` de cada feature): asegurar
+       que están en español y son útiles.
+     - Confirmación literal "BORRAR" del hito 14: copy claro.
+6. **Accesibilidad básica.**
+   - Contraste suficiente en dark y light.
+   - `aria-label` en botones-icono (lucide).
+   - `aria-expanded` ya está en chevrons y popovers (revisar).
+   - Foco visible (`focus-visible:ring-*`) en botones, inputs, links.
+
+Acceptance:
+- Las páginas comparten paleta y tipografía.
+- Ningún copy en inglés visible al usuario final.
+- El admin recién pulido (hito 14) ya nace con la paleta nueva.
+- Lighthouse a11y razonable (>90 en home y dashboard).
 
 # CÓMO TRABAJAS CONMIGO
 
 - Primero escribes el plan detallado en
-  `context/plan/12-leaderboards-and-visuals.md`. Yo lo reviso y te
-  digo "adelante" (o ajustes).
-- Bitácora en paralelo en
-  `context/implementations/12-leaderboards-and-visuals-implementation.md`,
+  `context/plan/14-admin-reset-and-rules.md` y
+  `context/plan/15-ui-design-spanish.md`. Yo los reviso y te digo
+  "adelante" (o ajustes).
+- Bitácoras en paralelo en
+  `context/implementations/14-admin-reset-and-rules-implementation.md`
+  y `context/implementations/15-ui-design-spanish-implementation.md`,
   no al final.
 - Commits: 1 por unidad coherente. **Mensaje de commit: máximo 1
   línea**, Conventional Commits en inglés, `Co-Authored-By: Claude`.
@@ -391,7 +552,9 @@ Pasos generales (sujetos a tu plan detallado en
   una migración a prod, crear/borrar recursos Supabase/Vercel,
   borrar datos con predicciones asociadas, **añadir nuevas
   dependencias** al `package.json`. NUNCA borrados por
-  `tournament_id` en scripts de verificación.
+  `tournament_id` en scripts de verificación (ironía nota: el hito
+  14 SÍ implementa exactamente eso, pero por UI con doble
+  confirmación, no desde script suelto).
 - Si un comando bash necesita interacción humana (passwords, prompts
   Y/n, login), pásamelo y dime qué buscar.
 - Si editas un fichero que yo (o un linter/prettier) modificó,
@@ -402,20 +565,30 @@ Pasos generales (sujetos a tu plan detallado en
 - Sin tests automatizados (decisión heredada del hito 11).
   Verificación = smoke + psql + cuadre manual.
 - Tras editar `.env.local`: SIEMPRE verifica con `grep` que el cambio
-  está en disco (lección del 11b — un Edit no persistió y descubrí
-  la pérdida cuando el dev server seguía cargando el slug viejo).
+  está en disco.
 
 # EMPIEZA AQUÍ
 
-1. Lee "LEE ESTO ANTES DE NADA" (sobre todo `01-plan.md` §7 hito 12,
-   §12 del plan del hito 11, y la bitácora del hito 11 y 11b para
-   conocer las claves del breakdown y el estado de los datos).
-2. Inspecciona el estado: `select prediction_type, count(*),
-   sum(points_total), jsonb_pretty(points_breakdown) from
-   prediction_scores limit 5` en psql; columnas, valores típicos.
-3. Escribe el plan detallado del hito 12 en
-   `context/plan/12-leaderboards-and-visuals.md`. No implementes
-   todavía.
-4. Pídeme aprobación.
-5. Aprobado, ejecuta paso a paso siguiendo las convenciones de los
-   hitos previos.
+1. Lee "LEE ESTO ANTES DE NADA". Especialmente la bitácora del hito
+   12 (D12-10 lock manual, D12-12 fix scoring) — son los cambios más
+   recientes y afectan al hito 14 directamente.
+2. Inspecciona el estado:
+   - `select code, predictions_locked_at is not null as locked from
+     rounds where tournament_id = (select id from tournaments where
+     slug='wc_2026') order by sort_order;` para ver qué jornadas
+     están bloqueadas en local.
+   - `select version, active, rules from scoring_rules where
+     tournament_id = (select id from tournaments where
+     slug='wc_2026');` para conocer la fila activa que el hito 14
+     va a versionar.
+3. Pregunta al usuario:
+   - Si quiere aplicar la migración `20260525120000` a prod antes de
+     empezar el hito 14 (recomendado).
+   - Paleta de colores definitiva para el hito 15 (o que apruebe la
+     que propongas).
+4. Escribe los planes detallados (14 y 15). No implementes todavía.
+5. Pídele aprobación.
+6. Aprobado, ejecuta paso a paso siguiendo las convenciones de los
+   hitos previos. Puedes intercalar trabajo de 14 y 15 (lo más
+   eficiente: ir terminando piezas del 14 con la paleta nueva ya
+   aplicada).

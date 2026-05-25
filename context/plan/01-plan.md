@@ -186,14 +186,16 @@ sentido). PRs pequeños y frecuentes.
 | 10 | Admin: introducción de resultados| `10-admin-results-entry.md`                | D. Resultados |
 | 11 | Motor de puntuación              | `11-scoring-engine.md`                     | D |
 | 12 | Leaderboards y gráfico evolución | `12-leaderboards-and-visuals.md`           | E. Visualización |
-| 13 | Resultados públicos y stats      | `13-public-results-and-stats.md`           | E |
+| 13 | ~~Resultados públicos y stats~~  | ~~eliminado en cierre del hito 12~~        | — |
 | 14 | Admin: reset y reglas            | `14-admin-reset-and-rules.md`              | F. Pulido |
 | 15 | Diseño UI español                | `15-ui-design-spanish.md`                  | F |
 | 16 | Despliegue producción + CI/CD    | `16-production-deployment.md`              | F |
 | 17 | Test E2E con Catar 2022          | `17-end-to-end-test-catar-2022.md`         | G. Validación |
 
-Los hitos se entregan en orden. Algunos pueden solaparse en paralelo
-(p.ej. 15 con 12/13), pero por defecto serial.
+Los hitos se entregan en orden. Por defecto serial. **Hito 13
+eliminado** al cerrar el hito 12: los resultados y desgloses ya son
+visibles desde `/clasificacion/partido/[fixtureId]` y la app no
+trackea goles por jugador ni estadísticas de selección.
 
 ---
 
@@ -769,26 +771,20 @@ estilo "burbujas con iniciales" que muestra evolución por jornada.
 
 ---
 
-### Hito 13 — Resultados públicos y stats
-Archivo destino: `13-public-results-and-stats.md`.
+### Hito 13 — ELIMINADO
 
-**Goal:** Página de resultados públicos por jornada y página de
-estadísticas por selección.
+La página `/resultados` y `/estadisticas/selecciones` se descartan:
 
-**Scope:**
-- `/resultados`:
-  - Dropdown de jornada/ronda.
-  - Por fixture: marcador, goleadores, indicadores de prórroga y
-    penaltis, equipo clasificado en eliminatorias.
-- `/estadisticas/selecciones`:
-  - Selector de selección.
-  - Tabla de jugadores con minutos, goles, asistencias, amarillas,
-    rojas (datos de `player_match_stats`).
-  - **Progresivo:** si el admin no está rellenando estos datos,
-    la tabla puede quedarse parcialmente vacía. No bloquea.
+- Los resultados por partido ya son visibles para todos en
+  `/clasificacion/partido/[fixtureId]` (que muestra el marcador
+  oficial + las predicciones de cada participante) y dentro del
+  `LockedFixturePanel` de `/predictions/matches` cuando la ronda
+  está bloqueada.
+- La app **no trackea goles por jugador** (decisión del usuario
+  cerrada en hito 12). Sin `player_match_stats` poblada las stats
+  de selección no aportan, así que se descarta esa página entera.
 
-**Acceptance:** al confirmar un resultado, se ve en `/resultados`
-sin necesidad de recargar más allá de un revalidate.
+El plan continúa directamente en el hito 14.
 
 ---
 
@@ -991,7 +987,6 @@ context/plan/
   10-admin-results-entry.md                    [pendiente]
   11-scoring-engine.md                         [pendiente]
   12-leaderboards-and-visuals.md               [pendiente]
-  13-public-results-and-stats.md               [pendiente]
   14-admin-reset-and-rules.md                  [pendiente]
   15-ui-design-spanish.md                      [pendiente]
   16-production-deployment.md                  [pendiente]
