@@ -71,4 +71,4 @@ export const MAX_INITIAL_TOP_SCORER = 100;
 export const MAX_INITIAL_BEST_PLAYER = 100;
 
 // Max per qualified-team slot in group qualification.
-export const MAX_GROUP_QUALIFICATION_SLOT = 5;
+export const MAX_GROUP_QUALIFICATION_SLOT = 25;

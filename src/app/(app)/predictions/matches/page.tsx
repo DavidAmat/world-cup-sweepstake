@@ -2,7 +2,6 @@ import Link from "next/link";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getMatchLockState, isFixtureLocked } from "@/lib/predictions/matchLock";
-import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { generateRandomMatchPredictions } from "./actions";
 import { MatchesForm, type RoundVM } from "./MatchesForm";
 import type { LockedEntry } from "./LockedFixturePanel";
@@ -57,7 +56,7 @@ export default async function MatchPredictionsPage({
   const { error, ok } = await searchParams;
   const { userId, supabase } = await requireAuth();
   const tournament = await getDefaultTournament();
-  const { overriding, fechaActual, lockedRoundIds } = await getMatchLockState(tournament.id);
+  const { lockedRoundIds } = await getMatchLockState(tournament.id);
 
   const { data: profileData } = await supabase
     .from("profiles")
@@ -256,7 +255,7 @@ export default async function MatchPredictionsPage({
     }));
 
   return (
-    <main className="mx-auto max-w-4xl p-10">
+    <main className="mx-auto max-w-[96rem] px-6 py-10">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Predicciones de partidos</h1>
@@ -271,12 +270,6 @@ export default async function MatchPredictionsPage({
         </Link>
       </div>
 
-      {overriding && (
-        <p className="border-info-light bg-info-light text-info-fg mt-4 rounded-md border p-3 text-xs">
-          🧪 Fecha simulada (FECHA_ACTUAL):{" "}
-          <strong>{fechaActual ? formatMadridDateTime(fechaActual) : "—"} (Madrid)</strong>.
-        </p>
-      )}
       {error && (
         <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
           {error}

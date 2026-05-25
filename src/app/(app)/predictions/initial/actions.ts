@@ -8,6 +8,7 @@ import { requireAdmin } from "@/lib/permissions/requireAdmin";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getInitialLockState } from "@/lib/predictions/initialLock";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { recalculateTournamentScores } from "@/lib/scoring/recalculate";
 import { GROUP_QUALIFIERS, readInitialPayload } from "./schemas";
 
 const SELF = "/predictions/initial";
@@ -159,7 +160,15 @@ export async function saveInitialPredictions(formData: FormData) {
     if (insErr) fail(insErr.message);
   }
 
+  // Recompute prediction_scores so the leaderboard reflects this save
+  // even when the user submits after match results were already
+  // confirmed (otherwise their points stay at 0 until the next admin
+  // recalc / result confirmation).
+  await recalculateTournamentScores(tournament.id);
+
   revalidatePath(SELF);
   revalidatePath(`${SELF}/public`);
+  revalidatePath("/clasificacion");
+  revalidatePath("/my-scores");
   redirect(`${SELF}?ok=saved`);
 }

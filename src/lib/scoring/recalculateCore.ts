@@ -196,7 +196,7 @@ export async function recalculateTournamentScoresCore(
 
   const { data: initialPreds } = await supabase
     .from("initial_predictions")
-    .select("user_id, champion_team_id, runner_up_team_id")
+    .select("user_id, champion_team_id, runner_up_team_id, top_scorer_correct, best_player_correct")
     .eq("tournament_id", tournamentId);
 
   for (const ip of initialPreds ?? []) {
@@ -205,6 +205,8 @@ export async function recalculateTournamentScoresCore(
         user_id: ip.user_id,
         champion_team_id: ip.champion_team_id,
         runner_up_team_id: ip.runner_up_team_id,
+        top_scorer_correct: ip.top_scorer_correct,
+        best_player_correct: ip.best_player_correct,
       },
       tournamentFinalOutcome,
       rules,

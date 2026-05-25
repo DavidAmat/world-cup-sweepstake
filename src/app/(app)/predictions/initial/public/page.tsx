@@ -3,7 +3,6 @@ import { TeamName } from "@/components/ui/TeamName";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getInitialLockState } from "@/lib/predictions/initialLock";
-import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { GROUP_CODES } from "../schemas";
 
 type SearchParams = Promise<{ cat?: string }>;
@@ -33,16 +32,15 @@ export default async function PublicInitialPredictionsPage({
 
   const { supabase } = await requireAuth();
   const tournament = await getDefaultTournament();
-  const { lockAt, locked, overriding, fechaActual } = await getInitialLockState(tournament.id);
+  const { locked } = await getInitialLockState(tournament.id);
 
   if (!locked) {
     return (
-      <main className="mx-auto max-w-3xl p-10">
+      <main className="mx-auto max-w-5xl p-10">
         <h1 className="text-2xl font-bold">Predicciones iniciales · vista pública</h1>
         <p className="mt-4 rounded-md border border-warning-light bg-warning-light p-3 text-sm text-warning-fg">
-          Las predicciones de los demás se harán públicas cuando empiece el torneo
-          {lockAt ? ` (${formatMadridDateTime(lockAt)} Madrid)` : ""}. Hasta entonces solo ves las
-          tuyas.
+          Las predicciones de los demás se harán públicas cuando el administrador las bloquee.
+          Hasta entonces solo ves las tuyas.
         </p>
         <p className="mt-4 text-sm">
           <Link href="/predictions/initial" className="underline">
@@ -90,7 +88,7 @@ export default async function PublicInitialPredictionsPage({
   }
 
   return (
-    <main className="mx-auto max-w-3xl p-10">
+    <main className="mx-auto max-w-5xl p-10">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Predicciones iniciales · vista pública</h1>
@@ -102,13 +100,6 @@ export default async function PublicInitialPredictionsPage({
           Mis predicciones
         </Link>
       </div>
-
-      {overriding && (
-        <p className="mt-4 rounded-md border border-info-light bg-info-light p-3 text-xs text-info-fg">
-          🧪 Fecha simulada (FECHA_ACTUAL):{" "}
-          <strong>{fechaActual ? formatMadridDateTime(fechaActual) : "—"} (Madrid)</strong>.
-        </p>
-      )}
 
       <form method="get" className="mt-6 flex items-end gap-3">
         <label className="flex flex-col gap-1 text-sm">

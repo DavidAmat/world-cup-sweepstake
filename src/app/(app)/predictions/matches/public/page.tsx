@@ -30,7 +30,7 @@ export default async function PublicMatchPredictionsPage({
   const { round: roundParam } = await searchParams;
   const { supabase } = await requireAuth();
   const tournament = await getDefaultTournament();
-  const { overriding, fechaActual, lockedRoundIds } = await getMatchLockState(tournament.id);
+  const { lockedRoundIds } = await getMatchLockState(tournament.id);
 
   const [{ data: rounds }, { data: roundFixtures }, { data: profiles }] = await Promise.all([
     supabase
@@ -47,7 +47,7 @@ export default async function PublicMatchPredictionsPage({
 
   if (availableRounds.length === 0) {
     return (
-      <main className="mx-auto max-w-4xl p-10">
+      <main className="mx-auto max-w-7xl p-10">
         <h1 className="text-2xl font-bold">Predicciones de partidos · vista pública</h1>
         <p className="mt-4 text-sm text-zinc-600">
           Todavía no hay partidos cargados para este torneo.
@@ -100,7 +100,7 @@ export default async function PublicMatchPredictionsPage({
   const users = profiles ?? [];
 
   return (
-    <main className="mx-auto max-w-4xl p-10">
+    <main className="mx-auto max-w-7xl p-10">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Predicciones de partidos · vista pública</h1>
@@ -112,13 +112,6 @@ export default async function PublicMatchPredictionsPage({
           Mis predicciones
         </Link>
       </div>
-
-      {overriding && (
-        <p className="mt-4 rounded-md border border-info-light bg-info-light p-3 text-xs text-info-fg">
-          🧪 Fecha simulada (FECHA_ACTUAL):{" "}
-          <strong>{fechaActual ? formatMadridDateTime(fechaActual) : "—"} (Madrid)</strong>.
-        </p>
-      )}
 
       <form method="get" className="mt-6 flex items-end gap-3">
         <label className="flex flex-col gap-1 text-sm">

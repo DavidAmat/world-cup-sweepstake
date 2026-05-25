@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { TeamName } from "@/components/ui/TeamName";
+import { NumberInput } from "@/components/ui/NumberInput";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
-import { Lock, Unlock, ChevronDown } from "lucide-react";
+import { Lock, Unlock, ChevronDown, Info } from "lucide-react";
 import {
   saveAllMatchPredictions,
   lockRoundFromPredictions,
@@ -57,8 +58,8 @@ export type RoundVM = {
 
 type Values = { h90: string; a90: string; et: boolean; pen: boolean; qual: string };
 
-const INPUT_CLS = "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm";
-const GOAL_CLS = `${INPUT_CLS} w-16 text-center`;
+const GOAL_CLS =
+  "rounded-md border border-zinc-300 bg-white px-2 py-1 w-16 text-center font-oswald text-xl font-bold text-zinc-900 focus:border-primary focus:outline-none";
 
 type Meta = { isKnockout: boolean; homeId: string; awayId: string };
 
@@ -179,9 +180,21 @@ export function MatchesForm({
   const [bulkSignal, setBulkSignal] = useState<LockedBulkSignal>({ open: true, n: 0 });
   const toggleAll = () => setBulkSignal((s) => ({ open: !s.open, n: s.n + 1 }));
 
+  const [, startRoundTransition] = useTransition();
+  const handleLockRound = (roundCode: string) => {
+    const fd = new FormData();
+    fd.set("round", roundCode);
+    startRoundTransition(() => lockRoundFromPredictions(fd));
+  };
+  const handleUnlockRound = (roundCode: string) => {
+    const fd = new FormData();
+    fd.set("round", roundCode);
+    startRoundTransition(() => unlockRoundFromPredictions(fd));
+  };
+
   return (
     <form action={saveAllMatchPredictions} className="mt-4">
-      <div className="sticky top-14 z-10 -mx-10 border-b border-zinc-200 bg-white/90 px-10 py-3 backdrop-blur">
+      <div className="sticky top-14 z-10 -mx-6 border-b border-zinc-200 bg-white/90 px-6 py-3 backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <p className="text-sm">
@@ -305,37 +318,43 @@ export function MatchesForm({
               </h2>
               {isAdmin &&
                 (r.locked ? (
-                  <form action={unlockRoundFromPredictions}>
-                    <input type="hidden" name="round" value={r.code} />
-                    <button
-                      type="submit"
-                      className="border-success/30 bg-success/10 text-success-fg hover:bg-success/20 flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
-                    >
-                      <Unlock className="h-3 w-3" aria-hidden />
-                      Desbloquear jornada
-                    </button>
-                  </form>
+                  <button
+                    type="button"
+                    onClick={() => handleUnlockRound(r.code)}
+                    className="border-success/30 bg-success/10 text-success-fg hover:bg-success/20 flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
+                  >
+                    <Unlock className="h-3 w-3" aria-hidden />
+                    Desbloquear jornada
+                  </button>
                 ) : (
-                  <form action={lockRoundFromPredictions}>
-                    <input type="hidden" name="round" value={r.code} />
-                    <button
-                      type="submit"
-                      className="border-danger/30 bg-danger/10 text-danger-fg hover:bg-danger/20 flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
-                    >
-                      <Lock className="h-3 w-3" aria-hidden />
-                      Bloquear jornada
-                    </button>
-                  </form>
+                  <button
+                    type="button"
+                    onClick={() => handleLockRound(r.code)}
+                    className="border-danger/30 bg-danger/10 text-danger-fg hover:bg-danger/20 flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
+                  >
+                    <Lock className="h-3 w-3" aria-hidden />
+                    Bloquear jornada
+                  </button>
                 ))}
             </div>
-            <ul className="mt-3 flex flex-col gap-3">
+            {r.fixtures.some((f) => f.isKnockout) && (
+              <div className="border-info/30 bg-info-light/40 text-info-fg mt-3 flex items-start gap-2 rounded-lg border px-3 py-2 text-xs">
+                <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+                <span>
+                  La prórroga es automática: si predices empate a 90&apos; en eliminatoria, hay
+                  prórroga. No se predice el resultado de la prórroga, solo si hay penaltis y qué
+                  equipo pasa.
+                </span>
+              </div>
+            )}
+            <ul className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
               {r.fixtures.map((f) => {
                 const v = values[f.id];
                 const status = f.locked ? "blocked" : isSaved(v, f.saved) ? "saved" : "unsaved";
                 return (
                   <li
                     key={f.id}
-                    className={`rounded-xl border bg-white p-4 transition-colors ${
+                    className={`min-w-0 rounded-xl border bg-white p-3 transition-colors ${
                       f.locked ? "border-danger/20 bg-danger/5" : "border-zinc-200"
                     }`}
                   >
@@ -432,40 +451,28 @@ function Editable({
     <div className="mt-3 flex flex-col gap-3">
       {/* Score inputs: give each team name a fixed min-width so long names
           like "Costa de Marfil" don't create a new line. */}
-      <div className="flex flex-wrap items-center gap-2 text-sm">
-        <span className="min-w-[9rem] text-right font-medium whitespace-nowrap">
-          <TeamName name={f.home} />
-        </span>
-        <input
-          type="number"
+      <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
+        <TeamName name={f.home} flagOnly className="h-5" />
+        <NumberInput
           name={`h90_${f.id}`}
-          min={0}
           value={v.h90}
-          onChange={(e) => set(f.id, { h90: e.target.value })}
+          onChange={(val) => set(f.id, { h90: val })}
           className={GOAL_CLS}
-          aria-label={`Goles ${f.home} a 90'`}
+          ariaLabel={`Goles ${f.home} a 90'`}
         />
         <span className="text-zinc-400">—</span>
-        <input
-          type="number"
+        <NumberInput
           name={`a90_${f.id}`}
-          min={0}
           value={v.a90}
-          onChange={(e) => set(f.id, { a90: e.target.value })}
+          onChange={(val) => set(f.id, { a90: val })}
           className={GOAL_CLS}
-          aria-label={`Goles ${f.away} a 90'`}
+          ariaLabel={`Goles ${f.away} a 90'`}
         />
-        <span className="min-w-[9rem] font-medium whitespace-nowrap">
-          <TeamName name={f.away} />
-        </span>
+        <TeamName name={f.away} flagOnly className="h-5" />
       </div>
 
       {f.isKnockout && (
         <div className="flex flex-col gap-2 rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm">
-          <p className="text-xs text-zinc-500">
-            La prórroga es automática: si predices empate a 90&apos; en eliminatoria, hay prórroga.
-            No se predice el resultado de la prórroga, solo si hay penaltis y qué equipo pasa.
-          </p>
           {v.et && <input type="hidden" name={`et_${f.id}`} value="1" />}
           <label className="flex items-center gap-2">
             <input

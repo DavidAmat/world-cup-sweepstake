@@ -105,7 +105,7 @@ export default async function HomePage() {
   const displayName = profile?.display_name ?? "jugador";
 
   return (
-    <main className="mx-auto max-w-4xl p-8">
+    <main className="mx-auto max-w-6xl p-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold">
           Hola, {displayName} <span className="wave">👋</span>

@@ -30,6 +30,6 @@ export const DEFAULT_SCORING_RULES_V1: ScoringRulesV1 = {
     best_player: 100,
   },
   group_qualification: {
-    team_correct: 5,
+    team_correct: 25,
   },
 };

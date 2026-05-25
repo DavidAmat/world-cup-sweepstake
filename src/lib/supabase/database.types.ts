@@ -193,6 +193,7 @@ export type Database = {
       };
       initial_predictions: {
         Row: {
+          best_player_correct: boolean | null;
           best_player_text: string | null;
           champion_team_id: string | null;
           created_at: string;
@@ -200,12 +201,14 @@ export type Database = {
           locked_at: string | null;
           runner_up_team_id: string | null;
           submitted_at: string | null;
+          top_scorer_correct: boolean | null;
           top_scorer_text: string | null;
           tournament_id: string;
           updated_at: string;
           user_id: string;
         };
         Insert: {
+          best_player_correct?: boolean | null;
           best_player_text?: string | null;
           champion_team_id?: string | null;
           created_at?: string;
@@ -213,12 +216,14 @@ export type Database = {
           locked_at?: string | null;
           runner_up_team_id?: string | null;
           submitted_at?: string | null;
+          top_scorer_correct?: boolean | null;
           top_scorer_text?: string | null;
           tournament_id: string;
           updated_at?: string;
           user_id: string;
         };
         Update: {
+          best_player_correct?: boolean | null;
           best_player_text?: string | null;
           champion_team_id?: string | null;
           created_at?: string;
@@ -226,6 +231,7 @@ export type Database = {
           locked_at?: string | null;
           runner_up_team_id?: string | null;
           submitted_at?: string | null;
+          top_scorer_correct?: boolean | null;
           top_scorer_text?: string | null;
           tournament_id?: string;
           updated_at?: string;

@@ -3,10 +3,12 @@ import Link from "next/link";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getInitialLockState } from "@/lib/predictions/initialLock";
-import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { Badge } from "@/components/ui/Badge";
 import { TeamName } from "@/components/ui/TeamName";
 import { Lock, Unlock } from "lucide-react";
+import { computeGroupTables, type FixtureForTable } from "@/lib/scoring/scoreGroup";
+import { DEFAULT_SCORING_RULES_V1 } from "@/lib/scoring/rules";
+import type { ScoringRulesV1 } from "@/lib/scoring/types";
 import { GROUP_CODES, GROUP_QUALIFIERS } from "./schemas";
 import {
   saveInitialPredictions,
@@ -26,7 +28,7 @@ export default async function InitialPredictionsPage({
   const { error, ok } = await searchParams;
   const { userId, supabase } = await requireAuth();
   const tournament = await getDefaultTournament();
-  const { lockAt, locked, overriding, fechaActual } = await getInitialLockState(tournament.id);
+  const { locked } = await getInitialLockState(tournament.id);
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -34,15 +36,6 @@ export default async function InitialPredictionsPage({
     .eq("user_id", userId)
     .single();
   const isAdmin = profile?.role === "admin";
-
-  const { data: tournamentFull } = await supabase
-    .from("tournaments")
-    .select("initial_predictions_locked_at")
-    .eq("id", tournament.id)
-    .single();
-  const manuallyLocked = !!(
-    tournamentFull as { initial_predictions_locked_at: string | null } | null
-  )?.initial_predictions_locked_at;
 
   const { data: teams } = await supabase
     .from("teams")
@@ -84,8 +77,85 @@ export default async function InitialPredictionsPage({
   const teamName = (id: string | null | undefined) =>
     id ? (teamById.get(id)?.display_name ?? "—") : "—";
 
+  // Group-stage results → table → top-2 = qualified teams. Only shown
+  // once the admin has locked initial predictions AND every group has
+  // all 6 matches confirmed (jornadas 1, 2 y 3 completas).
+  const [groupFixturesRes, resultsRes, rulesRes] = await Promise.all([
+    supabase
+      .from("fixtures")
+      .select("id, group_code, home_team_id, away_team_id, stage:stages(code)")
+      .eq("tournament_id", tournament.id),
+    supabase
+      .from("match_results")
+      .select("fixture_id, home_goals_90, away_goals_90, result_status")
+      .eq("tournament_id", tournament.id),
+    supabase
+      .from("scoring_rules")
+      .select("rules")
+      .eq("tournament_id", tournament.id)
+      .eq("active", true)
+      .maybeSingle(),
+  ]);
+
+  const confirmedResultByFixture = new Map<string, { home: number; away: number }>();
+  for (const r of resultsRes.data ?? []) {
+    if (r.result_status !== "confirmed") continue;
+    confirmedResultByFixture.set(r.fixture_id, {
+      home: r.home_goals_90 ?? 0,
+      away: r.away_goals_90 ?? 0,
+    });
+  }
+
+  type GroupFixtureRow = {
+    id: string;
+    group_code: string | null;
+    home_team_id: string | null;
+    away_team_id: string | null;
+    stage: { code: string } | { code: string }[] | null;
+  };
+
+  function stageCode(s: GroupFixtureRow["stage"]): string | null {
+    if (!s) return null;
+    return Array.isArray(s) ? (s[0]?.code ?? null) : s.code;
+  }
+
+  const fixturesForTable: FixtureForTable[] = [];
+  for (const f of (groupFixturesRes.data ?? []) as GroupFixtureRow[]) {
+    if (stageCode(f.stage) !== "group_stage") continue;
+    if (!f.group_code || !f.home_team_id || !f.away_team_id) continue;
+    const r = confirmedResultByFixture.get(f.id);
+    if (!r) continue;
+    fixturesForTable.push({
+      fixture_id: f.id,
+      group_code: f.group_code,
+      home_team_id: f.home_team_id,
+      away_team_id: f.away_team_id,
+      home_team_code: teamById.get(f.home_team_id)?.code ?? "",
+      away_team_code: teamById.get(f.away_team_id)?.code ?? "",
+      home_goals_90: r.home,
+      away_goals_90: r.away,
+    });
+  }
+
+  const groupTables = computeGroupTables(fixturesForTable, 6);
+  const qualifiedByGroup = new Map<string, Set<string>>();
+  let allGroupsComplete = GROUP_CODES.length > 0;
+  for (const g of GROUP_CODES) {
+    const table = groupTables.get(g);
+    if (table && table.complete && table.rows.length >= 2) {
+      qualifiedByGroup.set(g, new Set([table.rows[0].team_id, table.rows[1].team_id]));
+    } else {
+      allGroupsComplete = false;
+    }
+  }
+
+  const rules: ScoringRulesV1 =
+    (rulesRes.data?.rules as ScoringRulesV1 | null) ?? DEFAULT_SCORING_RULES_V1;
+  const teamCorrectPts = rules.group_qualification.team_correct;
+  const showEvaluation = locked && allGroupsComplete;
+
   return (
-    <main className="mx-auto max-w-3xl p-10">
+    <main className="mx-auto max-w-5xl p-10">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Predicciones iniciales</h1>
@@ -123,12 +193,7 @@ export default async function InitialPredictionsPage({
       <p className="mt-3 text-sm text-zinc-600">
         {locked ? (
           <>
-            {manuallyLocked
-              ? "Bloqueadas por el administrador."
-              : "Se cerraron al empezar el torneo" +
-                (lockAt ? ` (${formatMadridDateTime(lockAt)})` : "") +
-                "."}{" "}
-            Ya no se pueden editar.{" "}
+            Bloqueadas por el administrador. Ya no se pueden editar.{" "}
             <Link href="/predictions/initial/public" className="underline">
               Ver las de todos
             </Link>
@@ -136,20 +201,11 @@ export default async function InitialPredictionsPage({
           </>
         ) : (
           <>
-            Puedes editarlas hasta que el administrador las bloquee
-            {lockAt ? ` o empiece el primer partido (${formatMadridDateTime(lockAt)})` : ""}.
-            Después serán solo lectura y públicas.
+            Puedes editarlas hasta que el administrador las bloquee. Después serán solo lectura y
+            públicas.
           </>
         )}
       </p>
-
-      {overriding && (
-        <p className="border-info-light bg-info-light text-info-fg mt-4 rounded-md border p-3 text-xs">
-          🧪 Fecha simulada (FECHA_ACTUAL):{" "}
-          <strong>{fechaActual ? formatMadridDateTime(fechaActual) : "—"} (Madrid)</strong>. El
-          bloqueo se evalúa contra esta fecha, no la real.
-        </p>
-      )}
 
       {error && (
         <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
@@ -180,6 +236,9 @@ export default async function InitialPredictionsPage({
           bestPlayer={pred?.best_player_text ?? "—"}
           qualByGroup={qualByGroup}
           teamName={teamName}
+          qualifiedByGroup={qualifiedByGroup}
+          showEvaluation={showEvaluation}
+          teamCorrectPts={teamCorrectPts}
         />
       ) : (
         <form action={saveInitialPredictions} className="mt-6 flex flex-col gap-6">
@@ -322,6 +381,9 @@ function ReadOnlyView({
   bestPlayer,
   qualByGroup,
   teamName,
+  qualifiedByGroup,
+  showEvaluation,
+  teamCorrectPts,
 }: {
   championName: string;
   runnerUpName: string;
@@ -329,7 +391,21 @@ function ReadOnlyView({
   bestPlayer: string;
   qualByGroup: Map<string, Set<string>>;
   teamName: (id: string | null | undefined) => string;
+  qualifiedByGroup: Map<string, Set<string>>;
+  showEvaluation: boolean;
+  teamCorrectPts: number;
 }) {
+  let grandTotal = 0;
+  if (showEvaluation) {
+    for (const g of GROUP_CODES) {
+      const selected = qualByGroup.get(g) ?? new Set<string>();
+      const qualified = qualifiedByGroup.get(g) ?? new Set<string>();
+      let hits = 0;
+      for (const id of selected) if (qualified.has(id)) hits += 1;
+      grandTotal += hits * teamCorrectPts;
+    }
+  }
+
   return (
     <section className="mt-6 flex flex-col gap-6">
       <div className="grid gap-4 rounded-md border border-zinc-200 bg-white p-4 text-sm sm:grid-cols-2">
@@ -339,25 +415,115 @@ function ReadOnlyView({
         <Field label="Mejor jugador" value={bestPlayer} />
       </div>
       <div className="rounded-md border border-zinc-200 bg-white p-4">
-        <p className="mb-3 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
-          Clasificados de grupo
-        </p>
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+          <p className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+            Clasificados de grupo
+          </p>
+          {showEvaluation && (
+            <p className="text-xs text-zinc-600">
+              Total clasificados:{" "}
+              <span className="text-success-fg font-semibold">+{grandTotal} pts</span>
+            </p>
+          )}
+        </div>
+        {!showEvaluation && (
+          <p className="mb-3 text-xs text-zinc-500">
+            Los puntos se mostrarán cuando terminen las jornadas 1, 2 y 3 (todos los grupos
+            completos).
+          </p>
+        )}
         <div className="grid gap-3 sm:grid-cols-2">
           {GROUP_CODES.map((g) => {
-            const ids = [...(qualByGroup.get(g) ?? [])];
+            const selected = qualByGroup.get(g) ?? new Set<string>();
+            const qualified = qualifiedByGroup.get(g) ?? new Set<string>();
+
+            if (!showEvaluation) {
+              const ids = [...selected];
+              return (
+                <div key={g} className="text-sm">
+                  <span className="font-semibold">Grupo {g}: </span>
+                  <span className="inline-flex flex-wrap items-center gap-1 text-zinc-600">
+                    {ids.length
+                      ? ids.map((id, i) => (
+                          <span key={id} className="inline-flex items-center gap-1">
+                            {i > 0 && <span className="text-zinc-400">·</span>}
+                            <TeamName name={teamName(id)} />
+                          </span>
+                        ))
+                      : "—"}
+                  </span>
+                </div>
+              );
+            }
+
+            // Show every team that is either predicted or qualified.
+            const allIds = new Set<string>([...selected, ...qualified]);
+            const items = [...allIds].map((id) => {
+              const wasSelected = selected.has(id);
+              const didQualify = qualified.has(id);
+              return { id, wasSelected, didQualify };
+            });
+            items.sort((a, b) => {
+              const ar = a.wasSelected && a.didQualify ? 0 : 1;
+              const br = b.wasSelected && b.didQualify ? 0 : 1;
+              if (ar !== br) return ar - br;
+              return teamName(a.id).localeCompare(teamName(b.id), "es");
+            });
+
+            const hits = items.filter((i) => i.wasSelected && i.didQualify).length;
+            const groupPts = hits * teamCorrectPts;
+
             return (
-              <div key={g} className="text-sm">
-                <span className="font-semibold">Grupo {g}: </span>
-                <span className="inline-flex flex-wrap items-center gap-1 text-zinc-600">
-                  {ids.length
-                    ? ids.map((id, i) => (
-                        <span key={id} className="inline-flex items-center gap-1">
-                          {i > 0 && <span className="text-zinc-400">·</span>}
-                          <TeamName name={teamName(id)} />
+              <div key={g} className="rounded-md border border-zinc-100 bg-zinc-50/40 p-2">
+                <div className="mb-1.5 flex items-baseline justify-between gap-2">
+                  <span className="text-sm font-semibold">Grupo {g}</span>
+                  <span className="text-xs text-zinc-600">
+                    <span className="text-success-fg font-semibold">+{groupPts} pts</span>
+                  </span>
+                </div>
+                <ul className="flex flex-col gap-1">
+                  {items.map((it) => {
+                    const correct = it.wasSelected && it.didQualify;
+                    const missedQualifier = !it.wasSelected && it.didQualify;
+                    const wrongPick = it.wasSelected && !it.didQualify;
+                    return (
+                      <li key={it.id} className="flex items-center justify-between gap-2 text-sm">
+                        <span
+                          className={
+                            "inline-flex items-center gap-1.5 " +
+                            (correct
+                              ? "text-zinc-900"
+                              : missedQualifier
+                                ? "text-zinc-500"
+                                : "text-zinc-500 line-through")
+                          }
+                        >
+                          <TeamName name={teamName(it.id)} />
+                          {missedQualifier && (
+                            <span className="text-[10px] text-zinc-400 italic">(clasificó)</span>
+                          )}
                         </span>
-                      ))
-                    : "—"}
-                </span>
+                        {correct ? (
+                          <span
+                            aria-label={`Acertaste: +${teamCorrectPts} puntos`}
+                            className="border-success-light bg-success-light text-success-fg rounded-full border px-2 py-0.5 text-[10px] font-semibold"
+                          >
+                            +{teamCorrectPts} pts
+                          </span>
+                        ) : (
+                          <span
+                            aria-label={
+                              wrongPick ? "No pasó de ronda" : "Pasó de ronda, no la elegiste"
+                            }
+                            className="border-danger-light bg-danger-light text-danger-fg rounded-full border px-1.5 py-0.5 text-[10px] font-semibold"
+                          >
+                            ✗
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
             );
           })}

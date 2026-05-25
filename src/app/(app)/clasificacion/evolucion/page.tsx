@@ -11,7 +11,7 @@ export default async function EvolucionPage() {
   const points = buildEvolution(data);
 
   return (
-    <main className="mx-auto max-w-5xl p-10">
+    <main className="mx-auto max-w-7xl p-10">
       <h1 className="text-2xl font-bold">Evolución de puntos</h1>
       <p className="mt-1 text-sm text-zinc-600">
         Puntos acumulados de cada participante a lo largo del torneo. Las predicciones iniciales y

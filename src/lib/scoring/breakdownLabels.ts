@@ -62,7 +62,7 @@ export const CATEGORY_DESCRIPTIONS: Record<CategoryBucket, string> = {
     "Solo en eliminatorias: acertar si hay prórroga, si hay penaltis y qué equipo pasa de ronda. Aplica el multiplicador.",
   initial:
     "Campeón (200), subcampeón (150), pichichi (100) y mejor jugador (100). Los dos últimos los asigna el admin al cerrar el torneo.",
-  group_qualification: "5 puntos por cada equipo acertado como clasificado de su grupo.",
+  group_qualification: "25 puntos por cada equipo acertado como clasificado de su grupo.",
 };
 
 const MATCH_KEYS = new Set([

@@ -48,30 +48,30 @@ export function BreakdownTable({
         {rows.map(({ entry, value }) => (
           <tr key={entry.key} className="border-t border-zinc-100">
             <td className="py-1.5 pr-2">{entry.label}</td>
-            <td className="py-1.5 pr-2 text-right font-mono">{value}</td>
+            <td className="py-1.5 pr-2 text-right font-oswald">{value}</td>
           </tr>
         ))}
         {extraRows.map((r) => (
           <tr key={r.key} className="border-t border-zinc-100">
             <td className="py-1.5 pr-2">{r.key}</td>
-            <td className="py-1.5 pr-2 text-right font-mono">{r.value}</td>
+            <td className="py-1.5 pr-2 text-right font-oswald">{r.value}</td>
           </tr>
         ))}
       </tbody>
       <tfoot className="border-t-2 border-zinc-300 text-sm">
         <tr>
           <td className="py-1.5 pr-2 text-zinc-600">Subtotal</td>
-          <td className="py-1.5 pr-2 text-right font-mono">{sub}</td>
+          <td className="py-1.5 pr-2 text-right font-oswald">{sub}</td>
         </tr>
         {mult !== 1 && (
           <tr>
             <td className="py-1.5 pr-2 text-zinc-600">Multiplicador</td>
-            <td className="py-1.5 pr-2 text-right font-mono">×{mult}</td>
+            <td className="py-1.5 pr-2 text-right font-oswald">×{mult}</td>
           </tr>
         )}
         <tr>
           <td className="py-1.5 pr-2 font-semibold">Total</td>
-          <td className="py-1.5 pr-2 text-right font-mono font-semibold">{pointsTotal}</td>
+          <td className="py-1.5 pr-2 text-right font-oswald font-semibold">{pointsTotal}</td>
         </tr>
         {groupCode && (
           <tr>

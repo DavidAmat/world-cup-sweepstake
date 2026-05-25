@@ -42,6 +42,7 @@ export const COUNTRY_FLAG_MAP: Record<string, string> = {
   "Jordania": "JO",
   "Portugal": "PT",
   "República Democrática del Congo": "CD",
+  "RD Congo": "CD",
   "Uzbekistán": "UZ",
   "Colombia": "CO",
   "Inglaterra": "GB_ENG",

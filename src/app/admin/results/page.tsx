@@ -287,7 +287,7 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
                     <td className="py-2 pr-3 whitespace-nowrap">
                       {formatMadridDateTime(f.kickoff_at)}
                     </td>
-                    <td className="py-2 pr-3 font-mono">{scoreLabel}</td>
+                    <td className="py-2 pr-3 font-oswald">{scoreLabel}</td>
                     {isKnockoutRound && (
                       <td className="py-2 pr-3">
                         {result?.qualified_team_id ? (

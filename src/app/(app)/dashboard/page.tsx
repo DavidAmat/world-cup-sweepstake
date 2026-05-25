@@ -10,7 +10,7 @@ export default async function DashboardPage() {
     .single();
 
   return (
-    <main className="mx-auto max-w-3xl p-10">
+    <main className="mx-auto max-w-5xl p-10">
       <h1 className="text-2xl font-bold">Hola, {profile?.display_name ?? "jugador"}</h1>
       <p className="mt-2 text-sm text-zinc-600">
         Próximamente: resumen de tu porra, próximos partidos y posición en la clasificación.

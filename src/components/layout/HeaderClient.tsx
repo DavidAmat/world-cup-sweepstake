@@ -45,7 +45,7 @@ const NAV_ITEMS = [
 ];
 
 const CLASIFICACION_ITEMS = [
-  { href: "/clasificacion", label: "Clasificación General" },
+  { href: "/clasificacion/jornada", label: "Clasificación" },
   { href: "/my-scores", label: "Mis Predicciones" },
 ];
 
@@ -172,22 +172,21 @@ function DesktopNav({ displayName, isAdmin, isLoggedIn, signOutForm }: NavProps)
       {isAdmin && (
         <Link
           href="/admin"
-          className={`${LINK_BASE} ${
-            isActive(pathname, "/admin", false)
-              ? "text-special bg-special-light/40 shadow-sm"
-              : "text-special/80 hover:text-special hover:bg-special-light/30"
-          }`}
+          className={`${LINK_BASE} ${pathname.startsWith("/admin") ? LINK_ACTIVE : LINK_IDLE}`}
         >
-          <Shield className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          <Shield className="text-special h-3.5 w-3.5 shrink-0" aria-hidden />
           Admin
-          {isActive(pathname, "/admin", false) && (
-            <span className="bg-special absolute -bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full" />
-          )}
+          {pathname.startsWith("/admin") && <ActiveDot />}
         </Link>
       )}
 
       <div className="ml-3 flex items-center gap-2 border-l border-zinc-200 pl-3">
-        <span className="hidden text-xs text-zinc-500 lg:block">{displayName ?? "—"}</span>
+        <span className="hidden items-center gap-1 text-xs text-zinc-500 lg:flex">
+          {displayName ?? "—"}
+          {isAdmin && (
+            <Shield className="text-special h-3 w-3 shrink-0" aria-label="Administrador" />
+          )}
+        </span>
         {signOutForm}
       </div>
     </nav>
@@ -237,7 +236,7 @@ function MobileNav({ displayName, isAdmin, isLoggedIn, signOutForm, onClose }: N
             href: "/admin",
             label: "Admin",
             icon: Shield,
-            active: isActive(pathname, "/admin", false),
+            active: pathname.startsWith("/admin"),
           },
         ]
       : []),
@@ -245,7 +244,10 @@ function MobileNav({ displayName, isAdmin, isLoggedIn, signOutForm, onClose }: N
 
   return (
     <div className="flex flex-col gap-1 py-3">
-      <p className="px-3 pb-2 text-xs text-zinc-500">Hola, {displayName ?? "jugador"}</p>
+      <p className="flex items-center gap-1 px-3 pb-2 text-xs text-zinc-500">
+        Hola, {displayName ?? "jugador"}
+        {isAdmin && <Shield className="text-special h-3 w-3 shrink-0" aria-label="Administrador" />}
+      </p>
       {allItems.map(({ href, label, icon: Icon, active }) => (
         <Link
           key={href}
@@ -284,7 +286,7 @@ export function HeaderClient({ displayName, isAdmin, isLoggedIn, signOutForm }: 
           : "border-b border-transparent bg-white/70 backdrop-blur-sm"
       }`}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         <Link
           href="/"
           className="focus-visible:ring-primary flex items-center gap-2 rounded-md px-1 focus-visible:ring-2 focus-visible:outline-none"

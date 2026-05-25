@@ -7,6 +7,7 @@ import {
   type CategoryBucket,
 } from "@/lib/scoring/breakdownLabels";
 import { ClasificacionTabs } from "../Tabs";
+import { CategoriaTable } from "./CategoriaTable";
 
 const CATEGORY_ORDER: CategoryBucket[] = [
   "match_outcome",
@@ -24,7 +25,7 @@ export default async function CategoriaPage() {
   const hasScores = rows.some((r) => r.total > 0);
 
   return (
-    <main className="mx-auto max-w-5xl p-10">
+    <main className="mx-auto max-w-7xl p-10">
       <h1 className="text-2xl font-bold">Clasificación por categoría</h1>
       <p className="mt-1 text-sm text-zinc-600">
         Cuánto pesan en el total de cada participante los aciertos por tipo: resultados de partido,
@@ -47,44 +48,7 @@ export default async function CategoriaPage() {
           Aún no hay puntuaciones.
         </p>
       ) : (
-        <div className="mt-6 overflow-x-auto">
-          <table className="min-w-full border-collapse text-sm">
-            <thead className="bg-zinc-50 text-left text-xs text-zinc-500 uppercase">
-              <tr>
-                <th className="sticky left-0 bg-zinc-50 px-3 py-2 font-semibold">Participante</th>
-                {CATEGORY_ORDER.map((cat) => (
-                  <th key={cat} className="px-3 py-2 text-right font-semibold">
-                    {CATEGORY_LABELS[cat]}
-                  </th>
-                ))}
-                <th className="px-3 py-2 text-right font-semibold">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => {
-                const isMe = row.profile.user_id === userId;
-                return (
-                  <tr key={row.profile.user_id} className="border-t border-zinc-100">
-                    <td className="sticky left-0 bg-white px-3 py-2 font-medium">
-                      {row.profile.display_name}
-                      {isMe && (
-                        <span className="bg-info-light text-info-fg ml-1 rounded px-1.5 text-xs font-medium">
-                          tú
-                        </span>
-                      )}
-                    </td>
-                    {CATEGORY_ORDER.map((cat) => (
-                      <td key={cat} className="px-3 py-2 text-right font-mono">
-                        {row.byCategory[cat]}
-                      </td>
-                    ))}
-                    <td className="px-3 py-2 text-right font-mono font-bold">{row.total}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <CategoriaTable rows={rows} categoryOrder={CATEGORY_ORDER} userId={userId} />
       )}
     </main>
   );

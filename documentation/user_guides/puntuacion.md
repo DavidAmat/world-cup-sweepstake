@@ -213,7 +213,7 @@ El campeón y el subcampeón se asignan automáticamente cuando termine la final
 ## 4 · Clasificados de fase de grupos
 
 Eliges 2 equipos por grupo (sin orden).
-**Por cada equipo acertado** → 5 puntos.
+**Por cada equipo acertado** → 25 puntos.
 
 ---
 

@@ -1,5 +1,17 @@
 import type { EvolutionPoint } from "@/lib/scoring/leaderboard";
 
+const ROUND_SHORT_LABEL: Record<string, string> = {
+  group_md1: "J1",
+  group_md2: "J2",
+  group_md3: "J3",
+  r32: "16avos",
+  r16: "8avos",
+  qf: "4tos",
+  sf: "Semis",
+  third: "3.º",
+  final: "Final",
+};
+
 const COLORS = [
   "#3cdcb4", // success green
   "#4681ff", // primary blue
@@ -76,7 +88,7 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
             fontSize={10}
             fill="#9C9C9C"
           >
-            {pt.roundName}
+            {ROUND_SHORT_LABEL[pt.roundCode] ?? pt.roundName}
           </text>
         ))}
         {users.map((u, idx) => {

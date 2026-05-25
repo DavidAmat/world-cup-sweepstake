@@ -4,7 +4,6 @@ import Link from "next/link";
 // is passed via prop so each subpage can mark itself.
 
 export type TabKey =
-  | "general"
   | "jornada"
   | "fase"
   | "categoria"
@@ -12,12 +11,11 @@ export type TabKey =
   | "mis-predicciones";
 
 const TABS: { key: TabKey; href: string; label: string }[] = [
-  { key: "general", href: "/clasificacion", label: "General" },
-  { key: "mis-predicciones", href: "/my-scores", label: "Mis Predicciones" },
   { key: "jornada", href: "/clasificacion/jornada", label: "Por jornada" },
   { key: "fase", href: "/clasificacion/fase", label: "Por fase" },
   { key: "categoria", href: "/clasificacion/categoria", label: "Por categoría" },
   { key: "evolucion", href: "/clasificacion/evolucion", label: "Evolución" },
+  { key: "mis-predicciones", href: "/my-scores", label: "Mis Predicciones" },
 ];
 
 export function ClasificacionTabs({ active }: { active: TabKey }) {

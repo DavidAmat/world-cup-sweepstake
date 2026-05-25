@@ -212,7 +212,7 @@ export default async function ResultEntryPage({
 
         <section className="mt-6 rounded-md border border-zinc-200 bg-white p-5">
           <h2 className="text-sm font-semibold">Marcador</h2>
-          <p className="mt-2 font-mono text-lg">
+          <p className="mt-2 font-oswald text-lg">
             {homeTeam.display_name} {result.home_goals_90} – {result.away_goals_90}{" "}
             {awayTeam.display_name}
           </p>
@@ -238,7 +238,7 @@ export default async function ResultEntryPage({
           ) : (
             <ul className="mt-2 space-y-1 text-sm">
               {existingGoals.map((g, i) => (
-                <li key={i} className="font-mono">
+                <li key={i} className="font-oswald">
                   {goalLabel(g)}
                 </li>
               ))}

@@ -1,7 +1,8 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { acceptTerms } from "./actions";
-import { CheckCircle2, ListChecks, ClipboardList, Lock } from "lucide-react";
+import { CheckCircle2, ListChecks, ClipboardList, Lock, Check, X } from "lucide-react";
 
 type SearchParams = Promise<{ error?: string; ok?: string }>;
 
@@ -30,7 +31,7 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
   }
 
   return (
-    <main className="mx-auto max-w-3xl p-8">
+    <main className="mx-auto max-w-6xl p-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Normas y puntuación</h1>
         <p className="mt-1 text-sm text-zinc-500">
@@ -38,8 +39,8 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
         </p>
       </div>
 
-      {/* Step-by-step guide */}
-      <section className="mb-6 flex flex-col gap-4">
+      {/* ── How it works ─────────────────────────────────────────────── */}
+      <section className="mb-8 flex flex-col gap-4">
         <h2 className="text-base font-semibold text-zinc-800">Cómo funciona</h2>
 
         <div className="border-primary/20 bg-primary/5 flex gap-4 rounded-2xl border p-5">
@@ -49,13 +50,10 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
           <div>
             <p className="text-sm font-semibold">Paso 1 — Predicciones iniciales</p>
             <p className="mt-1 text-xs leading-relaxed text-zinc-600">
-              Antes de que empiece el torneo, define: <strong>campeón</strong>,{" "}
-              <strong>subcampeón</strong>, <strong>pichichi</strong>, <strong>mejor jugador</strong>{" "}
-              y <strong>2 equipos que pasan por cada grupo</strong> (12 grupos, 24 clasificados en
-              total).
-            </p>
-            <p className="mt-2 text-xs text-zinc-500 italic">
-              Ejemplo: Campeón → Brasil · Pichichi → Mbappé · Grupo A pasan → Argentina y Marruecos
+              Antes de que empiece el torneo: <strong>campeón</strong>,{" "}
+              <strong>subcampeón</strong>, <strong>pichichi</strong>,{" "}
+              <strong>mejor jugador</strong> y <strong>2 equipos que pasan por cada grupo</strong>.
+              Se bloquean al comenzar el primer partido.
             </p>
           </div>
         </div>
@@ -67,16 +65,10 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
           <div>
             <p className="text-sm font-semibold">Paso 2 — Predicciones de partidos</p>
             <p className="mt-1 text-xs leading-relaxed text-zinc-600">
-              Antes de cada jornada (el admin bloquea con ≥24h de antelación), predice el{" "}
-              <strong>marcador a 90&apos;</strong> de cada partido. En eliminatorias, además indica
-              si habrá <strong>prórroga</strong>, si habrá <strong>penaltis</strong> y qué{" "}
-              <strong>equipo pasa</strong>.
-            </p>
-            <p className="mt-2 text-xs text-zinc-500 italic">
-              Ejemplo: España 2 – 1 Francia · Sin prórroga
-            </p>
-            <p className="mt-1 text-xs text-zinc-500 italic">
-              Ejemplo eliminatoria: Brasil 1 – 1 Portugal · Prórroga → Penaltis → Pasa Brasil
+              Antes de cada jornada predice el <strong>marcador a 90&apos;</strong>. En
+              eliminatorias, además indica si habrá <strong>prórroga</strong>,{" "}
+              <strong>penaltis</strong> y qué <strong>equipo pasa</strong>. El admin bloquea la
+              jornada antes del primer partido.
             </p>
           </div>
         </div>
@@ -88,46 +80,306 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
           <div>
             <p className="text-sm font-semibold">Bloqueos y visibilidad</p>
             <p className="mt-1 text-xs leading-relaxed text-zinc-600">
-              Mientras una jornada esté <strong>abierta</strong>, solo tú ves tus predicciones. En
-              cuanto el admin la <strong>bloquea</strong>, quedan congeladas y se hacen públicas
-              para todos. Si no has predicho antes del bloqueo, ese partido cuenta como 0 puntos.
+              Mientras una jornada esté <strong>abierta</strong>, solo tú ves tus predicciones. Al{" "}
+              <strong>bloquearse</strong>, quedan congeladas y se hacen públicas para todos. Sin
+              predicción = 0 puntos en ese partido.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Scoring summary */}
-      <section className="mb-6 rounded-2xl border border-zinc-200 bg-zinc-50 p-5 text-sm">
-        <h2 className="mb-3 font-semibold text-zinc-800">Sistema de puntuación (resumen)</h2>
-        <div className="grid gap-y-1.5 text-xs text-zinc-600 sm:grid-cols-2">
-          {[
-            ["Ganador o empate a 90′", "5 pts"],
-            ["Resultado exacto a 90′", "10 pts"],
-            ["Cercanía de goles (±1)", "1–3 pts"],
-            ["Diferencia exacta de goles", "3 pts"],
-            ["Prórroga acertada", "5 pts"],
-            ["Penaltis acertados", "5 pts"],
-            ["Equipo que pasa acertado", "8 pts"],
-            ["Campeón acertado", "10 pts"],
-            ["Subcampeón acertado", "5 pts"],
-          ].map(([label, pts]) => (
-            <div key={label} className="flex justify-between gap-4 pr-4">
-              <span>{label}</span>
-              <span className="font-semibold text-zinc-800">{pts}</span>
+      {/* ── Scoring examples 3×3 grid ────────────────────────────────── */}
+      <section className="mb-8">
+        <h2 className="mb-4 text-base font-semibold text-zinc-800">
+          Sistema de puntuación — ejemplos
+        </h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {/* ── Row 1: Group stage ── */}
+          <ExCard
+            title="Marcador exacto a 90′"
+            phase="Grupos ×1"
+            breakdown={[
+              { label: "Ganador correcto", pts: 5, ok: true },
+              { label: "Marcador exacto", pts: 10, ok: true },
+            ]}
+            base={15}
+          >
+            <MatchCmp
+              realH={2}
+              realA={1}
+              predH={2}
+              predA={1}
+              homeFlag="🇪🇸"
+              home="España"
+              awayFlag="🇫🇷"
+              away="Francia"
+            />
+          </ExCard>
+
+          <ExCard
+            title="Ganador + cercanía de goles"
+            phase="Grupos ×1"
+            breakdown={[
+              { label: "Ganador correcto", pts: 5, ok: true },
+              { label: "Local ±2 goles", pts: 1, ok: true },
+              { label: "Visitante exacto (0-0)", pts: 3, ok: true },
+            ]}
+            base={9}
+          >
+            <MatchCmp
+              realH={3}
+              realA={0}
+              predH={1}
+              predA={0}
+              homeFlag="🇧🇷"
+              home="Brasil"
+              awayFlag="🇩🇪"
+              away="Alemania"
+            />
+          </ExCard>
+
+          <ExCard
+            title="Diferencia exacta de goles"
+            phase="Grupos ×1"
+            breakdown={[
+              { label: "Ganador correcto", pts: 5, ok: true },
+              { label: "Local ±1 gol", pts: 2, ok: true },
+              { label: "Visitante ±1 gol", pts: 2, ok: true },
+              { label: "Diferencia exacta (+2)", pts: 3, ok: true },
+            ]}
+            base={12}
+          >
+            <MatchCmp
+              realH={3}
+              realA={1}
+              predH={2}
+              predA={0}
+              homeFlag="🇦🇷"
+              home="Argentina"
+              awayFlag="🇲🇽"
+              away="México"
+            />
+          </ExCard>
+
+          {/* ── Row 2: Knockout ── */}
+          <ExCard
+            title="Prórroga acertada (sin penaltis)"
+            phase="R16 ×2"
+            breakdown={[
+              { label: "Empate correcto", pts: 5, ok: true },
+              { label: "Marcador exacto", pts: 10, ok: true },
+              { label: "Prórroga acertada", pts: 5, ok: true },
+              { label: "Clasificado acertado", pts: 8, ok: true },
+            ]}
+            base={28}
+            mult={2}
+          >
+            <MatchCmp
+              realH={1}
+              realA={1}
+              predH={1}
+              predA={1}
+              homeFlag="🇵🇹"
+              home="Portugal"
+              awayFlag="🇪🇸"
+              away="España"
+              realExtra="ET ✓ · Pen ✗ · Pasa Portugal"
+              predExtra="ET ✓ · Pen ✗ · Pasa Portugal"
+            />
+          </ExCard>
+
+          <ExCard
+            title="Penaltis + todo acertado"
+            phase="R16 ×2"
+            breakdown={[
+              { label: "Empate correcto", pts: 5, ok: true },
+              { label: "Marcador exacto", pts: 10, ok: true },
+              { label: "Prórroga acertada", pts: 5, ok: true },
+              { label: "Penaltis acertados", pts: 5, ok: true },
+              { label: "Clasificado acertado", pts: 8, ok: true },
+            ]}
+            base={33}
+            mult={2}
+          >
+            <MatchCmp
+              realH={0}
+              realA={0}
+              predH={0}
+              predA={0}
+              homeFlag="🇫🇷"
+              home="Francia"
+              awayFlag="🇧🇷"
+              away="Brasil"
+              realExtra="ET ✓ · Pen ✓ · Pasa Francia"
+              predExtra="ET ✓ · Pen ✓ · Pasa Francia"
+            />
+          </ExCard>
+
+          <ExCard
+            title="Fallo en el clasificado"
+            phase="R16 ×2"
+            breakdown={[
+              { label: "Empate correcto", pts: 5, ok: true },
+              { label: "Marcador exacto", pts: 10, ok: true },
+              { label: "Prórroga acertada", pts: 5, ok: true },
+              { label: "Clasificado (error)", pts: 8, ok: false },
+            ]}
+            base={20}
+            mult={2}
+          >
+            <MatchCmp
+              realH={1}
+              realA={1}
+              predH={1}
+              predA={1}
+              homeFlag="🇩🇪"
+              home="Alemania"
+              awayFlag="🇦🇷"
+              away="Argentina"
+              realExtra="Pasa: Alemania"
+              predExtra="Pasa: Argentina ✗"
+            />
+          </ExCard>
+
+          {/* ── Row 3: Multiplier + initials ── */}
+          <ExCard
+            title="Multiplicador — Final ×5"
+            phase="Final ×5"
+            breakdown={[
+              { label: "Ganador correcto", pts: 5, ok: true },
+              { label: "Marcador exacto", pts: 10, ok: true },
+            ]}
+            base={15}
+            mult={5}
+          >
+            <MatchCmp
+              realH={2}
+              realA={1}
+              predH={2}
+              predA={1}
+              homeFlag="🇧🇷"
+              home="Brasil"
+              awayFlag="🇦🇷"
+              away="Argentina"
+            />
+          </ExCard>
+
+          <ExCard
+            title="Campeón y subcampeón"
+            phase="Inicial"
+            breakdown={[
+              { label: "Campeón acertado", pts: 200, ok: true },
+              { label: "Subcampeón acertado", pts: 150, ok: true },
+            ]}
+            base={350}
+          >
+            <div className="overflow-hidden rounded-lg border border-zinc-100 bg-zinc-50 text-xs">
+              <div className="flex items-center gap-1.5 px-2 py-1.5">
+                <span className="w-7 shrink-0 text-right text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+                  Pred
+                </span>
+                <span>🥇 </span>
+                <span className="font-medium text-zinc-700">🇧🇷 Brasil</span>
+                <span className="text-zinc-300">·</span>
+                <span>🥈 </span>
+                <span className="font-medium text-zinc-700">🇦🇷 Argentina</span>
+              </div>
+              <div className="flex items-center gap-1.5 border-t border-zinc-100 px-2 py-1.5">
+                <span className="w-7 shrink-0 text-right text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+                  Real
+                </span>
+                <span className="text-success-fg font-medium">
+                  🇧🇷 Brasil ✓ · 🇦🇷 Argentina ✓
+                </span>
+              </div>
             </div>
-          ))}
+          </ExCard>
+
+          <ExCard
+            title="Clasificados de grupo"
+            phase="Inicial"
+            breakdown={[
+              { label: "España pasa (Grupo A)", pts: 25, ok: true },
+              { label: "Francia — no pasó", pts: 25, ok: false },
+            ]}
+            base={25}
+            note="25 pts por acierto · sin penalización por fallo"
+          >
+            <div className="overflow-hidden rounded-lg border border-zinc-100 bg-zinc-50 text-xs">
+              <div className="flex items-center gap-1.5 px-2 py-1.5">
+                <span className="w-7 shrink-0 text-right text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+                  Pred
+                </span>
+                <span className="font-medium text-zinc-700">🇪🇸 España · 🇫🇷 Francia</span>
+              </div>
+              <div className="flex items-center gap-1.5 border-t border-zinc-100 px-2 py-1.5">
+                <span className="w-7 shrink-0 text-right text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+                  Real
+                </span>
+                <span className="font-medium">
+                  <span className="text-success-fg">🇪🇸 ✓</span>
+                  <span className="text-zinc-300"> · </span>
+                  <span className="text-zinc-400">🇩🇪 Alemania</span>
+                  <span className="text-zinc-300"> · </span>
+                  <span className="text-zinc-400">🇫🇷 ✗</span>
+                </span>
+              </div>
+            </div>
+          </ExCard>
         </div>
-        <p className="mt-3 text-xs text-zinc-500">
-          En eliminatorias se aplica un multiplicador por ronda (×2 en R32, hasta ×5 en la final).
-          Detalle completo en{" "}
-          <Link href="/clasificacion" className="underline">
-            Clasificación
-          </Link>
-          .
-        </p>
       </section>
 
-      {/* Feedback banners */}
+      {/* ── Multiplier + initial predictions tables ───────────────────── */}
+      <section className="mb-8 flex flex-col gap-4 sm:flex-row sm:gap-6">
+        <div className="flex-1 rounded-xl border border-zinc-200 bg-white p-4">
+          <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+            Multiplicadores por fase
+          </h3>
+          <table className="w-full border-collapse text-xs">
+            <tbody>
+              {(
+                [
+                  ["Fase de grupos", "×1"],
+                  ["R32, R16, Cuartos, 3.º", "×2"],
+                  ["Semifinales", "×3"],
+                  ["Final", "×5"],
+                ] as [string, string][]
+              ).map(([fase, mult]) => (
+                <tr key={fase} className="border-b border-zinc-100 last:border-0">
+                  <td className="py-1.5 pr-4 text-zinc-700">{fase}</td>
+                  <td className="py-1.5 text-right font-bold text-zinc-900">{mult}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="flex-1 rounded-xl border border-zinc-200 bg-white p-4">
+          <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+            Predicciones iniciales
+          </h3>
+          <table className="w-full border-collapse text-xs">
+            <tbody>
+              {(
+                [
+                  ["Campeón acertado", "200 pts"],
+                  ["Subcampeón acertado", "150 pts"],
+                  ["Pichichi acertado", "100 pts"],
+                  ["Mejor jugador", "100 pts"],
+                  ["Equipo clasif. de grupo", "25 pts c/u"],
+                ] as [string, string][]
+              ).map(([label, pts]) => (
+                <tr key={label} className="border-b border-zinc-100 last:border-0">
+                  <td className="py-1.5 pr-4 text-zinc-700">{label}</td>
+                  <td className="py-1.5 text-right font-semibold text-zinc-900">{pts}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* ── Feedback banners ─────────────────────────────────────────── */}
       {error && (
         <p className="mb-4 rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-700">
           {error}
@@ -146,7 +398,7 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
         </div>
       )}
 
-      {/* Accept section */}
+      {/* ── Accept section ────────────────────────────────────────────── */}
       <section className="rounded-2xl border border-zinc-200 bg-white p-5">
         {!activeTournament ? (
           <p className="text-sm text-zinc-500">
@@ -188,5 +440,139 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
         )}
       </section>
     </main>
+  );
+}
+
+// ── Helper components ────────────────────────────────────────────────────────
+
+function GoalBox({ v }: { v: number }) {
+  return (
+    <span className="mx-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded bg-zinc-800 text-[11px] font-bold text-white">
+      {v}
+    </span>
+  );
+}
+
+function MatchCmp({
+  realH,
+  realA,
+  predH,
+  predA,
+  homeFlag,
+  home,
+  awayFlag,
+  away,
+  realExtra,
+  predExtra,
+}: {
+  realH: number;
+  realA: number;
+  predH: number;
+  predA: number;
+  homeFlag: string;
+  home: string;
+  awayFlag: string;
+  away: string;
+  realExtra?: string;
+  predExtra?: string;
+}) {
+  return (
+    <div className="overflow-hidden rounded-lg border border-zinc-100 bg-zinc-50 text-xs">
+      <div className="flex items-center gap-1 px-2 py-1.5">
+        <span className="w-7 shrink-0 text-right text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+          Real
+        </span>
+        <span className="shrink-0">{homeFlag}</span>
+        <span className="min-w-0 truncate font-medium text-zinc-700">{home}</span>
+        <GoalBox v={realH} />
+        <span className="shrink-0 text-zinc-300">–</span>
+        <GoalBox v={realA} />
+        <span className="min-w-0 truncate font-medium text-zinc-700">{away}</span>
+        <span className="shrink-0">{awayFlag}</span>
+      </div>
+      {realExtra && (
+        <p className="pb-1 pl-10 pr-2 text-[10px] italic text-zinc-500">{realExtra}</p>
+      )}
+      <div className="flex items-center gap-1 border-t border-zinc-100 px-2 py-1.5">
+        <span className="text-primary/60 w-7 shrink-0 text-right text-[9px] font-semibold uppercase tracking-wide">
+          Pred
+        </span>
+        <span className="shrink-0">{homeFlag}</span>
+        <span className="min-w-0 truncate font-medium text-zinc-700">{home}</span>
+        <GoalBox v={predH} />
+        <span className="shrink-0 text-zinc-300">–</span>
+        <GoalBox v={predA} />
+        <span className="min-w-0 truncate font-medium text-zinc-700">{away}</span>
+        <span className="shrink-0">{awayFlag}</span>
+      </div>
+      {predExtra && (
+        <p className="text-primary/60 pb-1 pl-10 pr-2 text-[10px] italic">{predExtra}</p>
+      )}
+    </div>
+  );
+}
+
+function ExCard({
+  title,
+  phase,
+  children,
+  breakdown,
+  base,
+  mult = 1,
+  note,
+}: {
+  title: string;
+  phase: string;
+  children: ReactNode;
+  breakdown: { label: string; pts: number; ok: boolean }[];
+  base: number;
+  mult?: number;
+  note?: string;
+}) {
+  const total = Math.round(base * mult);
+  return (
+    <div className="flex flex-col gap-2.5 rounded-xl border border-zinc-200 bg-white p-3">
+      <div className="flex items-start justify-between gap-1">
+        <p className="text-[11px] font-semibold leading-tight text-zinc-800">{title}</p>
+        <span className="shrink-0 rounded-full bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-500">
+          {phase}
+        </span>
+      </div>
+
+      {children}
+
+      <div className="flex flex-col gap-0.5 border-t border-zinc-100 pt-2">
+        {breakdown.map((b) => (
+          <div
+            key={b.label}
+            className={`flex items-center justify-between gap-2 text-[11px] ${
+              b.ok ? "text-success-fg" : "text-zinc-400"
+            }`}
+          >
+            <span className="flex min-w-0 items-center gap-0.5">
+              {b.ok ? (
+                <Check className="h-3 w-3 shrink-0" />
+              ) : (
+                <X className="h-3 w-3 shrink-0" />
+              )}
+              <span className="truncate">{b.label}</span>
+            </span>
+            <span className={`shrink-0 font-oswald font-semibold ${b.ok ? "" : "opacity-40"}`}>
+              {b.pts > 0 ? `+${b.pts}` : "—"}
+            </span>
+          </div>
+        ))}
+        {note && <p className="mt-0.5 text-[10px] italic text-zinc-400">{note}</p>}
+      </div>
+
+      <div className="text-right text-sm font-bold text-zinc-900">
+        {mult > 1 && (
+          <span className="mr-1 text-xs font-normal text-zinc-400">
+            {base} &times; {mult} =
+          </span>
+        )}
+        {total} pts
+      </div>
+    </div>
   );
 }

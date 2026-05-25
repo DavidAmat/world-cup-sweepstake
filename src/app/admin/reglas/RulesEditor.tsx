@@ -1,5 +1,6 @@
 "use client";
 
+import { NumberInput } from "@/components/ui/NumberInput";
 import { saveScoringRulesDraft } from "./actions";
 import type { ScoringRulesV1 } from "@/lib/scoring/types";
 
@@ -31,14 +32,12 @@ function NumInput({
   return (
     <label className="flex flex-col gap-1">
       <span className="text-xs font-medium text-zinc-600">{label}</span>
-      <input
-        type="number"
+      <NumberInput
         name={name}
         defaultValue={defaultValue}
-        min={0}
-        step={1}
+        max={9999}
         required
-        className="focus:border-primary focus:ring-primary-light rounded-md border border-zinc-300 px-3 py-1.5 text-sm tabular-nums outline-none focus:ring-2"
+        className="focus:border-primary focus:ring-primary-light w-24 rounded-md border border-zinc-300 px-3 py-1.5 font-oswald text-base font-semibold outline-none focus:ring-2"
       />
     </label>
   );

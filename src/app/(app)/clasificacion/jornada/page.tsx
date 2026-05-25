@@ -1,81 +1,132 @@
-import Link from "next/link";
+import { CheckCircle2, RefreshCw } from "lucide-react";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { loadLeaderboardData, buildByRound } from "@/lib/scoring/leaderboard";
 import { ClasificacionTabs } from "../Tabs";
+import { recalculateClasificacion } from "../actions";
+import { JornadaTable } from "./JornadaTable";
 
-export default async function JornadaPage() {
-  const { userId } = await requireAuth();
+type SearchParams = Promise<{ ok?: string }>;
+
+export default async function JornadaPage({ searchParams }: { searchParams: SearchParams }) {
+  const { ok } = await searchParams;
+  const { userId, supabase } = await requireAuth();
   const tournament = await getDefaultTournament();
   const data = await loadLeaderboardData(tournament.id);
-  const { rounds, rows, totalsByRound } = buildByRound(data);
+  const { rounds, rows: matchRows, totalsByRound } = buildByRound(data);
+
+  const { data: profileData } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("user_id", userId)
+    .single();
+  const isAdmin = profileData?.role === "admin";
+
+  // Per-user initial-prediction scores. `top_scorer` and `best_player`
+  // breakdown keys come from the `initial` row; champion / runner_up are
+  // folded into `otros_initial` so the grand total stays consistent with
+  // /clasificacion/categoria. Group-qualification points are summed
+  // across every gqp row for the user.
+  type ExtraScore = {
+    pichichi: number;
+    mejor_jug: number;
+    clasificados: number;
+    otros_initial: number;
+  };
+  const extraByUser = new Map<string, ExtraScore>();
+  const ensure = (uid: string): ExtraScore => {
+    const cur = extraByUser.get(uid) ?? {
+      pichichi: 0,
+      mejor_jug: 0,
+      clasificados: 0,
+      otros_initial: 0,
+    };
+    extraByUser.set(uid, cur);
+    return cur;
+  };
+  for (const s of data.scores) {
+    if (s.prediction_type === "initial") {
+      const bd = s.points_breakdown as Record<string, unknown>;
+      const num = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0) || 0);
+      const e = ensure(s.user_id);
+      e.pichichi += num(bd.top_scorer);
+      e.mejor_jug += num(bd.best_player);
+      e.otros_initial += num(bd.champion) + num(bd.runner_up);
+    } else if (s.prediction_type === "group_qualification") {
+      ensure(s.user_id).clasificados += s.points_total;
+    }
+  }
+
+  const rows = matchRows.map((r) => {
+    const e = extraByUser.get(r.profile.user_id) ?? {
+      pichichi: 0,
+      mejor_jug: 0,
+      clasificados: 0,
+      otros_initial: 0,
+    };
+    return {
+      profile: r.profile,
+      matchesTotal: r.total,
+      pichichi: e.pichichi,
+      mejor_jug: e.mejor_jug,
+      clasificados: e.clasificados,
+      otros_initial: e.otros_initial,
+      grandTotal: r.total + e.pichichi + e.mejor_jug + e.clasificados + e.otros_initial,
+      byRound: Object.fromEntries(r.byRound),
+    };
+  });
+
+  const totalsByExtra = {
+    pichichi: rows.reduce((sum, r) => sum + r.pichichi, 0),
+    mejor_jug: rows.reduce((sum, r) => sum + r.mejor_jug, 0),
+    clasificados: rows.reduce((sum, r) => sum + r.clasificados, 0),
+  };
 
   return (
-    <main className="mx-auto max-w-5xl p-10">
-      <h1 className="text-2xl font-bold">Clasificación por jornada</h1>
-      <p className="mt-1 text-sm text-zinc-600">
-        Puntos que cada participante ha sacado en cada jornada o ronda con resultados confirmados.
-        Pulsa el nombre de una jornada para ver los partidos.
-      </p>
+    <main className="mx-auto max-w-7xl p-10">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">Clasificación por jornada</h1>
+          <p className="mt-1 text-sm text-zinc-600">
+            Puntos que cada participante ha sacado en cada jornada o ronda con resultados
+            confirmados. Pulsa el nombre de una jornada para ver los partidos.
+          </p>
+        </div>
+        {isAdmin && (
+          <form action={recalculateClasificacion}>
+            <button
+              type="submit"
+              className="border-special/30 bg-special-light/40 text-special-fg hover:bg-special-light/60 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors"
+              title="Recalcula prediction_scores para todos los usuarios"
+            >
+              <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+              Calcular puntuación
+            </button>
+          </form>
+        )}
+      </div>
 
       <ClasificacionTabs active="jornada" />
+
+      {ok === "recalculated" && (
+        <div className="border-success/30 bg-success/10 text-success-fg mt-4 flex items-center gap-2 rounded-lg border p-3 text-sm">
+          <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
+          <span>Puntuaciones recalculadas.</span>
+        </div>
+      )}
 
       {rounds.length === 0 ? (
         <p className="mt-6 rounded-md border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
           Todavía no hay jornadas con resultados confirmados.
         </p>
       ) : (
-        <div className="mt-6 overflow-x-auto">
-          <table className="min-w-full border-collapse text-sm">
-            <thead className="bg-zinc-50 text-left text-xs text-zinc-500 uppercase">
-              <tr>
-                <th className="sticky left-0 bg-zinc-50 px-3 py-2 font-semibold">Participante</th>
-                {rounds.map((r) => (
-                  <th key={r.code} className="px-3 py-2 text-right font-semibold">
-                    <Link href={`/clasificacion/jornada/${r.code}`} className="hover:underline">
-                      {r.name}
-                    </Link>
-                  </th>
-                ))}
-                <th className="px-3 py-2 text-right font-semibold">Total partidos</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => {
-                const isMe = row.profile.user_id === userId;
-                return (
-                  <tr key={row.profile.user_id} className="border-t border-zinc-100">
-                    <td className="sticky left-0 bg-white px-3 py-2 font-medium">
-                      {row.profile.display_name}
-                      {isMe && (
-                        <span className="bg-info-light text-info-fg ml-1 rounded px-1.5 text-xs font-medium">
-                          tú
-                        </span>
-                      )}
-                    </td>
-                    {rounds.map((r) => (
-                      <td key={r.code} className="px-3 py-2 text-right font-mono text-zinc-700">
-                        {row.byRound.get(r.code) ?? 0}
-                      </td>
-                    ))}
-                    <td className="px-3 py-2 text-right font-mono font-bold">{row.total}</td>
-                  </tr>
-                );
-              })}
-              <tr className="border-t-2 border-zinc-300 bg-zinc-50">
-                <td className="sticky left-0 bg-zinc-50 px-3 py-2 text-xs font-semibold text-zinc-500 uppercase">
-                  Pts totales
-                </td>
-                {rounds.map((r) => (
-                  <td key={r.code} className="px-3 py-2 text-right font-mono text-xs text-zinc-500">
-                    {totalsByRound.get(r.code) ?? 0}
-                  </td>
-                ))}
-                <td className="px-3 py-2 text-right font-mono text-xs text-zinc-500">—</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <JornadaTable
+          rows={rows}
+          rounds={rounds}
+          totalsByRound={Object.fromEntries(totalsByRound)}
+          totalsByExtra={totalsByExtra}
+          userId={userId}
+        />
       )}
 
       <p className="mt-4 text-xs text-zinc-500">

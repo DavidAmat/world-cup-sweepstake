@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { TeamName } from "@/components/ui/TeamName";
+import { NumberInput } from "@/components/ui/NumberInput";
 import { saveMatchResult, confirmMatchResult } from "../actions";
 import { GOAL_PERIODS, type GoalPeriod } from "../schemas";
 
@@ -36,7 +37,8 @@ type Props = {
 };
 
 const INPUT_CLS = "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm";
-const GOAL_NUM_CLS = `${INPUT_CLS} w-20 text-center`;
+const GOAL_NUM_CLS =
+  "rounded-md border border-zinc-300 bg-white px-2 py-1 w-16 text-center font-oswald text-xl font-bold text-zinc-900 focus:border-primary focus:outline-none";
 
 const PERIOD_LABELS: Record<GoalPeriod, string> = {
   first_half: "1ª parte",
@@ -108,24 +110,18 @@ export function ResultForm({
         <h2 className="text-sm font-semibold">Resultado a 90&apos;</h2>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
           <span className="min-w-28 font-medium"><TeamName name={homeTeam.display_name} /></span>
-          <input
+          <NumberInput
             name="home_goals_90"
-            type="number"
-            min={0}
-            inputMode="numeric"
             value={h90}
-            onChange={(e) => setH90(e.target.value)}
+            onChange={setH90}
             className={GOAL_NUM_CLS}
             required
           />
           <span className="text-zinc-400">–</span>
-          <input
+          <NumberInput
             name="away_goals_90"
-            type="number"
-            min={0}
-            inputMode="numeric"
             value={a90}
-            onChange={(e) => setA90(e.target.value)}
+            onChange={setA90}
             className={GOAL_NUM_CLS}
             required
           />
@@ -238,18 +234,13 @@ export function ResultForm({
 
                   <label className="flex flex-col gap-1 text-xs">
                     <span className="font-medium">Minuto</span>
-                    <input
-                      type="number"
-                      min={0}
+                    <NumberInput
                       max={130}
-                      inputMode="numeric"
-                      value={g.minute ?? ""}
-                      onChange={(e) =>
-                        patchGoal(i, {
-                          minute: e.target.value === "" ? null : Number(e.target.value),
-                        })
+                      value={g.minute === null || g.minute === undefined ? "" : String(g.minute)}
+                      onChange={(val) =>
+                        patchGoal(i, { minute: val === "" ? null : Number(val) })
                       }
-                      className={`${INPUT_CLS} w-20`}
+                      className={`${INPUT_CLS} w-20 font-oswald`}
                     />
                   </label>
 

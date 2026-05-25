@@ -2,9 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
-import { formatMadridDateTime } from "@/lib/dates/madridTime";
-import { TeamName } from "@/components/ui/TeamName";
 import { ClasificacionTabs } from "../../Tabs";
+import {
+  RoundDetailTable,
+  type RoundDetailFixture,
+  type RoundDetailProfile,
+} from "./RoundDetailTable";
 
 type RouteParams = Promise<{ roundCode: string }>;
 
@@ -84,21 +87,32 @@ export default async function JornadaDetallePage({ params }: { params: RoutePara
   );
 
   // user_id → fixture_id → points
-  const pointsByUserFixture = new Map<string, Map<string, number>>();
+  const pointsByUserFixture: Record<string, Record<string, number>> = {};
   const totalByUser = new Map<string, number>();
   for (const s of scores) {
     if (!s.fixture_id) continue;
-    if (!pointsByUserFixture.has(s.user_id)) pointsByUserFixture.set(s.user_id, new Map());
-    pointsByUserFixture.get(s.user_id)!.set(s.fixture_id, s.points_total);
+    if (!pointsByUserFixture[s.user_id]) pointsByUserFixture[s.user_id] = {};
+    pointsByUserFixture[s.user_id][s.fixture_id] = s.points_total;
     totalByUser.set(s.user_id, (totalByUser.get(s.user_id) ?? 0) + s.points_total);
   }
 
-  const sortedProfiles = [...(profiles ?? [])].sort(
-    (a, b) => (totalByUser.get(b.user_id) ?? 0) - (totalByUser.get(a.user_id) ?? 0),
-  );
+  const sortedProfiles: RoundDetailProfile[] = [...(profiles ?? [])]
+    .sort((a, b) => (totalByUser.get(b.user_id) ?? 0) - (totalByUser.get(a.user_id) ?? 0))
+    .map((p) => ({ user_id: p.user_id, display_name: p.display_name, initials: p.initials }));
+
+  const fixtureRows: RoundDetailFixture[] = fixtures.map((f) => {
+    const result = resultByFixture.get(f.id);
+    return {
+      id: f.id,
+      kickoff_at: f.kickoff_at,
+      home: f.home_team?.display_name ?? "TBD",
+      away: f.away_team?.display_name ?? "TBD",
+      resultLabel: result ? `${result.h}-${result.a}` : null,
+    };
+  });
 
   return (
-    <main className="mx-auto max-w-5xl p-10">
+    <main className="mx-auto max-w-7xl p-10">
       <div className="flex items-baseline justify-between gap-2">
         <div>
           <p className="text-xs text-zinc-500 uppercase">Clasificación · jornada</p>
@@ -111,77 +125,12 @@ export default async function JornadaDetallePage({ params }: { params: RoutePara
 
       <ClasificacionTabs active="jornada" />
 
-      <div className="mt-6 overflow-x-auto">
-        <table className="min-w-full border-collapse text-sm">
-          <thead className="bg-zinc-50 text-left text-xs text-zinc-500 uppercase">
-            <tr>
-              <th className="sticky left-0 bg-zinc-50 px-3 py-2 font-semibold">Partido</th>
-              {sortedProfiles.map((p) => (
-                <th key={p.user_id} className="px-3 py-2 text-center font-semibold">
-                  {p.initials || p.display_name.slice(0, 2)}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {fixtures.map((f) => {
-              const result = resultByFixture.get(f.id);
-              return (
-                <tr key={f.id} className="border-t border-zinc-100">
-                  <td className="sticky left-0 bg-white px-3 py-2">
-                    <div className="flex flex-col">
-                      <Link
-                        href={`/clasificacion/partido/${f.id}`}
-                        className="font-medium hover:underline"
-                      >
-                        <span className="inline-flex flex-wrap items-center gap-1.5">
-                          <TeamName name={f.home_team?.display_name ?? "TBD"} />
-                          {" vs "}
-                          <TeamName name={f.away_team?.display_name ?? "TBD"} />
-                        </span>
-                      </Link>
-                      <span className="text-xs text-zinc-500">
-                        {formatMadridDateTime(f.kickoff_at)}
-                        {result ? ` · ${result.h}-${result.a}` : " · sin resultado"}
-                      </span>
-                    </div>
-                  </td>
-                  {sortedProfiles.map((p) => {
-                    const pts = pointsByUserFixture.get(p.user_id)?.get(f.id);
-                    const isMe = p.user_id === userId;
-                    return (
-                      <td
-                        key={p.user_id}
-                        className={
-                          "px-3 py-2 text-center font-mono " + (isMe ? "bg-info-light" : "")
-                        }
-                      >
-                        {pts === undefined ? <span className="text-zinc-400">—</span> : pts}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-            <tr className="border-t-2 border-zinc-300 bg-zinc-50">
-              <td className="sticky left-0 bg-zinc-50 px-3 py-2 text-xs font-semibold text-zinc-500 uppercase">
-                Total jornada
-              </td>
-              {sortedProfiles.map((p) => {
-                let s = 0;
-                for (const f of fixtures) {
-                  s += pointsByUserFixture.get(p.user_id)?.get(f.id) ?? 0;
-                }
-                return (
-                  <td key={p.user_id} className="px-3 py-2 text-center font-mono font-bold">
-                    {s}
-                  </td>
-                );
-              })}
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <RoundDetailTable
+        fixtures={fixtureRows}
+        profiles={sortedProfiles}
+        pointsByUserFixture={pointsByUserFixture}
+        userId={userId}
+      />
 
       <p className="mt-4 text-xs text-zinc-500">
         Pulsa un partido para ver el desglose detallado y comparar las predicciones de cada

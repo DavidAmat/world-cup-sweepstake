@@ -7,6 +7,7 @@ import { requireAdmin } from "@/lib/permissions/requireAdmin";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getMatchLockState, isFixtureLocked } from "@/lib/predictions/matchLock";
 import { ROUNDS, type RoundCode } from "@/lib/fixtures/catalogs";
+import { recalculateTournamentScores } from "@/lib/scoring/recalculate";
 import { readFixturePayload } from "./schemas";
 
 const SELF = "/predictions/matches";
@@ -108,8 +109,14 @@ export async function saveAllMatchPredictions(formData: FormData) {
     .upsert(rows, { onConflict: "fixture_id,user_id" });
   if (error) back("error=" + encodeURIComponent(error.message));
 
+  // Recompute prediction_scores so users who save after results are
+  // confirmed see their points immediately on the leaderboard.
+  await recalculateTournamentScores(tournament.id);
+
   revalidatePath(SELF);
   revalidatePath(`${SELF}/public`);
+  revalidatePath("/clasificacion");
+  revalidatePath("/my-scores");
   back("ok=saved");
 }
 
@@ -195,8 +202,12 @@ export async function generateRandomMatchPredictions() {
     .upsert(rows, { onConflict: "fixture_id,user_id" });
   if (error) redirect(`${SELF}?error=${encodeURIComponent(error.message)}`);
 
+  await recalculateTournamentScores(tournament.id);
+
   revalidatePath(SELF);
   revalidatePath(`${SELF}/public`);
+  revalidatePath("/clasificacion");
+  revalidatePath("/my-scores");
   redirect(`${SELF}?ok=random`);
 }
 

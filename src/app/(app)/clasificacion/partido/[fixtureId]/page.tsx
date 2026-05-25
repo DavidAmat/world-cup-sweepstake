@@ -110,7 +110,7 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
   }
 
   return (
-    <main className="mx-auto max-w-4xl p-10">
+    <main className="mx-auto max-w-6xl p-10">
       <div className="flex items-baseline justify-between gap-2">
         <div>
           <p className="text-xs text-zinc-500 uppercase">

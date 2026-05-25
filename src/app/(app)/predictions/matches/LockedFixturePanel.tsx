@@ -7,10 +7,11 @@ import { BreakdownPopover } from "@/components/scoring/BreakdownPopover";
 import { BreakdownTable } from "@/components/scoring/BreakdownTable";
 import { PointsBar } from "@/components/scoring/PointsBar";
 
-// 6-column grid: name | h-goal | separator | a-goal | extra | pts
-// Wider pts column so "56 pts" fits on one line.
+// 5-column grid: name | h-goal | separator | a-goal | pts.
+// Knockout extras (prórroga/penaltis/pasa) are rendered on a second line
+// below the row so each card fits comfortably in a 3-column fixture grid.
 const ROW_CLS =
-  "grid grid-cols-[minmax(140px,1.4fr)_2.5rem_0.6rem_2.5rem_minmax(160px,1.5fr)_6rem] items-center gap-2 px-3 py-1.5 text-sm";
+  "grid grid-cols-[minmax(0,1fr)_1.5rem_0.4rem_1.5rem_minmax(3.5rem,auto)] items-center gap-1.5 px-2 py-1 text-sm";
 
 type Prediction = {
   h90: number;
@@ -77,7 +78,7 @@ function ExtraInfo({ et, pen, qual }: { et: boolean; pen: boolean; qual: ReactNo
 
 function ScoreBox({ value }: { value: number | string }) {
   return (
-    <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-900 text-lg font-bold text-white shadow-sm">
+    <span className="font-oswald inline-flex h-7 w-7 items-center justify-center rounded-md bg-zinc-900 text-lg font-bold text-white shadow-sm">
       {value}
     </span>
   );
@@ -97,18 +98,18 @@ function RealResultBanner({
   qualTeamName: string;
 }) {
   return (
-    <div className="border-warning-light bg-warning-light/60 border-b px-4 py-3">
-      <div className="flex items-center justify-center gap-3">
+    <div className="border-warning-light bg-warning-light/60 border-b px-2 py-2">
+      <div className="flex items-center justify-center gap-2">
         <div className="flex min-w-0 flex-1 flex-col items-end gap-0.5">
-          <TeamName name={homeTeam} className="justify-end text-sm font-semibold" />
+          <TeamName name={homeTeam} className="justify-end text-xs font-semibold" />
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5">
           <ScoreBox value={realResult.h} />
-          <span className="text-sm font-bold text-zinc-400">—</span>
+          <span className="text-xs font-bold text-zinc-400">—</span>
           <ScoreBox value={realResult.a} />
         </div>
         <div className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
-          <TeamName name={awayTeam} className="text-sm font-semibold" />
+          <TeamName name={awayTeam} className="text-xs font-semibold" />
         </div>
       </div>
       {isKnockout && (
@@ -144,7 +145,7 @@ function PointsCell({
   onOpenChange: (next: string | null) => void;
 }) {
   if (!score) {
-    return <span className="font-mono text-xs whitespace-nowrap text-zinc-500">0 pts</span>;
+    return <span className="font-oswald text-xs whitespace-nowrap text-zinc-500">0 pts</span>;
   }
   return (
     <BreakdownPopover
@@ -174,13 +175,15 @@ function Row({
   accent?: string;
 }) {
   return (
-    <div className={`${ROW_CLS} ${accent ?? ""}`}>
-      <span className="truncate font-medium">{label}</span>
-      <span className="text-center font-mono font-semibold">{h}</span>
-      <span className="text-center text-zinc-400">-</span>
-      <span className="text-center font-mono font-semibold">{a}</span>
-      <span className="text-xs">{extra}</span>
-      <div className="flex justify-end">{rightCell}</div>
+    <div className={accent ?? ""}>
+      <div className={ROW_CLS}>
+        <span className="min-w-0 truncate font-medium">{label}</span>
+        <span className="text-center font-oswald font-semibold">{h}</span>
+        <span className="text-center text-zinc-400">-</span>
+        <span className="text-center font-oswald font-semibold">{a}</span>
+        <div className="flex justify-end">{rightCell}</div>
+      </div>
+      {extra && <div className="px-2 pb-1 pl-7 text-[10px] leading-tight">{extra}</div>}
     </div>
   );
 }
@@ -243,12 +246,14 @@ function RankingRow({
           />
         }
       />
-      <div className="mt-1 flex items-center gap-2 px-3">
-        <div className="flex-1">
+      <div className="mt-1 flex items-center gap-2 px-2">
+        <div className="min-w-0 flex-[3]">
           <PointsBar value={points} max={maxPoints} />
         </div>
-        <span className="font-mono text-[10px] whitespace-nowrap text-zinc-500">
-          {points} / {maxPoints}
+        <span className="font-oswald shrink-0 text-sm leading-none whitespace-nowrap text-zinc-900">
+          <span className={points === maxPoints ? "font-bold" : "font-medium"}>{points}</span>
+          <span className="mx-0.5 text-zinc-400">/</span>
+          <span className="font-bold">{maxPoints}</span>
         </span>
       </div>
     </div>
@@ -310,22 +315,6 @@ export function LockedFixturePanel({
           Aún sin resultado oficial confirmado.
         </p>
       )}
-
-      {/* Column header */}
-      <div
-        className={`${ROW_CLS} border-b border-zinc-200 bg-zinc-50 text-xs tracking-wide text-zinc-500 uppercase`}
-      >
-        <span></span>
-        <span className="flex justify-center font-semibold">
-          <TeamName name={homeTeam} />
-        </span>
-        <span></span>
-        <span className="flex justify-center font-semibold">
-          <TeamName name={awayTeam} />
-        </span>
-        <span>{isKnockout ? "Detalles" : ""}</span>
-        <span className="text-right">Pts</span>
-      </div>
 
       {/* My prediction (fixed on top) */}
       <Row

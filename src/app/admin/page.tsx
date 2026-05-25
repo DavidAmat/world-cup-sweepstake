@@ -48,6 +48,15 @@ export default async function AdminPage() {
             Versiona, activa y recalcula las reglas del motor de puntuación por torneo.
           </p>
         </Link>
+        <Link
+          href="/admin/evaluaciones"
+          className="rounded-md border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:bg-zinc-50"
+        >
+          <h2 className="text-sm font-semibold">Evaluaciones subjetivas</h2>
+          <p className="mt-1 text-xs text-zinc-600">
+            Marca a mano qué participantes acertaron el pichichi y el mejor jugador del torneo.
+          </p>
+        </Link>
       </section>
     </main>
   );

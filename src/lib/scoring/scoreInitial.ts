@@ -4,6 +4,8 @@ export type InitialPredictionInput = {
   user_id: string;
   champion_team_id: string | null;
   runner_up_team_id: string | null;
+  top_scorer_correct: boolean | null;
+  best_player_correct: boolean | null;
 };
 
 export type TournamentFinalOutcome = {
@@ -25,6 +27,13 @@ export function scoreInitialPrediction(
     if (outcome.runner_up_team_id !== null && p.runner_up_team_id === outcome.runner_up_team_id) {
       breakdown.runner_up = rules.initial_predictions.runner_up;
     }
+  }
+
+  if (p.top_scorer_correct === true) {
+    breakdown.top_scorer = rules.initial_predictions.top_scorer;
+  }
+  if (p.best_player_correct === true) {
+    breakdown.best_player = rules.initial_predictions.best_player;
   }
 
   const subtotal = Object.values(breakdown).reduce((acc, v) => acc + v, 0);
