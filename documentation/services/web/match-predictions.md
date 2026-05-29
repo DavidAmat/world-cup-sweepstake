@@ -11,7 +11,7 @@ src/app/(app)/predictions/matches/
   page.tsx              Server Component: loads rounds, fixtures, preds, scores, results
   MatchesForm.tsx       Client Component: single form, all jornadas, editable + locked panels
   LockedFixturePanel.tsx Client: locked fixture UI, ranking expansion, breakdown popovers
-  actions.ts            saveAllMatchPredictions, generateRandomMatchPredictions, lock/unlock round
+  actions.ts            saveAllMatchPredictions, clearAllMatchPredictions, generateRandomMatchPredictions (button hidden), lock/unlock round
   schemas.ts            FixturePredictionSchema, readFixturePayload
   public/page.tsx       Public comparative view (?round=)
 src/lib/predictions/
@@ -119,9 +119,13 @@ Form field naming per fixture id `fid`:
 
 Does **not** call `rpc("is_fixture_locked")` per fixture — relies on `lockedRoundIds` + RLS.
 
+## `clearAllMatchPredictions()`
+
+`requireAuth()`. Loads fixtures + `getMatchLockState`; deletes the user's `match_predictions` for fixtures in **unlocked** rounds (`.eq(user_id).in(fixture_id, unlockedIds)`), then `recalculateTournamentScores`. Redirects `?ok=cleared` (or `?error=` if everything is locked). Backs the **"Limpiar predicciones"** button.
+
 ## `generateRandomMatchPredictions()`
 
-`requireAuth()` only (not admin-gated in current code).
+`requireAuth()` only (not admin-gated in current code). **Still defined in `actions.ts`, but its button is commented out in `page.tsx`** (logic retained for future use).
 
 For each open fixture with teams:
 
@@ -141,7 +145,7 @@ Builds `RoundVM[]` with per-fixture: lock state, saved prediction, score, real r
 
 Renders `MatchesForm` with team filter list and admin flag.
 
-Also renders random-generator form (all users).
+Also renders the **"Limpiar predicciones"** form. (The random-generator form is commented out in `page.tsx`.)
 
 ## `MatchesForm.tsx` (client)
 

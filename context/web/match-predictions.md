@@ -46,9 +46,11 @@ Zod in `schemas.ts` mirrors these rules; DB CHECK still enforces `predicts_penal
 
 Knockout placeholders with missing `home_team_id` or `away_team_id` render disabled ("Equipos por definir") — no inputs, skipped on save.
 
-## Testing aid
+## Clear / testing aids
 
-**Generar predicciones aleatorias** on `/predictions/matches` fills all open fixtures for the **current user** with random plausible scores (any authenticated user; original hito plan said admin-only but code does not gate it).
+**Limpiar predicciones** on `/predictions/matches` deletes the current user's match predictions for every fixture whose round is **not locked** (`clearAllMatchPredictions`), then recalculates so the leaderboard drops those points.
+
+**Generar predicciones aleatorias** fills all open fixtures for the current user with random plausible scores (`generateRandomMatchPredictions`). The action is **still in `actions.ts`** but its button is **commented out** in `page.tsx` (re-import the action + uncomment the form to restore it).
 
 ## Scoring
 

@@ -120,6 +120,45 @@ export async function saveAllMatchPredictions(formData: FormData) {
   back("ok=saved");
 }
 
+// Clears the current user's match predictions for every fixture whose round is
+// NOT locked (locked rounds are read-only and RLS would reject the delete
+// anyway). Then recalculates so the leaderboard drops the removed points.
+export async function clearAllMatchPredictions() {
+  const { userId, supabase } = await requireAuth();
+  const tournament = await getDefaultTournament();
+
+  const { data: fixtures } = await supabase
+    .from("fixtures")
+    .select("id, round_id")
+    .eq("tournament_id", tournament.id);
+
+  const { lockedRoundIds } = await getMatchLockState(tournament.id);
+
+  const unlockedIds = (fixtures ?? [])
+    .filter((f) => !isFixtureLocked(f.round_id, lockedRoundIds))
+    .map((f) => f.id);
+
+  if (unlockedIds.length === 0) {
+    back("error=" + encodeURIComponent("No hay predicciones que borrar: todo está bloqueado."));
+  }
+
+  const { error } = await supabase
+    .from("match_predictions")
+    .delete()
+    .eq("tournament_id", tournament.id)
+    .eq("user_id", userId)
+    .in("fixture_id", unlockedIds);
+  if (error) back("error=" + encodeURIComponent(error.message));
+
+  await recalculateTournamentScores(tournament.id);
+
+  revalidatePath(SELF);
+  revalidatePath(`${SELF}/public`);
+  revalidatePath("/clasificacion");
+  revalidatePath("/my-scores");
+  back("ok=cleared");
+}
+
 // ── Random generator (admin only, testing aid) ───────────────────────────────
 // Dice for the 90' category, then a scoreline from that bucket. Group games
 // can end drawn (final). Knockout games drawn at 90' always go to extra time;

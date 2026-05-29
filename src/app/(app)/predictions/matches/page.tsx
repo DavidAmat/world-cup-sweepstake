@@ -2,7 +2,9 @@ import Link from "next/link";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getMatchLockState, isFixtureLocked } from "@/lib/predictions/matchLock";
-import { generateRandomMatchPredictions } from "./actions";
+import { clearAllMatchPredictions } from "./actions";
+// `generateRandomMatchPredictions` still lives in ./actions (logic kept). Its
+// button below is commented out; re-import it here to re-enable.
 import { MatchesForm, type RoundVM } from "./MatchesForm";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import type { LockedEntry } from "./LockedFixturePanel";
@@ -282,6 +284,26 @@ export default async function MatchPredictionsPage({
           Predicciones aleatorias generadas para todos tus partidos abiertos.
         </p>
       )}
+      {ok === "cleared" && (
+        <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
+          Predicciones borradas.
+        </p>
+      )}
+
+      <form action={clearAllMatchPredictions} className="mt-4">
+        <button
+          type="submit"
+          className="border-danger/30 bg-danger/10 text-danger-fg hover:bg-danger/20 rounded-md border px-4 py-2 text-sm font-medium"
+          title="Borra todas tus predicciones de los partidos no bloqueados"
+        >
+          Limpiar predicciones
+        </button>
+      </form>
+
+      {/*
+        Botón "Generar predicciones aleatorias" retirado a propósito. La lógica
+        sigue en ./actions.ts (generateRandomMatchPredictions); para reactivarlo,
+        vuelve a importar la acción arriba y descomenta este formulario:
 
       <form action={generateRandomMatchPredictions} className="mt-4">
         <button
@@ -292,6 +314,7 @@ export default async function MatchPredictionsPage({
           🎲 Generar predicciones aleatorias
         </button>
       </form>
+      */}
 
       {roundVMs.length === 0 ? (
         <p className="mt-6 text-sm text-zinc-600">
