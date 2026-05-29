@@ -13,9 +13,12 @@ import {
   ClipboardList,
   BarChart2,
 } from "lucide-react";
+import { Avatar } from "@/components/profiles/Avatar";
 
 type NavProps = {
   displayName: string | null;
+  initials: string | null;
+  avatarUrl: string | null;
   isAdmin: boolean;
   isLoggedIn: boolean;
   signOutForm: React.ReactNode;
@@ -128,7 +131,14 @@ function ClasificacionDropdown({ pathname, onClose }: { pathname: string; onClos
   );
 }
 
-function DesktopNav({ displayName, isAdmin, isLoggedIn, signOutForm }: NavProps) {
+function DesktopNav({
+  displayName,
+  initials,
+  avatarUrl,
+  isAdmin,
+  isLoggedIn,
+  signOutForm,
+}: NavProps) {
   const pathname = usePathname();
 
   if (!isLoggedIn) {
@@ -181,7 +191,13 @@ function DesktopNav({ displayName, isAdmin, isLoggedIn, signOutForm }: NavProps)
       )}
 
       <div className="ml-3 flex items-center gap-2 border-l border-zinc-200 pl-3">
-        <span className="hidden items-center gap-1 text-xs text-zinc-500 lg:flex">
+        <span className="hidden items-center gap-1.5 text-xs text-zinc-500 lg:flex">
+          <Avatar
+            displayName={displayName ?? "Jugador"}
+            initials={initials ?? "?"}
+            avatarUrl={avatarUrl}
+            size={22}
+          />
           {displayName ?? "—"}
           {isAdmin && (
             <Shield className="text-special h-3 w-3 shrink-0" aria-label="Administrador" />
@@ -193,7 +209,15 @@ function DesktopNav({ displayName, isAdmin, isLoggedIn, signOutForm }: NavProps)
   );
 }
 
-function MobileNav({ displayName, isAdmin, isLoggedIn, signOutForm, onClose }: NavProps) {
+function MobileNav({
+  displayName,
+  initials,
+  avatarUrl,
+  isAdmin,
+  isLoggedIn,
+  signOutForm,
+  onClose,
+}: NavProps) {
   const pathname = usePathname();
 
   if (!isLoggedIn) {
@@ -244,7 +268,13 @@ function MobileNav({ displayName, isAdmin, isLoggedIn, signOutForm, onClose }: N
 
   return (
     <div className="flex flex-col gap-1 py-3">
-      <p className="flex items-center gap-1 px-3 pb-2 text-xs text-zinc-500">
+      <p className="flex items-center gap-2 px-3 pb-2 text-xs text-zinc-500">
+        <Avatar
+          displayName={displayName ?? "Jugador"}
+          initials={initials ?? "?"}
+          avatarUrl={avatarUrl}
+          size={22}
+        />
         Hola, {displayName ?? "jugador"}
         {isAdmin && <Shield className="text-special h-3 w-3 shrink-0" aria-label="Administrador" />}
       </p>
@@ -268,15 +298,31 @@ function MobileNav({ displayName, isAdmin, isLoggedIn, signOutForm, onClose }: N
 
 type Props = {
   displayName: string | null;
+  initials: string | null;
+  avatarUrl: string | null;
   isAdmin: boolean;
   isLoggedIn: boolean;
   signOutForm: React.ReactNode;
 };
 
-export function HeaderClient({ displayName, isAdmin, isLoggedIn, signOutForm }: Props) {
+export function HeaderClient({
+  displayName,
+  initials,
+  avatarUrl,
+  isAdmin,
+  isLoggedIn,
+  signOutForm,
+}: Props) {
   const [open, setOpen] = useState(false);
   const scrolled = useScrolled();
-  const navProps: NavProps = { displayName, isAdmin, isLoggedIn, signOutForm };
+  const navProps: NavProps = {
+    displayName,
+    initials,
+    avatarUrl,
+    isAdmin,
+    isLoggedIn,
+    signOutForm,
+  };
 
   return (
     <header

@@ -25,7 +25,18 @@ const COLORS = [
   "#664E3C", // brown
 ];
 
-type UserMeta = { user_id: string; display_name: string; initials: string };
+type UserMeta = {
+  user_id: string;
+  display_name: string;
+  initials: string;
+  avatarUrl?: string | null;
+};
+
+// Avatar disc that lives at the end of every user's evolution line.
+// Bigger than the old initials badge (R) and renders the user's photo
+// when available, falling back to the colored initials disc otherwise.
+const AVATAR_R = 18;
+const AVATAR_STROKE = 2;
 
 export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; users: UserMeta[] }) {
   if (points.length === 0 || users.length === 0) {
@@ -33,10 +44,22 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
   }
 
   const WIDTH = 720;
-  const HEIGHT = 360;
-  const PAD = { top: 20, right: 80, bottom: 50, left: 50 };
+  const HEIGHT = 540;
+  const PAD = { top: 28, right: 90, bottom: 50, left: 50 };
   const innerW = WIDTH - PAD.left - PAD.right;
   const innerH = HEIGHT - PAD.top - PAD.bottom;
+
+  // y-axis floor: min cumulative across users at the first round (J1).
+  // Starting at 0 wastes vertical space when everyone already has 25+ pts
+  // by the end of jornada 1 — clipping the bottom makes deltas readable
+  // and spreads avatars at the last x position so they don't overlap.
+  let minYFirst = Infinity;
+  if (points.length > 0) {
+    for (const v of points[0].cumulativeByUser.values()) {
+      if (v < minYFirst) minYFirst = v;
+    }
+  }
+  if (!Number.isFinite(minYFirst)) minYFirst = 0;
 
   let maxY = 0;
   for (const pt of points) {
@@ -46,12 +69,19 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
   }
   if (maxY === 0) maxY = 10;
 
+  // Breathing room: ~6% of the visible range on each side so markers
+  // don't kiss the chart's top/bottom edges.
+  const rawRange = Math.max(1, maxY - minYFirst);
+  const pad = Math.max(2, rawRange * 0.06);
+  const yMin = Math.max(0, Math.floor(minYFirst - pad));
+  const yMax = Math.ceil(maxY + pad);
+  const yRange = Math.max(1, yMax - yMin);
+
   const stepX = points.length > 1 ? innerW / (points.length - 1) : 0;
   const xFor = (i: number) => PAD.left + i * stepX;
-  const yFor = (v: number) => PAD.top + innerH - (v / maxY) * innerH;
+  const yFor = (v: number) => PAD.top + innerH - ((v - yMin) / yRange) * innerH;
 
-  const niceMax = Math.max(10, Math.ceil(maxY / 10) * 10);
-  const yTicks = [0, niceMax * 0.25, niceMax * 0.5, niceMax * 0.75, niceMax];
+  const yTicks = [0, 0.25, 0.5, 0.75, 1].map((p) => yMin + p * yRange);
 
   return (
     <div className="overflow-x-auto">
@@ -91,6 +121,13 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
             {ROUND_SHORT_LABEL[pt.roundCode] ?? pt.roundName}
           </text>
         ))}
+        <defs>
+          {users.map((u) => (
+            <clipPath key={`clip-${u.user_id}`} id={`avatar-clip-${u.user_id}`}>
+              <circle cx={0} cy={0} r={AVATAR_R - AVATAR_STROKE} />
+            </clipPath>
+          ))}
+        </defs>
         {users.map((u, idx) => {
           const color = COLORS[idx % COLORS.length];
           const seg = points
@@ -102,29 +139,64 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
           const last = points[points.length - 1];
           const lastY = yFor(last.cumulativeByUser.get(u.user_id) ?? 0);
           const lastX = xFor(points.length - 1);
+          const avatarCx = lastX + AVATAR_R + 4;
           return (
             <g key={u.user_id}>
               <path d={seg} fill="none" stroke={color} strokeWidth={2} />
-              {points.map((pt, i) => (
-                <circle
-                  key={`${u.user_id}-${pt.roundCode}`}
-                  cx={xFor(i)}
-                  cy={yFor(pt.cumulativeByUser.get(u.user_id) ?? 0)}
-                  r={3}
-                  fill={color}
-                />
-              ))}
-              <circle cx={lastX + 18} cy={lastY} r={12} fill={color} />
-              <text
-                x={lastX + 18}
-                y={lastY + 3}
-                textAnchor="middle"
-                fontSize={10}
-                fontWeight="bold"
-                fill="#ffffff"
-              >
-                {u.initials.slice(0, 2).toUpperCase()}
-              </text>
+              {points.map((pt, i) => {
+                const v = pt.cumulativeByUser.get(u.user_id) ?? 0;
+                const cy = yFor(v);
+                return (
+                  <g key={`${u.user_id}-${pt.roundCode}`}>
+                    <circle cx={xFor(i)} cy={cy} r={3} fill={color} />
+                    <text
+                      x={xFor(i)}
+                      y={cy - 7}
+                      textAnchor="middle"
+                      fontSize={10}
+                      fontWeight="bold"
+                      fill={color}
+                    >
+                      {Math.round(v)}
+                    </text>
+                  </g>
+                );
+              })}
+              {u.avatarUrl ? (
+                <g transform={`translate(${avatarCx}, ${lastY})`}>
+                  <image
+                    href={u.avatarUrl}
+                    x={-(AVATAR_R - AVATAR_STROKE)}
+                    y={-(AVATAR_R - AVATAR_STROKE)}
+                    width={(AVATAR_R - AVATAR_STROKE) * 2}
+                    height={(AVATAR_R - AVATAR_STROKE) * 2}
+                    preserveAspectRatio="xMidYMid slice"
+                    clipPath={`url(#avatar-clip-${u.user_id})`}
+                  />
+                  <circle
+                    cx={0}
+                    cy={0}
+                    r={AVATAR_R - AVATAR_STROKE / 2}
+                    fill="none"
+                    stroke={color}
+                    strokeWidth={AVATAR_STROKE}
+                  />
+                </g>
+              ) : (
+                <>
+                  <circle cx={avatarCx} cy={lastY} r={AVATAR_R} fill={color} />
+                  <text
+                    x={avatarCx}
+                    y={lastY + 4}
+                    textAnchor="middle"
+                    fontSize={13}
+                    fontWeight="bold"
+                    fill="#ffffff"
+                  >
+                    {u.initials.slice(0, 2).toUpperCase()}
+                  </text>
+                </>
+              )}
             </g>
           );
         })}

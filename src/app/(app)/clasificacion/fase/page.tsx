@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { loadLeaderboardData, buildByStage } from "@/lib/scoring/leaderboard";
+import { avatarUrlMapFor } from "@/lib/profiles/avatars";
 import { ClasificacionTabs } from "../Tabs";
 import { FaseTable } from "./FaseTable";
 
@@ -33,6 +34,7 @@ export default async function FasePage() {
           }))}
           stages={stages}
           userId={userId}
+          avatarUrlByUser={avatarUrlMapFor(data.profiles)}
         />
       )}
     </main>

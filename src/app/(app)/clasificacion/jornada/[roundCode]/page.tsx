@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
+import { avatarUrlFor } from "@/lib/profiles/avatars";
 import { ClasificacionTabs } from "../../Tabs";
 import {
   RoundDetailTable,
@@ -98,7 +99,12 @@ export default async function JornadaDetallePage({ params }: { params: RoutePara
 
   const sortedProfiles: RoundDetailProfile[] = [...(profiles ?? [])]
     .sort((a, b) => (totalByUser.get(b.user_id) ?? 0) - (totalByUser.get(a.user_id) ?? 0))
-    .map((p) => ({ user_id: p.user_id, display_name: p.display_name, initials: p.initials }));
+    .map((p) => ({
+      user_id: p.user_id,
+      display_name: p.display_name,
+      initials: p.initials,
+      avatarUrl: avatarUrlFor(p.display_name),
+    }));
 
   const fixtureRows: RoundDetailFixture[] = fixtures.map((f) => {
     const result = resultByFixture.get(f.id);

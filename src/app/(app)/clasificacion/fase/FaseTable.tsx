@@ -1,6 +1,7 @@
 "use client";
 
 import { SortableTable, type SortableColumn } from "@/components/ui/SortableTable";
+import { Avatar } from "@/components/profiles/Avatar";
 import type { ProfileRef, StageRef } from "@/lib/scoring/leaderboard";
 
 export type FaseTableRow = {
@@ -13,6 +14,7 @@ type Props = {
   rows: FaseTableRow[];
   stages: StageRef[];
   userId: string;
+  avatarUrlByUser: Record<string, string | null>;
 };
 
 // Compact column labels — the full stage names ("Dieciseisavos de final"…)
@@ -28,7 +30,7 @@ const STAGE_ABBREV: Record<string, string> = {
   final: "Final",
 };
 
-export function FaseTable({ rows, stages, userId }: Props) {
+export function FaseTable({ rows, stages, userId, avatarUrlByUser }: Props) {
   const columns: SortableColumn<FaseTableRow>[] = [
     {
       key: "name",
@@ -38,14 +40,19 @@ export function FaseTable({ rows, stages, userId }: Props) {
       tdClassName: "sticky left-0 bg-white font-medium",
       getValue: (r) => r.profile.display_name,
       render: (r) => (
-        <>
-          {r.profile.display_name}
+        <span className="inline-flex items-center gap-2">
+          <Avatar
+            displayName={r.profile.display_name}
+            initials={r.profile.initials}
+            avatarUrl={avatarUrlByUser[r.profile.user_id] ?? null}
+          />
+          <span>{r.profile.display_name}</span>
           {r.profile.user_id === userId && (
             <span className="bg-info-light text-info-fg ml-1 rounded px-1.5 text-xs font-medium">
               tú
             </span>
           )}
-        </>
+        </span>
       ),
     },
     ...stages.map<SortableColumn<FaseTableRow>>((s) => ({

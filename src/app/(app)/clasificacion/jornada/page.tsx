@@ -2,6 +2,7 @@ import { CheckCircle2, RefreshCw } from "lucide-react";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { loadLeaderboardData, buildByRound } from "@/lib/scoring/leaderboard";
+import { avatarUrlMapFor } from "@/lib/profiles/avatars";
 import { ClasificacionTabs } from "../Tabs";
 import { recalculateClasificacion } from "../actions";
 import { JornadaTable } from "./JornadaTable";
@@ -126,6 +127,7 @@ export default async function JornadaPage({ searchParams }: { searchParams: Sear
           totalsByRound={Object.fromEntries(totalsByRound)}
           totalsByExtra={totalsByExtra}
           userId={userId}
+          avatarUrlByUser={avatarUrlMapFor(data.profiles)}
         />
       )}
 

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SortableTable, type SortableColumn } from "@/components/ui/SortableTable";
+import { Avatar } from "@/components/profiles/Avatar";
 import type { ProfileRef, RoundRef } from "@/lib/scoring/leaderboard";
 
 // Per-user initial-prediction breakdown. `pichichi` / `mejor_jug` come
@@ -27,6 +28,7 @@ type Props = {
   totalsByRound: Record<string, number>;
   totalsByExtra: { pichichi: number; mejor_jug: number; clasificados: number };
   userId: string;
+  avatarUrlByUser: Record<string, string | null>;
 };
 
 // Compact column labels — full round/stage names blow out the table
@@ -43,7 +45,14 @@ const ROUND_ABBREV: Record<string, string> = {
   final: "Final",
 };
 
-export function JornadaTable({ rows, rounds, totalsByRound, totalsByExtra, userId }: Props) {
+export function JornadaTable({
+  rows,
+  rounds,
+  totalsByRound,
+  totalsByExtra,
+  userId,
+  avatarUrlByUser,
+}: Props) {
   const columns: SortableColumn<JornadaTableRow>[] = [
     {
       key: "name",
@@ -53,14 +62,19 @@ export function JornadaTable({ rows, rounds, totalsByRound, totalsByExtra, userI
       tdClassName: "sticky left-0 bg-white font-medium",
       getValue: (r) => r.profile.display_name,
       render: (r) => (
-        <>
-          {r.profile.display_name}
+        <span className="inline-flex items-center gap-2">
+          <Avatar
+            displayName={r.profile.display_name}
+            initials={r.profile.initials}
+            avatarUrl={avatarUrlByUser[r.profile.user_id] ?? null}
+          />
+          <span>{r.profile.display_name}</span>
           {r.profile.user_id === userId && (
             <span className="bg-info-light text-info-fg ml-1 rounded px-1.5 text-xs font-medium">
               tú
             </span>
           )}
-        </>
+        </span>
       ),
     },
     ...rounds.map<SortableColumn<JornadaTableRow>>((r) => ({
@@ -110,10 +124,7 @@ export function JornadaTable({ rows, rounds, totalsByRound, totalsByExtra, userI
         Pts totales
       </td>
       {rounds.map((r) => (
-        <td
-          key={r.code}
-          className="font-oswald px-3 py-2 text-right text-xs text-zinc-500"
-        >
+        <td key={r.code} className="font-oswald px-3 py-2 text-right text-xs text-zinc-500">
           {totalsByRound[r.code] ?? 0}
         </td>
       ))}

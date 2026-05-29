@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { loadLeaderboardData, buildEvolution } from "@/lib/scoring/leaderboard";
+import { avatarUrlFor } from "@/lib/profiles/avatars";
 import { EvolutionChart } from "@/components/scoring/EvolutionChart";
 import { ClasificacionTabs } from "../Tabs";
 
@@ -27,6 +28,7 @@ export default async function EvolucionPage() {
             user_id: p.user_id,
             display_name: p.display_name,
             initials: p.initials,
+            avatarUrl: avatarUrlFor(p.display_name),
           }))}
         />
       </section>

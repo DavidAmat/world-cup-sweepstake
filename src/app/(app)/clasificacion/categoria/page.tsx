@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { loadLeaderboardData, buildByCategory } from "@/lib/scoring/leaderboard";
+import { avatarUrlMapFor } from "@/lib/profiles/avatars";
 import {
   CATEGORY_LABELS,
   CATEGORY_DESCRIPTIONS,
@@ -48,7 +49,12 @@ export default async function CategoriaPage() {
           Aún no hay puntuaciones.
         </p>
       ) : (
-        <CategoriaTable rows={rows} categoryOrder={CATEGORY_ORDER} userId={userId} />
+        <CategoriaTable
+          rows={rows}
+          categoryOrder={CATEGORY_ORDER}
+          userId={userId}
+          avatarUrlByUser={avatarUrlMapFor(data.profiles)}
+        />
       )}
     </main>
   );

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { TeamName } from "@/components/ui/TeamName";
+import { Avatar } from "@/components/profiles/Avatar";
 import { SortableTable, type SortableColumn } from "@/components/ui/SortableTable";
 
 export type RoundDetailFixture = {
@@ -17,6 +18,7 @@ export type RoundDetailProfile = {
   user_id: string;
   display_name: string;
   initials: string;
+  avatarUrl?: string | null;
 };
 
 type Props = {
@@ -27,12 +29,7 @@ type Props = {
   userId: string;
 };
 
-export function RoundDetailTable({
-  fixtures,
-  profiles,
-  pointsByUserFixture,
-  userId,
-}: Props) {
+export function RoundDetailTable({ fixtures, profiles, pointsByUserFixture, userId }: Props) {
   const columns: SortableColumn<RoundDetailFixture>[] = [
     {
       key: "fixture",
@@ -59,7 +56,19 @@ export function RoundDetailTable({
     },
     ...profiles.map<SortableColumn<RoundDetailFixture>>((p) => ({
       key: p.user_id,
-      label: p.initials || p.display_name.slice(0, 2),
+      label: (
+        <span className="inline-flex flex-col items-center gap-0.5" title={p.display_name}>
+          <Avatar
+            displayName={p.display_name}
+            initials={p.initials}
+            avatarUrl={p.avatarUrl ?? null}
+            size={28}
+          />
+          <span className="text-[10px] text-zinc-500">
+            {p.initials || p.display_name.slice(0, 2)}
+          </span>
+        </span>
+      ),
       align: "center" as const,
       tdClassName: (f) => {
         const isMe = p.user_id === userId;
@@ -94,12 +103,7 @@ export function RoundDetailTable({
 
   return (
     <div className="mt-6 overflow-x-auto">
-      <SortableTable
-        columns={columns}
-        rows={fixtures}
-        getRowKey={(f) => f.id}
-        footer={footer}
-      />
+      <SortableTable columns={columns} rows={fixtures} getRowKey={(f) => f.id} footer={footer} />
     </div>
   );
 }

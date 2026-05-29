@@ -7,6 +7,8 @@ import { TeamName } from "@/components/ui/TeamName";
 import { BreakdownTable } from "@/components/scoring/BreakdownTable";
 import { BreakdownPopover } from "@/components/scoring/BreakdownPopover";
 import { PointsBar } from "@/components/scoring/PointsBar";
+import { Avatar } from "@/components/profiles/Avatar";
+import { avatarUrlFor } from "@/lib/profiles/avatars";
 import { maxPointsForFixture } from "@/lib/scoring/maxPoints";
 import type { StageCode } from "@/lib/scoring/types";
 
@@ -117,7 +119,7 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
             {fixture.stage?.name ?? "Partido"} · {fixture.round?.name ?? ""}
             {fixture.group_code ? ` · Grupo ${fixture.group_code}` : ""}
           </p>
-          <h1 className="text-2xl font-bold inline-flex flex-wrap items-center gap-2">
+          <h1 className="inline-flex flex-wrap items-center gap-2 text-2xl font-bold">
             <TeamName name={homeTeam} /> vs <TeamName name={awayTeam} />
           </h1>
           <p className="mt-1 text-xs text-zinc-500">
@@ -133,16 +135,19 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
         <p className="text-xs font-semibold text-zinc-500 uppercase">Resultado oficial</p>
         {result && result.result_status === "confirmed" ? (
           <>
-            <p className="mt-1 text-lg font-bold inline-flex flex-wrap items-center gap-1.5">
+            <p className="mt-1 inline-flex flex-wrap items-center gap-1.5 text-lg font-bold">
               <TeamName name={homeTeam} /> {result.home_goals_90} - {result.away_goals_90}{" "}
               <TeamName name={awayTeam} />
             </p>
             {isKnockout && (
-              <p className="mt-1 text-xs text-zinc-600 inline-flex flex-wrap items-center gap-1">
+              <p className="mt-1 inline-flex flex-wrap items-center gap-1 text-xs text-zinc-600">
                 {result.went_extra_time ? "Con prórroga" : "Sin prórroga"} ·{" "}
                 {result.went_penalties ? "Decidido en penaltis" : "Sin penaltis"}
                 {qualifiedTeamName ? (
-                  <> · Pasa: <TeamName name={qualifiedTeamName} /></>
+                  <>
+                    {" "}
+                    · Pasa: <TeamName name={qualifiedTeamName} />
+                  </>
                 ) : null}
               </p>
             )}
@@ -170,8 +175,13 @@ export default async function PartidoPage({ params }: { params: RouteParams }) {
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="font-semibold">
-                    {profile.display_name}
+                  <p className="flex items-center gap-2 font-semibold">
+                    <Avatar
+                      displayName={profile.display_name}
+                      initials={profile.initials}
+                      avatarUrl={avatarUrlFor(profile.display_name)}
+                    />
+                    <span>{profile.display_name}</span>
                     {isMe && (
                       <span className="bg-info-light text-info-fg ml-1 rounded px-1.5 text-xs font-medium">
                         tú
