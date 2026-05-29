@@ -13,6 +13,7 @@ Master data is everything the app needs before users can predict:
 | 104 fixtures | `data/seeds/wc_2026/fixtures.json` | `fixtures` |
 | Stage/round catalog | `src/lib/fixtures/catalogs.ts` (hardcoded) | `stages`, `rounds` |
 | Scoring rules v1 | `DEFAULT_SCORING_RULES_V1` in code | `scoring_rules` |
+| 15 real accounts | `data/users/users_passwords.json` | `auth.users` + `profiles` |
 
 **Supabase is runtime source of truth.** JSON under `data/seeds/` is the committed bootstrap snapshot. The admin edits fixtures through `/admin/fixtures` after seeding; there is no download/sync script for 2026.
 
@@ -100,6 +101,26 @@ SUPABASE_SECRET_KEY=<secret> \
 ```
 
 Scripts auto-rewrite `127.0.0.1` → LAN IP for tsx (same quirk as other Supabase CLI scripts). See `scripts/lib/env.ts`.
+
+## Clean-slate & user creation (production start)
+
+Two extra scripts take the DB to a production starting state (real accounts, only Jornada 1/2/3
+fixtures, no results):
+
+```bash
+npm run wc2026:clean    # delete predictions/scores/results/terms; delete knockout fixtures; delete all users
+npm run wc2026:users    # create the 15 accounts from data/users/users_passwords.json
+```
+
+- `clean-slate.ts` keeps master data + `group_md1/2/3` fixtures (deletes the 32 knockout placeholders)
+  and deletes every auth user (cascades to profiles).
+- `create-users.ts` creates each account with a temporary password and `must_change_password=true`,
+  sets `is_scam` for the flagged user, and promotes `david@porra.com` to `admin`. Idempotent.
+- `:prod` variants forward `--confirm-prod`. Full runbook:
+  `documentation/implementations/wc2026-clean-slate-and-users.md`.
+
+`users_passwords.json` is committed bootstrap (usernames + temporary passwords); since users are
+forced to change their password on first login, it is only the initial handout.
 
 ## What is intentionally empty
 

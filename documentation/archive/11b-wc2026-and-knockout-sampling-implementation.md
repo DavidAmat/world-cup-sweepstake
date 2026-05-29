@@ -1,8 +1,8 @@
 # Hito 11b — Migrar a `wc_2026` + generador de cruces · bitácora
 
-> Plan: `context/plan/11b-wc2026-and-knockout-sampling.md`.
+> Plan: `11b-wc2026-and-knockout-sampling-plan.md`.
 > Hito intermedio entre 11 (motor) y 12 (leaderboards).
-> Bootstrap heredado: `context/plan/08-bootstrap-prompt.md`.
+> Bootstrap heredado: `08-bootstrap-prompt.md`.
 
 Bitácora en orden cronológico. Se va llenando a medida que avanza la
 implementación.
@@ -21,7 +21,7 @@ que cambiamos al calendario real.
 ### Plan aprobado
 
 Decisiones D11b-1..D11b-6 consolidadas en
-`context/plan/11b-wc2026-and-knockout-sampling.md` §11. Aprobado por
+`11b-wc2026-and-knockout-sampling-plan.md` §11. Aprobado por
 el usuario explícitamente. Empiezo por el catálogo.
 
 ### Hallazgos de la inspección previa

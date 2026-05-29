@@ -277,7 +277,7 @@ export function MatchesForm({
             )}
             <button
               type="submit"
-              className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
             >
               Guardar predicciones
             </button>
@@ -416,7 +416,7 @@ export function MatchesForm({
       <div className="mt-8 flex items-center gap-3">
         <button
           type="submit"
-          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
         >
           Guardar predicciones
         </button>

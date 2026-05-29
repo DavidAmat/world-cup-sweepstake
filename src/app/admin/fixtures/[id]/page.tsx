@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/permissions/requireAdmin";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { formatMadridDateTime, utcIsoToMadridInput } from "@/lib/dates/madridTime";
 import { FixtureStatusBadge } from "@/components/ui/Badge";
+import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { updateFixture } from "../actions";
 
 type RouteParams = Promise<{ id: string }>;
@@ -71,11 +72,7 @@ export default async function EditFixturePage({
         <FixtureStatusBadge status={fixture.status} />
       </div>
 
-      {errMsg && (
-        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
-          {errMsg}
-        </p>
-      )}
+      {errMsg && <ErrorBanner message={errMsg} className="mt-4" />}
       {ok === "updated" && (
         <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Cambios guardados.
@@ -229,7 +226,7 @@ export default async function EditFixturePage({
         <div className="flex items-center gap-3">
           <button
             type="submit"
-            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
           >
             Guardar cambios
           </button>

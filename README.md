@@ -6,15 +6,27 @@ App privada para gestionar la porra del Mundial 2026 entre amigos.
   (Auth + Postgres + RLS) · Vercel.
 - **Idioma de la UI**: español. El código y la base de datos están en
   inglés.
-- **Plan de implementación**: ver [`context/plan/01-plan.md`](context/plan/01-plan.md).
+
+## Documentación
+
+Empieza por la orientación del proyecto y el índice completo:
+
+- [`context/00-project-complete-overview.md`](context/00-project-complete-overview.md) — visión global (ideal para onboarding de un LLM)
+- [`context/00-index.md`](context/00-index.md) — índice de todos los ficheros en `context/` y `documentation/`
+- [`context/00-documentation-instructions.md`](context/00-documentation-instructions.md) — dónde va cada tipo de doc
+- [`documentation/`](documentation/) — detalle de ingeniería (rutas, SQL, comandos, runbooks)
 
 ## Desarrollo local
 
-Requisitos: Node 20.9+, Docker (para Supabase local desde el hito 03).
+Requisitos: Node 20.9+, Docker (para Supabase local).
 
 ```bash
 npm install
-cp .env.example .env.local        # rellenar tras crear el proyecto Supabase
+cp .env.example .env.local        # rellenar tras npm run db:start
+npm run db:start
+npm run db:reset
+npm run types:gen
+npm run wc2026:upload             # cargar torneo wc_2026
 npm run dev                        # http://localhost:3000
 ```
 
@@ -27,6 +39,8 @@ npm run lint          # ESLint
 npm run typecheck     # tsc --noEmit
 npm run format        # Prettier sobre todo el repo
 npm run format:check  # Prettier en modo check (CI)
+npm run wc2026:upload # subir seeds del Mundial 2026 a Supabase
+npm run scoring:smoke # smoke del motor de puntuación
 ```
 
 ## Estructura del repo
@@ -36,13 +50,11 @@ src/
   app/                    rutas Next.js (App Router)
   components/             UI compartida
   lib/                    clients Supabase, scoring, permisos, fechas, copy
-data/seeds/               JSONs de seed (Catar 2022 / Mundial 2026)
-supabase/                 migraciones y config Supabase CLI (hito 03)
-scripts/                  scripts de seed e importación
-context/
-  initial-setup/          brainstorming + PID iniciales
-  plan/                   plan de implementación por hitos (01..17)
-  implementations/        bitácora por hito (qué se hizo, errores, decisiones)
+data/seeds/wc_2026/       JSONs de seed del torneo activo
+supabase/                 migraciones y config Supabase CLI
+scripts/                  upload wc2026, scoring smoke, lib compartida
+context/                  documentación orientada a LLM (overviews)
+documentation/            documentación detallada para ingeniería
 ```
 
 ## Deploy
@@ -50,4 +62,4 @@ context/
 - Cada PR a `master` genera un Preview Deployment en Vercel.
 - Mergear a `master` despliega a producción.
 - Las migraciones a Supabase de producción se aplican manualmente con
-  `supabase db push` desde local (ver hito 16).
+  `npm run db:push` desde local.

@@ -9,7 +9,8 @@ import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getInitialLockState } from "@/lib/predictions/initialLock";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { recalculateTournamentScores } from "@/lib/scoring/recalculate";
-import { GROUP_QUALIFIERS, readInitialPayload } from "./schemas";
+import { BEST_THIRDS_ADVANCE } from "@/lib/scoring/scoreGroup";
+import { MIN_QUALIFIERS, MAX_QUALIFIERS, readInitialPayload } from "./schemas";
 
 const SELF = "/predictions/initial";
 
@@ -90,9 +91,10 @@ export async function saveInitialPredictions(formData: FormData) {
   ensureTeam(payload.champion_team_id, "Campeón");
   ensureTeam(payload.runner_up_team_id, "Subcampeón");
 
-  // gqp rows to insert. Exactly GROUP_QUALIFIERS teams per group, every
-  // group, no order (predicted_position = null). User decision: 0, 1 or
-  // 3+ selected in any group is an error.
+  // gqp rows to insert. Each group must have MIN..MAX (2..3) teams, no order
+  // (predicted_position = null). WC2026 rule: exactly BEST_THIRDS_ADVANCE (8)
+  // groups must have 3 teams (the bet that their third advances as a best
+  // third); the rest have 2.
   const gqpRows: {
     tournament_id: string;
     user_id: string;
@@ -101,14 +103,16 @@ export async function saveInitialPredictions(formData: FormData) {
     predicted_position: null;
   }[] = [];
 
+  let groupsWithThree = 0;
   for (const q of payload.qualifiers) {
     const { group_code } = q;
     const teamIds = [...new Set(q.team_ids)];
-    if (teamIds.length !== GROUP_QUALIFIERS) {
+    if (teamIds.length < MIN_QUALIFIERS || teamIds.length > MAX_QUALIFIERS) {
       fail(
-        `Grupo ${group_code}: tienes que seleccionar exactamente ${GROUP_QUALIFIERS} equipos (has marcado ${teamIds.length}).`,
+        `Grupo ${group_code}: selecciona ${MIN_QUALIFIERS} o ${MAX_QUALIFIERS} equipos (has marcado ${teamIds.length}).`,
       );
     }
+    if (teamIds.length === MAX_QUALIFIERS) groupsWithThree += 1;
     for (const tid of teamIds) {
       if (groupByTeam.get(tid) !== group_code) {
         fail(`Grupo ${group_code}: un equipo seleccionado no pertenece a ese grupo.`);
@@ -121,6 +125,13 @@ export async function saveInitialPredictions(formData: FormData) {
         predicted_position: null,
       });
     }
+  }
+
+  if (groupsWithThree !== BEST_THIRDS_ADVANCE) {
+    fail(
+      `Tienes que marcar 3 equipos en exactamente ${BEST_THIRDS_ADVANCE} grupos (el 3.º que crees ` +
+        `que se clasifica como mejor tercero) y 2 en el resto. Ahora tienes ${groupsWithThree} grupos con 3.`,
+    );
   }
 
   // Keep the original submitted_at across edits.

@@ -1,6 +1,6 @@
 # Hito 12 — Implementación
 
-Bitácora paralela a `context/plan/12-leaderboards-and-visuals.md`.
+Bitácora paralela a `12-leaderboards-and-visuals-plan.md`.
 
 ---
 
@@ -14,7 +14,7 @@ Bitácora paralela a `context/plan/12-leaderboards-and-visuals.md`.
   - group_qualification: 20 (105 pts)
   - initial: 1 (200 pts)
 - 3 perfiles en local: David1 (admin), David2, David3 (sin scores).
-- Plan detallado: `context/plan/12-leaderboards-and-visuals.md`.
+- Plan detallado: `12-leaderboards-and-visuals-plan.md`.
 - El usuario pidió implementar todo de un tirón y hacer commit+push
   al cierre. No esperamos aprobación de plan.
 

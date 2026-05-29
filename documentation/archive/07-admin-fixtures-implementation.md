@@ -1,6 +1,6 @@
 # 07 — Admin: fixtures · bitácora de implementación
 
-> Hito en curso. Plan: `context/plan/07-admin-fixtures.md`.
+> Hito en curso. Plan: `07-admin-fixtures-plan.md`.
 
 ## Estado
 
@@ -10,7 +10,7 @@
 - [x] Paso 3 · Schemas Zod + esqueletos de server actions.
 - [x] Paso 4 · Edición `/admin/fixtures/[id]`.
 - [x] Paso 5 · Creación individual `/admin/fixtures/new`.
-- [x] Paso 6 · Import masivo (`prompts/`, `/admin/fixtures/import`,
+- [x] Paso 6 · Import masivo (../implementations/, `/admin/fixtures/import`,
       `previewImport` + `commitImport`).
 - [x] Paso 7 · Cosméticos (links en `/admin`, lint/typecheck/format).
 - [x] Paso 8 · Verificación funcional + roundtrip `wc2022:download`
@@ -38,13 +38,13 @@ cumplidos. Datos: prod sigue con 48 fixtures de grupos; local tiene
 además 8 octavos de prueba (solo local).
 
 Siguiente: hito 08 — predicciones iniciales. Bootstrap reescrito en
-`context/plan/08-bootstrap-prompt.md`.
+`08-bootstrap-prompt.md`.
 
 ## Decisiones aprobadas
 
 - DH7-1 a DH7-7 sin cambios (ver plan §1).
 - En lugar de "duplicar fixture": importación masiva por JSON pegado
-  generado con ChatGPT. Prompt versionado en `prompts/`.
+  generado con ChatGPT. Prompt versionado en ../implementations/.
 - Contador "X fixtures bloqueados ahora" en el listado: incluido.
 - Formato `external_id` para nuevos: `wc2022_<round>_NNN`.
 
@@ -243,7 +243,7 @@ anon           : status=307 location=/login
 
 ## Paso 6 · Importación masiva por JSON
 
-- `prompts/admin-fixtures-import.md`: prompt versionado para ChatGPT.
+- `../implementations/admin-fixtures-json-import.md`: prompt versionado para ChatGPT.
   Schema exacto, lista de los 32 equipos de Catar 2022, reglas duras
   (snake_case external_id, fecha Madrid ISO sin TZ, placeholders en
   vez de inventar), ejemplo input→output, plantilla para 2026.

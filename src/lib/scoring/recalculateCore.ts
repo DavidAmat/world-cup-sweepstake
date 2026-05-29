@@ -5,7 +5,9 @@ import { scoreGroupMatch, scoreKnockoutMatch } from "./scoreMatch";
 import { scoreInitialPrediction, type TournamentFinalOutcome } from "./scoreInitial";
 import {
   computeGroupTables,
+  computeAdvancingTeams,
   scoreGroupQualificationPrediction,
+  BEST_THIRDS_ADVANCE,
   type FixtureForTable,
   type GroupQualificationPredictionInput,
 } from "./scoreGroup";
@@ -132,6 +134,21 @@ export async function recalculateTournamentScoresCore(
   }
   const groupTables = computeGroupTables(fixturesForTable, 6);
 
+  // Who advances to R32: top 2 per group + the best thirds (only when R32
+  // exists for this tournament). The best-thirds ranking resolves once every
+  // group is complete; until then group_qualification predictions for thirds
+  // simply score 0.
+  const groupCodesPresent = new Set<string>();
+  for (const f of fixtures ?? []) {
+    const meta = fixtureById.get(f.id);
+    if (meta?.stage_code === "group_stage" && f.group_code) groupCodesPresent.add(f.group_code);
+  }
+  const advancingTeams = computeAdvancingTeams(
+    groupTables,
+    groupCodesPresent.size,
+    hasR32 ? BEST_THIRDS_ADVANCE : 0,
+  );
+
   let tournamentFinalOutcome: TournamentFinalOutcome = {
     champion_team_id: null,
     runner_up_team_id: null,
@@ -248,7 +265,7 @@ export async function recalculateTournamentScoresCore(
   }
 
   for (const p of byUserGroup.values()) {
-    const out = scoreGroupQualificationPrediction(p, groupTables.get(p.group_code), rules);
+    const out = scoreGroupQualificationPrediction(p, advancingTeams.advancing, rules);
     if (out.total === 0 && Object.keys(out.breakdown).length === 0) continue;
     rowsToInsert.push({
       tournament_id: tournamentId,
@@ -269,11 +286,6 @@ export async function recalculateTournamentScoresCore(
   if (rowsToInsert.length > 0) {
     await supabase.from("prediction_scores").insert(rowsToInsert);
   }
-
-  // hasR32 will gate the "top 2 + 8 best thirds" logic for wc_2026 once
-  // group_qualification scoring needs it. For now the orchestrator only
-  // reads it as a marker; the value is computed above for future use.
-  void hasR32;
 
   return { inserted: rowsToInsert.length };
 }

@@ -1,8 +1,8 @@
 # Hito 15 — Diseño UI español
 
-Referencia de alto nivel: `context/plan/01-plan.md` §"Hito 15".
+Referencia de alto nivel: `01-plan.md` §"Hito 15".
 Bitácora paralela: `context/implementations/15-ui-design-spanish-implementation.md`.
-Paleta fuente: `context/plan/99-color-palette.md`.
+Paleta fuente: `99-color-palette.md`.
 
 ---
 
@@ -17,7 +17,7 @@ Consolidar la app con una identidad visual coherente, eliminar el modo oscuro, a
 ## Decisiones cerradas
 
 - **Sin dark mode.** Eliminar todas las clases `dark:*` del proyecto. La app será 100% light mode.
-- **Paleta**: la del archivo `context/plan/99-color-palette.md`. Los colores "dark" son los vibrantes (para texto, bordes, iconos, botones); los colores "light" son los pasteles (para fondos de badges, paneles de estado, highlights).
+- **Paleta**: la del archivo `99-color-palette.md`. Los colores "dark" son los vibrantes (para texto, bordes, iconos, botones); los colores "light" son los pasteles (para fondos de badges, paneles de estado, highlights).
 - **Fuente principal**: **Plus Jakarta Sans** vía `next/font/google`. Geist Mono se mantiene para números y código.
 - **Sin dependencias nuevas.** `next/font/google` ya existe en Next.js. No se añade nada al `package.json`.
 

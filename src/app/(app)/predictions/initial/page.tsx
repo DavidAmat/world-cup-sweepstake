@@ -4,12 +4,19 @@ import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getInitialLockState } from "@/lib/predictions/initialLock";
 import { Badge } from "@/components/ui/Badge";
+import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { TeamName } from "@/components/ui/TeamName";
 import { Lock, Unlock } from "lucide-react";
-import { computeGroupTables, type FixtureForTable } from "@/lib/scoring/scoreGroup";
+import {
+  computeGroupTables,
+  computeAdvancingTeams,
+  BEST_THIRDS_ADVANCE,
+  type FixtureForTable,
+} from "@/lib/scoring/scoreGroup";
 import { DEFAULT_SCORING_RULES_V1 } from "@/lib/scoring/rules";
 import type { ScoringRulesV1 } from "@/lib/scoring/types";
-import { GROUP_CODES, GROUP_QUALIFIERS } from "./schemas";
+import { GROUP_CODES } from "./schemas";
+import { ClasificadosPicker } from "./ClasificadosPicker";
 import {
   saveInitialPredictions,
   lockInitialPredictions,
@@ -73,6 +80,14 @@ export default async function InitialPredictionsPage({
     set.add(row.team_id);
     qualByGroup.set(row.group_code, set);
   }
+
+  // Props for the (client) clasificados picker.
+  const pickerGroups = GROUP_CODES.map((g) => ({
+    code: g,
+    teams: (teamsByGroup.get(g) ?? []).map((t) => ({ id: t.id, name: t.display_name })),
+  }));
+  const pickerInitial: Record<string, string[]> = {};
+  for (const g of GROUP_CODES) pickerInitial[g] = [...(qualByGroup.get(g) ?? [])];
 
   const teamName = (id: string | null | undefined) =>
     id ? (teamById.get(id)?.display_name ?? "—") : "—";
@@ -138,16 +153,12 @@ export default async function InitialPredictionsPage({
   }
 
   const groupTables = computeGroupTables(fixturesForTable, 6);
-  const qualifiedByGroup = new Map<string, Set<string>>();
-  let allGroupsComplete = GROUP_CODES.length > 0;
-  for (const g of GROUP_CODES) {
-    const table = groupTables.get(g);
-    if (table && table.complete && table.rows.length >= 2) {
-      qualifiedByGroup.set(g, new Set([table.rows[0].team_id, table.rows[1].team_id]));
-    } else {
-      allGroupsComplete = false;
-    }
-  }
+  // Advancing teams = top 2 per group + best thirds. byGroup gives, per group,
+  // the teams that actually advanced (top 2 and, once all groups are complete,
+  // its third if it ranks among the best thirds).
+  const advancing = computeAdvancingTeams(groupTables, GROUP_CODES.length, BEST_THIRDS_ADVANCE);
+  const qualifiedByGroup = advancing.byGroup;
+  const allGroupsComplete = advancing.allGroupsComplete;
 
   const rules: ScoringRulesV1 =
     (rulesRes.data?.rules as ScoringRulesV1 | null) ?? DEFAULT_SCORING_RULES_V1;
@@ -207,11 +218,7 @@ export default async function InitialPredictionsPage({
         )}
       </p>
 
-      {error && (
-        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
-          {error}
-        </p>
-      )}
+      {error && <ErrorBanner message={error} className="mt-4" />}
       {ok === "saved" && (
         <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Predicciones guardadas.
@@ -314,60 +321,7 @@ export default async function InitialPredictionsPage({
             </p>
           </fieldset>
 
-          <fieldset className="rounded-md border border-zinc-200 p-4">
-            <legend className="px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
-              Clasificados de cada grupo
-            </legend>
-            <p className="mb-3 text-xs text-zinc-500">
-              Marca exactamente <strong>{GROUP_QUALIFIERS}</strong> equipos por grupo (los que crees
-              que pasan de ronda). El orden no importa.
-            </p>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {GROUP_CODES.map((g) => {
-                const groupTeams = teamsByGroup.get(g) ?? [];
-                const selected = qualByGroup.get(g) ?? new Set<string>();
-                return (
-                  <fieldset key={g} className="rounded-md border border-zinc-200 p-3">
-                    <legend className="px-1 text-sm font-semibold">Grupo {g}</legend>
-                    <div className="flex flex-col gap-1.5">
-                      {groupTeams.map((t) => (
-                        <label key={t.id} className="flex items-center gap-2 text-sm">
-                          <input
-                            type="checkbox"
-                            name={`qual_${g}`}
-                            value={t.id}
-                            defaultChecked={selected.has(t.id)}
-                            className="h-4 w-4 rounded border-zinc-300"
-                          />
-                          <TeamName name={t.display_name} />
-                        </label>
-                      ))}
-                    </div>
-                  </fieldset>
-                );
-              })}
-            </div>
-          </fieldset>
-
-          <div className="flex items-center gap-3">
-            <button
-              type="submit"
-              className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-            >
-              Guardar predicciones
-            </button>
-            <Link
-              href="/predictions/initial/public"
-              className="text-sm text-zinc-600 underline hover:text-zinc-900"
-            >
-              Ver vista pública
-            </Link>
-          </div>
-          <p className="text-xs text-zinc-500">
-            Campeón, subcampeón, pichichi y mejor jugador puedes dejarlos para luego. Los
-            clasificados requieren {GROUP_QUALIFIERS} equipos en cada grupo para poder guardar.
-            Editable mientras el torneo no haya empezado.
-          </p>
+          <ClasificadosPicker groups={pickerGroups} initialSelected={pickerInitial} />
         </form>
       )}
     </main>

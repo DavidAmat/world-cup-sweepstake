@@ -1,7 +1,7 @@
 # 11 — Motor de puntuación · plan detallado
 
 > **Aprobado por el usuario** (decisiones D11-1..D11-5 consolidadas en
-> §3 y §11). Bootstrap: `context/plan/08-bootstrap-prompt.md`.
+> §3 y §11). Bootstrap: `08-bootstrap-prompt.md`.
 > Bitácora en paralelo: `context/implementations/11-scoring-engine-implementation.md`.
 > Guía de usuario: `documentation/user_guides/puntuacion.md`.
 

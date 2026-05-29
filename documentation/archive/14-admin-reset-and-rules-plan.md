@@ -1,6 +1,6 @@
 # Hito 14 — Admin: reset y reglas
 
-Referencia de alto nivel: `context/plan/01-plan.md` §"Hito 14".
+Referencia de alto nivel: `01-plan.md` §"Hito 14".
 Bitácora paralela: `context/implementations/14-admin-reset-and-rules-implementation.md`.
 
 ---

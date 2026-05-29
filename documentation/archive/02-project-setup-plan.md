@@ -5,7 +5,7 @@ toda la base de tooling, estructura de carpetas y dependencias core,
 listo para que el siguiente hito (03) añada Supabase local y
 migraciones encima.
 
-> Referencia del índice: `context/plan/01-plan.md` §7 → Hito 02.
+> Referencia del índice: `01-plan.md` §7 → Hito 02.
 
 ---
 

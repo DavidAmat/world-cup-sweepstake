@@ -1,6 +1,6 @@
 # 05 — Auth + profiles + roles
 
-> Referencia del índice: `context/plan/01-plan.md` §7 → Hito 05.
+> Referencia del índice: `01-plan.md` §7 → Hito 05.
 >
 > Depende de: hito 04 (tablas `profiles`, `terms_acceptances`,
 > helpers `is_admin`).

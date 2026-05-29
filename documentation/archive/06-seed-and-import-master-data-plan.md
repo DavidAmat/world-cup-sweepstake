@@ -1,6 +1,6 @@
 # 06 — Seeds e importación de master data · plan
 
-> Hito 06 del roadmap (`context/plan/01-plan.md` §7).
+> Hito 06 del roadmap (`01-plan.md` §7).
 > Objetivo funcional: tener cargado en local **y** producción el master
 > data del Mundial de Catar 2022 (`tournaments`, `teams`, `stages`,
 > `rounds`, `fixtures`) **sin resultados de partidos**, listo para que

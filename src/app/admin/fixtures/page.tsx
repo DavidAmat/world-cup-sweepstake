@@ -105,7 +105,7 @@ export default async function AdminFixturesPage({ searchParams }: { searchParams
         <div className="flex gap-2">
           <Link
             href="/admin/fixtures/import"
-            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
           >
             Importar JSON
           </Link>
@@ -169,7 +169,7 @@ export default async function AdminFixturesPage({ searchParams }: { searchParams
         </label>
         <button
           type="submit"
-          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
         >
           Filtrar
         </button>

@@ -11,8 +11,5 @@ dependencies = [
     "pandas>=2.2.0",
 ]
 
-[project.scripts]
-convert-world-cup-csv = "convert_world_cup_csv_to_json:main"
-
 [tool.uv]
 package = false

@@ -1,10 +1,10 @@
 # 08 — Predicciones iniciales · plan
 
-> Hito 08 del roadmap (`context/plan/01-plan.md` §7).
+> Hito 08 del roadmap (`01-plan.md` §7).
 > Fuente funcional: PID §5.4 (form), §5.5 (vista pública), §6.3
 > (qué se puntuará en hito 11 — aquí NO se puntúa), §4.2 (tablas
 > `initial_predictions` y `group_qualification_predictions`).
-> Bootstrap: `context/plan/08-bootstrap-prompt.md`.
+> Bootstrap: `08-bootstrap-prompt.md`.
 
 ---
 

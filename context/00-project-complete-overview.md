@@ -28,7 +28,7 @@ An admin enters real results by hand; a scoring engine computes a leaderboard wi
 ## Domain flow
 
 1. **Seed master data** (`scripts/wc2026/upload.ts`): 48 teams in 12 groups (A–L), fixtures, stages, rounds, and the active `scoring_rules` version. Every row carries a `tournament_id` (multi-tournament data model). The app runs on the real 2026 calendar.
-2. **Register / login** (Supabase Auth). Trigger `handle_new_user` creates a `profiles` row (`role` = `player` by default; admins promoted manually). Users accept rules/terms.
+2. **Login** (Supabase Auth). Accounts are **pre-created** (public registration disabled) from `data/users/users_passwords.json` via `scripts/wc2026/create-users.ts`; `david@porra.com` is admin. Trigger `handle_new_user` creates the `profiles` row. Each account ships with a temporary password and `must_change_password=true`: the `proxy.ts` gate forces `/cambiar-password` on first login, and `/perfil` lets users change it later. One account (`is_scam`) gets a fake-malware prank page (`ScamExperience`). Users then accept rules/terms.
 3. **Initial predictions** (`/predictions/initial`) and **group qualification** stay editable until the admin sets `tournaments.initial_predictions_locked_at`.
 4. **Match predictions** (`/predictions/matches`) per `jornada`. A `jornada` locks when the admin sets `rounds.predictions_locked_at` (manual; the old 24h auto-lock is removed). While open, others' predictions are hidden by RLS; once locked, they become visible.
 5. **Admin enters results** (`/admin/results`): 90' goals, prórroga/penaltis, qualified team, goleadores; status draft → confirmed. Knockout pairings can be generated per round.
@@ -47,11 +47,12 @@ An admin enters real results by hand; a scoring engine computes a leaderboard wi
 
 ## Data model (high level)
 
-18 tables, all RLS-enabled, all keyed by `tournament_id` where applicable:
+19 tables, all RLS-enabled, all keyed by `tournament_id` where applicable:
 `tournaments`, `profiles`, `app_settings`, `terms_acceptances`, `teams`, `players`, `stages`, `rounds`,
 `fixtures`, `match_results`, `match_goals`, `player_match_stats`, `initial_predictions`,
 `group_qualification_predictions`, `match_predictions`, `scoring_rules`, `prediction_scores`,
-`leaderboard_snapshots`. Status/role/type fields are CHECK constraints (no Postgres enums).
+`leaderboard_snapshots`, `login_events` (admin-only login audit log). Status/role/type fields are CHECK constraints (no Postgres enums).
+`profiles` carries `must_change_password` + `is_scam` flags (pinned in RLS).
 `prediction_scores.prediction_type` ∈ `group_phase | knockout | initial | group_qualification`.
 
 Key functions: `is_admin()` (RLS gate), `app_now()` (returns `app_settings.fecha_actual` or real `now()`), `is_fixture_locked()` (reads `rounds.predictions_locked_at`), `are_initial_predictions_locked()` (reads `tournaments.initial_predictions_locked_at`), `handle_new_user()`, `set_updated_at()`.
@@ -68,7 +69,7 @@ Server Actions (`actions.ts`) for mutations; Zod `schemas.ts` per feature; `requ
 
 ## Status / history
 
-Hitos 02–12 shipped (setup, supabase, schema, auth, seeds, fixtures, initial & match predictions, results, scoring, WC2026 migration, leaderboards). 13 deleted. 14 (admin reset + reglas) and 15 (palette / Plus Jakarta Sans / no dark mode) closed; 16 UI tweaks (floating navbar, home dashboard) shipped. **Avatars/profiles** documented; avatar PNGs are test placeholders pending real usernames.
+Hitos 02–12 shipped (setup, supabase, schema, auth, seeds, fixtures, initial & match predictions, results, scoring, WC2026 migration, leaderboards). 13 deleted. 14 (admin reset + reglas) and 15 (palette / Plus Jakarta Sans / no dark mode) closed; 16 UI tweaks (floating navbar, home dashboard) shipped. **Avatars/profiles** documented; avatar PNGs are test placeholders pending real usernames. **Production start:** registration disabled, 15 real accounts pre-created with forced first-login password change (`profiles.must_change_password`), `/perfil` self-service change, and a `profiles.is_scam` prank account; clean-slate + user-creation scripts under `scripts/wc2026/` — see `documentation/implementations/wc2026-clean-slate-and-users.md`.
 
 ## Documentation
 

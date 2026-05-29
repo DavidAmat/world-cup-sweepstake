@@ -1,6 +1,6 @@
 # 06 — Seeds e importación de master data · bitácora de implementación
 
-> Hito ejecutado: ver plan en `context/plan/06-seed-and-import-master-data.md`.
+> Hito ejecutado: ver plan en `06-seed-and-import-master-data-plan.md`.
 
 ## Resumen ejecutivo
 

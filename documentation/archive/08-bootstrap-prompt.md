@@ -13,16 +13,16 @@ conmigo en español.
 - **Hito 14 — Admin: reset y reglas.** `/admin/reset` (selector +
   checkboxes + modal "BORRAR") y `/admin/reglas` (versionado de
   `scoring_rules` por torneo, editor JSON, activar, recalcular).
-  Definición de alto nivel: `context/plan/01-plan.md` §"Hito 14 —
+  Definición de alto nivel: `01-plan.md` §"Hito 14 —
   Admin: reset y reglas".
 - **Hito 15 — Diseño UI español.** Paleta definitiva, tokens
   semánticos en Tailwind, header/footer consistentes, estados (empty
   / loading / error) en español, accesibilidad básica. Definición de
-  alto nivel: `context/plan/01-plan.md` §"Hito 15 — Diseño UI
+  alto nivel: `01-plan.md` §"Hito 15 — Diseño UI
   español".
 - Los **planes detallados los escribes tú** al empezar:
-  - `context/plan/14-admin-reset-and-rules.md` (no existe aún).
-  - `context/plan/15-ui-design-spanish.md` (no existe aún).
+  - `14-admin-reset-and-rules-plan.md` (no existe aún).
+  - `15-ui-design-spanish-plan.md` (no existe aún).
 - Las bitácoras se llenan **en paralelo** en
   `context/implementations/14-admin-reset-and-rules-implementation.md`
   y `context/implementations/15-ui-design-spanish-implementation.md`.
@@ -31,7 +31,7 @@ conmigo en español.
 
 En este orden, hasta entender el estado actual:
 
-1. `context/plan/01-plan.md` — §7 hito 14 y hito 15 (scope original).
+1. `01-plan.md` — §7 hito 14 y hito 15 (scope original).
 2. `context/implementations/12-leaderboards-and-visuals-implementation.md`
    — bitácora cerrada del hito 12. Te interesa especialmente:
    - **D12-10** (lock manual por ronda → migración
@@ -183,7 +183,7 @@ Hito 11b — Migración a wc_2026 + generador de cruces (CERRADO)
   - Prod: `wc_2022_test` borrado (CASCADE). `wc_2026` activo.
 
 Hito 12 — Leaderboards, visuales y lock manual (CERRADO)
-  Plan: `context/plan/12-leaderboards-and-visuals.md`
+  Plan: `12-leaderboards-and-visuals-plan.md`
   Bitácora: `context/implementations/12-leaderboards-and-visuals-implementation.md`
 
   ### Vistas nuevas
@@ -538,8 +538,8 @@ Acceptance:
 # CÓMO TRABAJAS CONMIGO
 
 - Primero escribes el plan detallado en
-  `context/plan/14-admin-reset-and-rules.md` y
-  `context/plan/15-ui-design-spanish.md`. Yo los reviso y te digo
+  `14-admin-reset-and-rules-plan.md` y
+  `15-ui-design-spanish-plan.md`. Yo los reviso y te digo
   "adelante" (o ajustes).
 - Bitácoras en paralelo en
   `context/implementations/14-admin-reset-and-rules-implementation.md`

@@ -1,7 +1,7 @@
 # 10 — Admin: introducción de resultados · bitácora de implementación
 
-> Hito **CERRADO**. Plan: `context/plan/10-admin-results-entry.md`
-> Bootstrap siguiente: `context/plan/08-bootstrap-prompt.md` (actualizado para hito 11).
+> Hito **CERRADO**. Plan: `10-admin-results-entry-plan.md`
+> Bootstrap siguiente: `08-bootstrap-prompt.md` (actualizado para hito 11).
 
 ## Estado
 

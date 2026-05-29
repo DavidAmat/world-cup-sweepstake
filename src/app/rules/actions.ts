@@ -9,7 +9,7 @@ const PLACEHOLDER_RULES_VERSION = 0;
 
 export async function acceptTerms(formData: FormData) {
   const tournamentId = String(formData.get("tournamentId") ?? "").trim();
-  if (!tournamentId) redirect("/dashboard");
+  if (!tournamentId) redirect("/");
 
   const { userId, supabase } = await requireAuth();
   const { error } = await supabase.from("terms_acceptances").insert({

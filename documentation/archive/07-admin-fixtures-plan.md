@@ -1,6 +1,6 @@
 # 07 — Admin: fixtures · plan
 
-> Hito 07 del roadmap (`context/plan/01-plan.md` §7).
+> Hito 07 del roadmap (`01-plan.md` §7).
 > Objetivo funcional: el admin puede ver, editar y crear `fixtures`
 > desde la web, sin tocar la DB directamente y sin romper predicciones
 > existentes.
@@ -21,7 +21,7 @@
      admin pega un JSON con N fixtures (por ejemplo los 8 octavos) y
      la UI los inserta de golpe. El JSON lo genera ChatGPT a partir
      de la lista oficial de partidos, usando el prompt versionado en
-     `prompts/admin-fixtures-import.md`. **Este es el camino real
+     `../implementations/admin-fixtures-json-import.md`. **Este es el camino real
      para añadir eliminatorias**; el form `new` queda como
      emergencia.
 2. Todo persiste en Supabase. Nada se escribe en el JSON Python. La
@@ -37,7 +37,7 @@
    `/dashboard` (Tailwind, paleta `zinc`, sin librería de UI).
 6. **No** se implementa gestión de jugadores (D2 del hito 06). El plan
    maestro §7 hito 07 menciona `/admin/players`, eso queda fuera.
-7. Carpeta nueva `prompts/` (raíz del repo) con el prompt versionado
+7. Carpeta nueva ../implementations/ (raíz del repo) con el prompt versionado
    para ChatGPT. Es la fuente de verdad de qué formato espera la UI
    de import.
 
@@ -225,7 +225,7 @@ el textarea + submit + render del informe de resultado).
    sea) y copia el listado de, por ejemplo, los 8 octavos con sus
    fechas y horas locales.
 2. Va a ChatGPT, pega ese listado y le pasa el prompt versionado en
-   `prompts/admin-fixtures-import.md`.
+   `../implementations/admin-fixtures-json-import.md`.
 3. ChatGPT devuelve un array JSON con N fixtures en el formato
    especificado.
 4. El admin copia ese JSON, va a `/admin/fixtures/import`, lo pega
@@ -598,7 +598,7 @@ selector de torneo, esto se reemplaza por algo que lee de
 ## 7. Estructura de archivos final del hito
 
 ```
-prompts/                                       ← NUEVO (raíz del repo)
+documentation/implementations/admin-fixtures-json-import.md  ← sustituye prompts/
   admin-fixtures-import.md                     ← prompt para ChatGPT (ver §15)
 
 src/
@@ -739,7 +739,7 @@ Convenciones a copiar de lo existente (`/login`, `/register`, `/rules`,
     - Tras crear, redirect al detail con `?ok=created`.
 
 ### Paso 6 · Importación por JSON (camino principal)
-15. Crear `prompts/admin-fixtures-import.md` con el prompt versionado
+15. Crear `../implementations/admin-fixtures-json-import.md` con el prompt versionado
     (ver §15). Incluye la lista de los 32 teams de Catar 2022 y un
     ejemplo completo de output esperado.
 16. Crear `src/app/admin/fixtures/import/page.tsx`: query inicial
@@ -811,7 +811,7 @@ Convenciones a copiar de lo existente (`/login`, `/register`, `/rules`,
 - [ ] `/admin/fixtures/import` acepta un JSON pegado, muestra preview
       con verdes/ámbares/rojos, y al confirmar hace upsert masivo.
       Idempotente: re-importar el mismo JSON no duplica filas.
-- [ ] `prompts/admin-fixtures-import.md` existe y describe el formato
+- [ ] `../implementations/admin-fixtures-json-import.md` existe y describe el formato
       con un ejemplo completo, incluida la lista de 32 teams para el
       torneo actual.
 - [ ] Un usuario `player` no puede acceder a ninguna de las 4 rutas
@@ -876,7 +876,7 @@ Aprobadas por el autor en la primera revisión del plan:
 
 ---
 
-## 15. Prompt para ChatGPT (`prompts/admin-fixtures-import.md`)
+## 15. Prompt para ChatGPT (`../implementations/admin-fixtures-json-import.md`)
 
 Contenido a versionar literal en el repo. Está pensado para que el
 admin lo copie tal cual junto con su lista de partidos. El prompt:
@@ -894,7 +894,7 @@ admin lo copie tal cual junto con su lista de partidos. El prompt:
    usa un placeholder (`'Ganador A'`, `'2.º grupo C'`, …) en vez de
    inventar."
 
-El prompt vive en `prompts/admin-fixtures-import.md`. Su contenido
+El prompt vive en `../implementations/admin-fixtures-json-import.md`. Su contenido
 detallado se redacta en el paso 15 de la implementación. Esqueleto:
 
 ```markdown

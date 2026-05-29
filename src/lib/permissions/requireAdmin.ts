@@ -11,7 +11,7 @@ export async function requireAdmin() {
     .eq("user_id", userId)
     .single();
 
-  if (profile?.role !== "admin") redirect("/dashboard");
+  if (profile?.role !== "admin") redirect("/");
 
   return { userId, supabase, profile };
 }

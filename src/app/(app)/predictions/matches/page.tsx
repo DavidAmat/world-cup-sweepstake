@@ -4,6 +4,7 @@ import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getMatchLockState, isFixtureLocked } from "@/lib/predictions/matchLock";
 import { generateRandomMatchPredictions } from "./actions";
 import { MatchesForm, type RoundVM } from "./MatchesForm";
+import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import type { LockedEntry } from "./LockedFixturePanel";
 import { maxPointsForFixture } from "@/lib/scoring/maxPoints";
 import type { StageCode } from "@/lib/scoring/types";
@@ -270,11 +271,7 @@ export default async function MatchPredictionsPage({
         </Link>
       </div>
 
-      {error && (
-        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
-          {error}
-        </p>
-      )}
+      {error && <ErrorBanner message={error} className="mt-4" />}
       {ok === "saved" && (
         <p className="border-success-light bg-success-light text-success-fg mt-4 rounded-md border p-3 text-sm">
           Predicciones guardadas.

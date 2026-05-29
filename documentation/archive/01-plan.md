@@ -2,10 +2,10 @@
 
 Este documento es el índice maestro del plan de implementación de la app
 de la porra del Mundial 2026. Convierte el PID
-(`context/initial-setup/02-pid.md`) en una secuencia ordenada de hitos
+(`02-pid.md`) en una secuencia ordenada de hitos
 ejecutables.
 
-Cada hito tendrá su propio fichero detallado dentro de `context/plan/`
+Cada hito tendrá su propio fichero detallado dentro de `documentation/archive/` (histórico: `context/plan/`)
 (`02-XXX.md`, `03-XXX.md`, …). **Esos ficheros se irán creando uno a uno
 justo antes de empezar cada hito**, no todos a la vez. Este `01-plan.md`
 sirve para:
@@ -25,7 +25,7 @@ sirve para:
 ## 1. Cómo se usa este plan
 
 1. Cuando empezamos un hito (por ejemplo `02-project-setup`), creamos
-   primero el fichero detallado correspondiente en `context/plan/`.
+   primero el fichero detallado correspondiente en `documentation/archive/`.
 2. Implementamos el hito en el código.
 3. Mientras se implementa, vamos registrando avances/errores/cambios de
    decisión en `context/implementations/NN-XXX-implementation.md`
@@ -974,7 +974,7 @@ emergerán durante la implementación:
 ## 11. Índice de ficheros que se irán creando
 
 ```txt
-context/plan/
+documentation/archive/
   01-plan.md                                   ← este fichero
   02-project-setup.md                          [pendiente]
   03-supabase-local-and-migrations.md          [pendiente]
@@ -1002,6 +1002,6 @@ context/implementations/                       [se crea al empezar]
 ## 12. Próximo paso
 
 Cuando confirmes este índice, abrimos el primer hito creando
-`context/plan/02-project-setup.md` con todo el detalle (comandos,
+`02-project-setup-plan.md` con todo el detalle (comandos,
 contenidos exactos de `package.json`, estructura final, decisiones
 de tooling y un checklist de salida) y empezamos a implementar.

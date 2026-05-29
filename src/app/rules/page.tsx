@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { acceptTerms } from "./actions";
+import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { CheckCircle2, ListChecks, ClipboardList, Lock, Check, X } from "lucide-react";
 
 type SearchParams = Promise<{ error?: string; ok?: string }>;
@@ -380,11 +381,7 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
       </section>
 
       {/* ── Feedback banners ─────────────────────────────────────────── */}
-      {error && (
-        <p className="mb-4 rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-700">
-          {error}
-        </p>
-      )}
+      {error && <ErrorBanner message={error} className="mb-4" />}
       {ok && (
         <div className="border-success/30 bg-success/10 text-success-fg mb-4 flex items-center gap-3 rounded-xl border p-4 text-sm">
           <CheckCircle2 className="h-5 w-5 shrink-0" />

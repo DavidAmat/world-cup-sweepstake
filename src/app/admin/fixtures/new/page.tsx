@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/permissions/requireAdmin";
+import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { createFixture } from "../actions";
 
@@ -50,11 +51,7 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
         .
       </p>
 
-      {errMsg && (
-        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
-          {errMsg}
-        </p>
-      )}
+      {errMsg && <ErrorBanner message={errMsg} className="mt-4" />}
 
       <form action={createFixture} className="mt-6 flex flex-col gap-5">
         <label className="flex flex-col gap-1 text-sm">
@@ -63,12 +60,12 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
             type="text"
             name="external_id"
             required
-            placeholder="wc2022_r16_001"
+            placeholder="wc2026_r16_001"
             pattern="[a-z0-9_-]+"
             className="rounded-md border border-zinc-300 bg-white px-3 py-2 font-mono text-sm"
           />
           <span className="text-xs text-zinc-500">
-            Patrón sugerido: <code>wc2022_&lt;round&gt;_NNN</code> (round ∈ r16, qf, sf, third,
+            Patrón sugerido: <code>wc2026_&lt;round&gt;_NNN</code> (round ∈ r32, r16, qf, sf, third,
             final). Debe ser único en el torneo y no se podrá editar luego.
           </span>
         </label>
@@ -226,7 +223,7 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
         <div className="flex items-center gap-3">
           <button
             type="submit"
-            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
           >
             Crear fixture
           </button>

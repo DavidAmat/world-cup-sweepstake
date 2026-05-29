@@ -1,6 +1,6 @@
 # 04 — Esquema de base de datos · bitácora de implementación
 
-> Hito ejecutado: ver plan en `context/plan/04-database-schema.md`.
+> Hito ejecutado: ver plan en `04-database-schema-plan.md`.
 
 ## Resumen
 

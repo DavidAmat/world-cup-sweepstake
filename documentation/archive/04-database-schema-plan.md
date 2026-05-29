@@ -1,6 +1,6 @@
 # 04 — Esquema de base de datos
 
-> Referencia del índice: `context/plan/01-plan.md` §7 → Hito 04.
+> Referencia del índice: `01-plan.md` §7 → Hito 04.
 >
 > Depende de: hito 03 (Supabase local + producción enlazada,
 > extensiones `pgcrypto` y `citext` activadas).

@@ -1,8 +1,8 @@
 # 09 — Predicciones de partidos · bitácora de implementación
 
-> Hito **CERRADO**. Plan: `context/plan/09-match-predictions.md`
+> Hito **CERRADO**. Plan: `09-match-predictions-plan.md`
 > (aprobado por el usuario: "Adelante"). Bootstrap:
-> `context/plan/08-bootstrap-prompt.md`.
+> `08-bootstrap-prompt.md`.
 
 ## Estado
 

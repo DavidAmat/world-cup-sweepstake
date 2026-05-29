@@ -44,6 +44,10 @@ Prórroga and penaltis points apply only when the event **actually occurred** an
 - `initial` — champion, runner-up, subjective awards
 - `group_qualification` — clasificados (one row per user per group when scorable)
 
+## Who advances (group qualification)
+
+`computeAdvancingTeams` (`src/lib/scoring/scoreGroup.ts`) turns the per-group standings (`computeGroupTables`) into the set of teams that reach R32: the **top 2 of every completed group** plus the **`BEST_THIRDS_ADVANCE` (8) best third-placed teams**. Thirds are ranked globally by pts → goal difference → goals for → team code, and the ranking only resolves once **all 12 groups are complete** (you cannot rank the 12 thirds before then); until then only top-2 advance and third picks score 0. `scoreGroupQualificationPrediction` awards `group_qualification.team_correct` (25) per predicted team that is in that advancing set. The best-thirds gate is keyed on the tournament having an R32 round (`hasR32`). The admin can inspect the live standings + thirds ranking at **`/admin/standings`**.
+
 ## When recalculation runs
 
 - Admin confirms a match result (`confirmMatchResult`)

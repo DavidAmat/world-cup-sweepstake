@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { commitImport, previewImport, type PreviewState } from "../actions";
 
 const INITIAL_STATE: PreviewState = { ok: false };
@@ -35,7 +36,7 @@ export function ImportClient() {
             name="payload"
             required
             rows={14}
-            placeholder='[ { "external_id": "wc2022_r16_001", "fase": "octavos", ... } ]'
+            placeholder='[ { "external_id": "wc2026_r16_001", "fase": "octavos", ... } ]'
             className="rounded-md border border-zinc-300 bg-white p-3 font-mono text-xs leading-relaxed"
           />
         </label>
@@ -44,7 +45,7 @@ export function ImportClient() {
           <button
             type="submit"
             disabled={pending}
-            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90 disabled:opacity-60"
           >
             {pending ? "Validando…" : "Validar y previsualizar"}
           </button>
@@ -59,11 +60,7 @@ export function ImportClient() {
         </div>
       </form>
 
-      {state.error && (
-        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
-          {state.error}
-        </p>
-      )}
+      {state.error && <ErrorBanner message={state.error} className="mt-4" />}
 
       {report && (
         <section className="mt-6">

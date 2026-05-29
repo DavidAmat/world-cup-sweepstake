@@ -2,9 +2,9 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { madridLocalToUtcIso } from "@/lib/dates/madridTime";
 
-// Testing knob: FECHA_ACTUAL lets us simulate a moved "current date" so we
-// can see the initial-predictions lock open/close without waiting for real
-// time. Accepted values:
+// Optional testing knob: FECHA_ACTUAL overrides public.app_settings.fecha_actual
+// so app_now() matches a chosen instant. Prediction locking is admin-controlled
+// and does not depend on this value.
 //   · unset / empty           → use the real now() (no override)
 //   · "YYYY-MM-DD"            → that day 00:00 Madrid time
 //   · "YYYY-MM-DDTHH:MM[:SS]" → that wall-clock Madrid time

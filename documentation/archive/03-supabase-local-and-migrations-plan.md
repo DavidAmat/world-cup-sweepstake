@@ -1,6 +1,6 @@
 # 03 — Supabase local + migraciones
 
-> Referencia del índice: `context/plan/01-plan.md` §7 → Hito 03.
+> Referencia del índice: `01-plan.md` §7 → Hito 03.
 >
 > Depende de: hito 02 (proyecto Next.js arrancando + estructura
 > `src/lib/supabase/` lista).

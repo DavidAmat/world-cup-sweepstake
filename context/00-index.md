@@ -89,6 +89,8 @@ One-line map of every file in `context/` and `documentation/`. Read [`00-documen
 
 - `implementations/README.md` — stable topic how-tos (not dated journals)
 - `implementations/admin-fixtures-json-import.md` — ChatGPT prompt + workflow for bulk knockout import
+- `implementations/wc2026-clean-slate-and-users.md` — prod clean-slate + 15-account creation + forced-password runbook
+- `implementations/pending-prod-migrations.md` — running tracker of local→prod migrations + deploy steps
 
 ## documentation/issues/
 

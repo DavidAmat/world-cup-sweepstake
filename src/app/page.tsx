@@ -61,12 +61,6 @@ export default async function HomePage() {
           >
             Iniciar sesión
           </Link>
-          <Link
-            href="/register"
-            className="rounded-xl border border-zinc-200 px-6 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
-          >
-            Crear cuenta
-          </Link>
         </div>
       </main>
     );

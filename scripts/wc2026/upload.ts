@@ -1,17 +1,13 @@
 /**
  * Seeder for the wc_2026 tournament (48 teams in 12 groups, 104 fixtures
  * = 72 group matches + 32 knockout placeholders).
- *
- * Mirrors scripts/wc2022/upload.ts and shares the same lib/. The only
- * tournament-specific bit is which JSON files we read; everything else
- * (upserts, schemas, env detection) is identical to wc2022.
  */
 import { readFileSync } from "node:fs";
 import { PATHS } from "./lib/paths";
-import { PythonMatchesSchema, TeamsSchema, TournamentSchema } from "../wc2022/lib/schemas";
-import { assertSafeTarget, detectTarget } from "../wc2022/lib/env";
-import { createScriptAdminClient } from "../wc2022/lib/supabase";
-import { fatal, info, step } from "../wc2022/lib/log";
+import { PythonMatchesSchema, TeamsSchema, TournamentSchema } from "../lib/schemas";
+import { assertSafeTarget, detectTarget } from "../lib/env";
+import { createScriptAdminClient } from "../lib/supabase";
+import { fatal, info, step } from "../lib/log";
 import {
   upsertFixtures,
   upsertRounds,
@@ -19,7 +15,7 @@ import {
   upsertStages,
   upsertTeams,
   upsertTournament,
-} from "../wc2022/lib/upserts";
+} from "../lib/upserts";
 
 async function main() {
   const target = detectTarget();

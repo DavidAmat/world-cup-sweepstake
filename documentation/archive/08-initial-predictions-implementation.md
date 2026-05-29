@@ -1,6 +1,6 @@
 # 08 — Predicciones iniciales · bitácora de implementación
 
-> Hito **CERRADO**. Plan: `context/plan/08-initial-predictions.md`.
+> Hito **CERRADO**. Plan: `08-initial-predictions-plan.md`.
 
 ## Estado
 
@@ -40,7 +40,7 @@ futuro: scripts throwaway nunca borran por torneo, solo filas que
 crean y acotadas por user_id de test.
 
 Siguiente: hito 09 — predicciones de partidos. Bootstrap reescrito en
-`context/plan/08-bootstrap-prompt.md`.
+`08-bootstrap-prompt.md`.
 
 ## Decisiones aprobadas
 

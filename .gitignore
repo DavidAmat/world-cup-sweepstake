@@ -49,8 +49,8 @@ supabase/.temp
 .idea/
 .vscode/
 
-# Claude Code local settings
-.claude/
+# Claude Code local-only override (tracked: .claude/CLAUDE.md)
+.claude/settings.local.json
 
 # Python (parallel pipeline, not part of the Next.js app)
 .venv/

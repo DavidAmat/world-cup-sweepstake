@@ -1,7 +1,7 @@
 # 10 — Admin: introducción de resultados
 
 > Estado: **PENDIENTE DE APROBACIÓN**
-> Bootstrap: `context/plan/08-bootstrap-prompt.md`
+> Bootstrap: `08-bootstrap-prompt.md`
 
 ---
 

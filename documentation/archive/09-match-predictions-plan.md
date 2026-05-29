@@ -1,10 +1,10 @@
 # 09 — Predicciones de partidos · plan
 
-> Hito 09 del roadmap (`context/plan/01-plan.md` §7).
+> Hito 09 del roadmap (`01-plan.md` §7).
 > Fuente funcional: PID §5.7 (form grupos vs eliminatorias), §5.8
 > (vista pública), §4.4 (lock 24h), §4.2 (tabla `match_predictions`),
 > §6.2 (criterios — se puntúan en hito 11, **aquí NO**).
-> Bootstrap: `context/plan/08-bootstrap-prompt.md`.
+> Bootstrap: `08-bootstrap-prompt.md`.
 
 ---
 

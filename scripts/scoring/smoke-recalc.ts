@@ -7,13 +7,13 @@
  *   npm run scoring:smoke -- --confirm-prod     # writes to remote (refuses otherwise)
  *
  * The script forces tsx-friendly URL resolution (LAN IP instead of 127.0.0.1)
- * via the same helper the wc2022 scripts use.
+ * via scripts/lib/env.ts (LAN IP rewrite for tsx against local Supabase).
  */
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../src/lib/supabase/database.types";
 import { recalculateTournamentScoresCore } from "../../src/lib/scoring/recalculateCore";
-import { assertSafeTarget, detectTarget } from "../wc2022/lib/env";
-import { done, fatal, info, step } from "../wc2022/lib/log";
+import { assertSafeTarget, detectTarget } from "../lib/env";
+import { done, fatal, info, step } from "../lib/log";
 
 function parseSlug(): string {
   const idx = process.argv.indexOf("--slug");

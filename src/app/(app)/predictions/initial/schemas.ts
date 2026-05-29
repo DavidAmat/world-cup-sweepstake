@@ -1,13 +1,17 @@
 import { z } from "zod";
 
-// 12 groups for wc_2026 (was 8 in wc_2022_test, removed). Per group the
-// user picks EXACTLY `GROUP_QUALIFIERS` teams (order does not matter —
-// `predicted_position` is stored as null). The 2026 format also passes
-// the 8 best thirds to R32; that lives in the scoring engine, not here.
+// 12 groups for wc_2026. Per group the user picks the teams they think advance
+// to R32 (order does not matter — `predicted_position` is stored as null).
+// WC2026 sends the top 2 of every group PLUS the 8 best third-placed teams to
+// R32. So the user marks 3 teams in exactly BEST_THIRDS_ADVANCE (8) groups (the
+// 2 firsts + the third they bet sneaks in as a best third) and 2 in the other
+// 4 groups → 32 advancing teams total. The best-thirds ranking lives in the
+// scoring engine (src/lib/scoring/scoreGroup.ts).
 export const GROUP_CODES = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"] as const;
 export type GroupCode = (typeof GROUP_CODES)[number];
 
-export const GROUP_QUALIFIERS = 2;
+export const MIN_QUALIFIERS = 2;
+export const MAX_QUALIFIERS = 3;
 
 const UuidOrNull = z.string().uuid("Selección inválida").nullable();
 const FreeTextOrNull = z.string().trim().min(1).max(80, "Máximo 80 caracteres").nullable();

@@ -12,6 +12,7 @@ import {
   ListChecks,
   ClipboardList,
   BarChart2,
+  User,
 } from "lucide-react";
 import { Avatar } from "@/components/profiles/Avatar";
 
@@ -146,15 +147,9 @@ function DesktopNav({
       <div className="flex items-center gap-2">
         <Link
           href="/login"
-          className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
-        >
-          Iniciar sesión
-        </Link>
-        <Link
-          href="/register"
           className="bg-primary rounded-lg px-3 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
         >
-          Crear cuenta
+          Iniciar sesión
         </Link>
       </div>
     );
@@ -191,18 +186,24 @@ function DesktopNav({
       )}
 
       <div className="ml-3 flex items-center gap-2 border-l border-zinc-200 pl-3">
-        <span className="hidden items-center gap-1.5 text-xs text-zinc-500 lg:flex">
+        <Link
+          href="/perfil"
+          title="Mi perfil"
+          className={`flex items-center gap-1.5 rounded-md px-1.5 py-1 text-xs text-zinc-500 transition-colors hover:bg-white/60 hover:text-zinc-900 ${
+            pathname.startsWith("/perfil") ? "text-primary" : ""
+          }`}
+        >
           <Avatar
             displayName={displayName ?? "Jugador"}
             initials={initials ?? "?"}
             avatarUrl={avatarUrl}
             size={22}
           />
-          {displayName ?? "—"}
+          <span className="hidden lg:inline">{displayName ?? "—"}</span>
           {isAdmin && (
             <Shield className="text-special h-3 w-3 shrink-0" aria-label="Administrador" />
           )}
-        </span>
+        </Link>
         {signOutForm}
       </div>
     </nav>
@@ -226,16 +227,9 @@ function MobileNav({
         <Link
           href="/login"
           onClick={onClose}
-          className="rounded-lg border border-zinc-200 px-4 py-2.5 text-center text-sm font-medium"
-        >
-          Iniciar sesión
-        </Link>
-        <Link
-          href="/register"
-          onClick={onClose}
           className="bg-primary rounded-lg px-4 py-2.5 text-center text-sm font-medium text-white"
         >
-          Crear cuenta
+          Iniciar sesión
         </Link>
       </div>
     );
@@ -264,6 +258,12 @@ function MobileNav({
           },
         ]
       : []),
+    {
+      href: "/perfil",
+      label: "Mi perfil",
+      icon: User,
+      active: pathname.startsWith("/perfil"),
+    },
   ];
 
   return (

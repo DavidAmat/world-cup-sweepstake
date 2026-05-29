@@ -1,6 +1,6 @@
 # 05 — Auth + profiles + roles · bitácora de implementación
 
-> Hito ejecutado: ver plan en `context/plan/05-auth-and-profiles.md`.
+> Hito ejecutado: ver plan en `05-auth-and-profiles-plan.md`.
 
 ## Resumen
 

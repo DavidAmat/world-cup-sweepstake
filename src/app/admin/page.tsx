@@ -57,6 +57,24 @@ export default async function AdminPage() {
             Marca a mano qué participantes acertaron el pichichi y el mejor jugador del torneo.
           </p>
         </Link>
+        <Link
+          href="/admin/users"
+          className="rounded-md border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:bg-zinc-50"
+        >
+          <h2 className="text-sm font-semibold">Usuarios</h2>
+          <p className="mt-1 text-xs text-zinc-600">
+            Participantes (nombre, email, avatar) y registro de accesos por hora de Madrid.
+          </p>
+        </Link>
+        <Link
+          href="/admin/standings"
+          className="rounded-md border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:bg-zinc-50"
+        >
+          <h2 className="text-sm font-semibold">Clasificación de grupos</h2>
+          <p className="mt-1 text-xs text-zinc-600">
+            Tabla en vivo de cada grupo y ranking de los mejores terceros que pasan a la fase final.
+          </p>
+        </Link>
       </section>
     </main>
   );

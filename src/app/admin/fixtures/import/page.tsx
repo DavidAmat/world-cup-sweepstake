@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/permissions/requireAdmin";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { ImportClient } from "./ImportClient";
+import { ErrorBanner } from "@/components/ui/ErrorBanner";
 
 type SearchParams = Promise<{ error?: string }>;
 
@@ -21,15 +22,11 @@ export default async function ImportFixturesPage({ searchParams }: { searchParam
       <h1 className="mt-1 text-2xl font-bold">Importar fixtures</h1>
       <p className="mt-2 text-sm text-zinc-600">
         Pega un array JSON con N fixtures generado por ChatGPT siguiendo el prompt en{" "}
-        <code>prompts/admin-fixtures-import.md</code>. Torneo destino:{" "}
+        <code>documentation/implementations/admin-fixtures-json-import.md</code>. Torneo destino:{" "}
         <strong>{tournament.name}</strong>.
       </p>
 
-      {errMsg && (
-        <p className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
-          {errMsg}
-        </p>
-      )}
+      {errMsg && <ErrorBanner message={errMsg} className="mt-4" />}
 
       <ImportClient />
 
@@ -38,7 +35,7 @@ export default async function ImportFixturesPage({ searchParams }: { searchParam
         <pre className="mt-3 overflow-x-auto rounded-md bg-white p-3 text-xs leading-relaxed">
           {`[
   {
-    "external_id": "wc2022_r16_001",
+    "external_id": "wc2026_r16_001",
     "fase": "octavos",
     "tipo_partido": "eliminatoria",
     "jornada": null,

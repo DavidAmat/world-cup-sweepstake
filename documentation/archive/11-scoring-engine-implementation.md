@@ -1,7 +1,7 @@
 # Hito 11 — Motor de puntuación · bitácora
 
-> Plan: `context/plan/11-scoring-engine.md`.
-> Bootstrap: `context/plan/08-bootstrap-prompt.md`.
+> Plan: `11-scoring-engine-plan.md`.
+> Bootstrap: `08-bootstrap-prompt.md`.
 > Guía de usuario: `documentation/user_guides/puntuacion.md`.
 
 Bitácora en orden cronológico. Se va llenando a medida que avanza la
@@ -42,7 +42,7 @@ Verificación con `psql` directo sobre el contenedor local
 ### Plan aprobado
 
 Las 8 decisiones (D11-1..D11-8) están consolidadas en
-`context/plan/11-scoring-engine.md` §11. El usuario aprobó el plan
+`11-scoring-engine-plan.md` §11. El usuario aprobó el plan
 explícitamente. Comienzo por el commit 1 del orden de ejecución (§7).
 
 ### Desviaciones respecto al bootstrap

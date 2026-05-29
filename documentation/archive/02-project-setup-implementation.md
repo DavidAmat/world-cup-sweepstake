@@ -1,6 +1,6 @@
 # 02 — Project setup · bitácora de implementación
 
-> Hito ejecutado: ver plan en `context/plan/02-project-setup.md`.
+> Hito ejecutado: ver plan en `02-project-setup-plan.md`.
 
 ## Resumen
 
@@ -190,7 +190,7 @@ Ambos en `master`, ya en remote (`origin/master`).
 ## Próximo hito
 
 Hito 03 — Supabase local + migraciones. Crearemos
-`context/plan/03-supabase-local-and-migrations.md` con el detalle
+`03-supabase-local-and-migrations-plan.md` con el detalle
 y empezaremos a:
 
 - Instalar Supabase CLI.

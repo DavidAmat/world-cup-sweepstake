@@ -1,10 +1,9 @@
 // Helpers to bridge Postgres `timestamptz` values (UTC ISO) and the
 // admin UI, which deals with users thinking in `Europe/Madrid`.
 //
-// We deliberately avoid hardcoding the CET/CEST offset (the script in
-// `scripts/wc2022/lib/maps.ts` does that and is documented as a
-// limitation). Here we use `Intl.DateTimeFormat` with timeZone
-// `"Europe/Madrid"` so winter/summer transitions are correct.
+// We deliberately avoid hardcoding the CET/CEST offset. Here we use
+// `Intl.DateTimeFormat` with timeZone `"Europe/Madrid"` so winter/summer
+// transitions are correct.
 
 const MADRID_TIMEZONE = "Europe/Madrid";
 
@@ -147,4 +146,14 @@ export function formatMadridDateTime(utcIso: string): string {
   const p = readMadridParts(date);
   const month = MONTHS_ES[parseInt(p.month, 10) - 1] ?? p.month;
   return `${parseInt(p.day, 10)}-${month} ${p.hour}h${p.minute}`;
+}
+
+// Full Madrid timestamp incl. year + seconds, e.g. "29-May-2026 17:30:05".
+// Used for the login audit log so each access is fully identifiable.
+export function formatMadridDateTimeFull(utcIso: string): string {
+  const date = new Date(utcIso);
+  if (Number.isNaN(date.getTime())) return "—";
+  const p = readMadridParts(date);
+  const month = MONTHS_ES[parseInt(p.month, 10) - 1] ?? p.month;
+  return `${parseInt(p.day, 10)}-${month}-${p.year} ${p.hour}:${p.minute}:${p.second}`;
 }

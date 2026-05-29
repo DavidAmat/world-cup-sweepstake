@@ -1,6 +1,6 @@
 # 03 — Supabase local + migraciones · bitácora de implementación
 
-> Hito ejecutado: ver plan en `context/plan/03-supabase-local-and-migrations.md`.
+> Hito ejecutado: ver plan en `03-supabase-local-and-migrations-plan.md`.
 
 ## Resumen
 

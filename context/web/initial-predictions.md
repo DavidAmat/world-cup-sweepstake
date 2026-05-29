@@ -12,9 +12,15 @@ Before match-by-match betting starts, every player fills in **initial prediction
 | Subcampeón | Team select | 150 pts if correct |
 | Pichichi | Free text (1–80 chars) | 100 pts if admin marks correct |
 | Mejor jugador | Free text (1–80 chars) | 100 pts if admin marks correct |
-| Clasificados | Exactly **2 teams per group** (A–L), checkboxes, no order | 25 pts per correct team |
+| Clasificados | **2 or 3 teams per group** (A–L), checkboxes, no order | 25 pts per correct team |
 
-Champion, runner-up, pichichi, and mejor jugador can be saved partially (left empty). **Group clasificados are all-or-nothing on save:** all 12 groups must have exactly 2 teams selected.
+Champion, runner-up, pichichi, and mejor jugador can be saved partially (left empty).
+
+### Clasificados rule (WC2026 best thirds)
+
+32 teams reach the round of 32: the **top 2 of every group** (24) **plus the 8 best third-placed teams** across the 12 groups. So the prediction reflects that: the user marks **3 teams in exactly 8 groups** (the 2 firsts + the third they bet sneaks in as a best third) and **2 teams in the other 4** → 32 teams. **Save is gated:** every group needs ≥2 (and ≤3) selected, and exactly 8 groups must have 3. The `ClasificadosPicker` client component enforces this live (caps each group at 3, shows a "grupos con 3: X/8" counter, disables Guardar until valid); the server action re-validates. The count `8` is `BEST_THIRDS_ADVANCE` in `src/lib/scoring/scoreGroup.ts`.
+
+A predicted team scores 25 pts if it actually advances — i.e. it finishes top-2 of its group **or** its group's third place and that third ranks among the global best 8 (resolved only once all 12 groups are complete; see `context/web/scoring-engine.md`).
 
 Free-text awards (`pichichi`, `mejor jugador`) have no automatic match — the admin judges them later at `/admin/evaluaciones`.
 
@@ -46,7 +52,7 @@ When locked and all group-stage fixtures have confirmed results, the read-only p
 ## Data model (summary)
 
 - **`initial_predictions`** — one row per `(tournament_id, user_id)`; team FKs for champion/runner-up; text columns for awards; nullable booleans for subjective evaluation.
-- **`group_qualification_predictions`** — up to 2 rows per `(user, group, team)`; `predicted_position` is always `null` (order not predicted).
+- **`group_qualification_predictions`** — 2 or 3 rows per `(user, group)`, one per predicted team; `predicted_position` is always `null` (order not predicted). No schema change was needed for the best-thirds rule — only the validation count and the scoring logic changed.
 
 See `documentation/services/database/tables.md` for columns and constraints.
 

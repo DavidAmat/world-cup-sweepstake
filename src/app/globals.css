@@ -39,10 +39,6 @@
   --color-orange-light: #ffc598;
   --color-orange-fg: #5a2800;
 
-  /* Muted */
-  --color-muted: #9c9c9c;
-  --color-muted-strong: #393939;
-  --color-muted-bg: #f4f4f5;
 }
 
 @theme inline {
@@ -76,10 +72,6 @@
   --color-orange: var(--color-orange);
   --color-orange-light: var(--color-orange-light);
   --color-orange-fg: var(--color-orange-fg);
-
-  --color-muted: var(--color-muted);
-  --color-muted-strong: var(--color-muted-strong);
-  --color-muted-bg: var(--color-muted-bg);
 
   --font-sans: var(--font-plus-jakarta-sans);
   --font-mono: var(--font-geist-mono);
