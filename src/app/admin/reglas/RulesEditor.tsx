@@ -1,6 +1,7 @@
 "use client";
 
 import { NumberInput } from "@/components/ui/NumberInput";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { saveScoringRulesDraft } from "./actions";
 import type { ScoringRulesV1 } from "@/lib/scoring/types";
 
@@ -37,7 +38,7 @@ function NumInput({
         defaultValue={defaultValue}
         max={9999}
         required
-        className="focus:border-primary focus:ring-primary-light w-24 rounded-md border border-zinc-300 px-3 py-1.5 font-oswald text-base font-semibold outline-none focus:ring-2"
+        className="focus:border-primary focus:ring-primary-light font-oswald w-24 rounded-md border border-zinc-300 px-3 py-1.5 text-base font-semibold outline-none focus:ring-2"
       />
     </label>
   );
@@ -180,12 +181,12 @@ export function RulesEditor({ ruleId, defaultValues: d }: Props) {
       </Section>
 
       <div className="flex justify-end">
-        <button
-          type="submit"
-          className="bg-primary text-primary-fg focus-visible:ring-primary rounded-md px-4 py-2 text-sm font-semibold hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
+        <SubmitButton
+          className="bg-primary text-primary-fg focus-visible:ring-primary inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-70"
+          pendingText="Guardando…"
         >
           Guardar borrador
-        </button>
+        </SubmitButton>
       </div>
     </form>
   );

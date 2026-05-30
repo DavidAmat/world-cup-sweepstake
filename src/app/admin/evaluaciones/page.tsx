@@ -4,6 +4,7 @@ import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { DEFAULT_SCORING_RULES_V1 } from "@/lib/scoring/rules";
 import type { ScoringRulesV1 } from "@/lib/scoring/types";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { setSubjectiveEvaluation } from "./actions";
 
 type SearchParams = Promise<{ ok?: string; error?: string }>;
@@ -86,11 +87,10 @@ function EvaluationButtons({
             <input type="hidden" name="user_id" value={userId} />
             <input type="hidden" name="field" value={field} />
             <input type="hidden" name="value" value={b.value} />
-            <button
-              type="submit"
+            <SubmitButton
               disabled={isActive}
               className={
-                "rounded-md border px-2.5 py-1 text-xs font-medium transition " +
+                "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition " +
                 (isActive
                   ? `${b.activeCls} cursor-default`
                   : "border-zinc-300 bg-white text-zinc-700 hover:border-zinc-400 hover:bg-zinc-50")
@@ -99,7 +99,7 @@ function EvaluationButtons({
               aria-label={`${FIELD_LABEL[field]}: marcar como ${b.label.toLowerCase()}`}
             >
               {b.label}
-            </button>
+            </SubmitButton>
           </form>
         );
       })}

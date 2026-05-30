@@ -5,6 +5,7 @@ import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { FixtureStatusBadge } from "@/components/ui/Badge";
 import { TeamName } from "@/components/ui/TeamName";
+import { NavSubmitButton } from "@/components/ui/SubmitButton";
 import { ROUNDS } from "@/lib/fixtures/catalogs";
 
 const STATUS_VALUES = ["scheduled", "locked", "completed", "cancelled"] as const;
@@ -105,7 +106,7 @@ export default async function AdminFixturesPage({ searchParams }: { searchParams
         <div className="flex gap-2">
           <Link
             href="/admin/fixtures/import"
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
+            className="bg-primary text-primary-fg rounded-md px-4 py-2 text-sm font-medium hover:opacity-90"
           >
             Importar JSON
           </Link>
@@ -167,12 +168,9 @@ export default async function AdminFixturesPage({ searchParams }: { searchParams
             <option value="cancelled">Cancelado</option>
           </select>
         </label>
-        <button
-          type="submit"
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
-        >
+        <NavSubmitButton className="bg-primary text-primary-fg rounded-md px-4 py-2 text-sm font-medium hover:opacity-90">
           Filtrar
-        </button>
+        </NavSubmitButton>
         {(roundFilter || statusFilter) && (
           <Link
             href="/admin/fixtures"
@@ -206,12 +204,16 @@ export default async function AdminFixturesPage({ searchParams }: { searchParams
               rows.map((f) => {
                 const home = f.home_team?.display_name;
                 const away = f.away_team?.display_name;
-                const homeLabel = home
-                  ? <TeamName name={home} />
-                  : <span className="text-zinc-400 italic">{f.home_placeholder ?? "—"}</span>;
-                const awayLabel = away
-                  ? <TeamName name={away} />
-                  : <span className="text-zinc-400 italic">{f.away_placeholder ?? "—"}</span>;
+                const homeLabel = home ? (
+                  <TeamName name={home} />
+                ) : (
+                  <span className="text-zinc-400 italic">{f.home_placeholder ?? "—"}</span>
+                );
+                const awayLabel = away ? (
+                  <TeamName name={away} />
+                ) : (
+                  <span className="text-zinc-400 italic">{f.away_placeholder ?? "—"}</span>
+                );
                 return (
                   <tr key={f.id} className="border-b border-zinc-100 hover:bg-zinc-50">
                     <td className="py-2 pr-3">

@@ -6,6 +6,7 @@ import { getInitialLockState } from "@/lib/predictions/initialLock";
 import { Badge } from "@/components/ui/Badge";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { TeamName } from "@/components/ui/TeamName";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { Lock, Unlock } from "lucide-react";
 import {
   computeGroupTables,
@@ -178,23 +179,23 @@ export default async function InitialPredictionsPage({
           {isAdmin &&
             (locked ? (
               <form action={unlockInitialPredictions}>
-                <button
-                  type="submit"
-                  className="border-success/30 bg-success/10 text-success-fg hover:bg-success/20 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
+                <SubmitButton
+                  className="border-success/30 bg-success/10 text-success-fg hover:bg-success/20 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-70"
+                  pendingText="Desbloqueando…"
                 >
                   <Unlock className="h-3.5 w-3.5" aria-hidden />
                   Desbloquear
-                </button>
+                </SubmitButton>
               </form>
             ) : (
               <form action={lockInitialPredictions}>
-                <button
-                  type="submit"
-                  className="border-danger/30 bg-danger/10 text-danger-fg hover:bg-danger/20 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
+                <SubmitButton
+                  className="border-danger/30 bg-danger/10 text-danger-fg hover:bg-danger/20 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-70"
+                  pendingText="Bloqueando…"
                 >
                   <Lock className="h-3.5 w-3.5" aria-hidden />
                   Bloquear
-                </button>
+                </SubmitButton>
               </form>
             ))}
           <Badge tone={locked ? "danger" : "success"}>{locked ? "Bloqueado" : "Abierto"}</Badge>

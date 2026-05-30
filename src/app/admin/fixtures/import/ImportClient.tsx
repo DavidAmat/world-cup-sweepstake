@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
+import { useBusyWhile } from "@/components/ui/Busy";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { commitImport, previewImport, type PreviewState } from "../actions";
 
 const INITIAL_STATE: PreviewState = { ok: false };
@@ -23,6 +25,8 @@ function KindBadge({ kind }: { kind: "create" | "update" | "error" }) {
 
 export function ImportClient() {
   const [state, action, pending] = useActionState(previewImport, INITIAL_STATE);
+  // Block the page (busy overlay) while a preview/commit is in flight.
+  useBusyWhile(pending);
 
   const report = state.report;
   const noErrors = report ? report.counts.error === 0 && report.counts.total > 0 : false;
@@ -45,18 +49,18 @@ export function ImportClient() {
           <button
             type="submit"
             disabled={pending}
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90 disabled:opacity-60"
+            className="bg-primary text-primary-fg rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60"
           >
             {pending ? "Validando…" : "Validar y previsualizar"}
           </button>
-          <button
-            type="submit"
+          <SubmitButton
             formAction={commitImport}
             disabled={!noErrors || pending}
-            className="border-success-light bg-success-light text-success-fg hover:bg-success-light rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-50"
+            className="border-success-light bg-success-light text-success-fg hover:bg-success-light inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-50"
+            pendingText="Insertando…"
           >
             Confirmar e insertar
-          </button>
+          </SubmitButton>
         </div>
       </form>
 

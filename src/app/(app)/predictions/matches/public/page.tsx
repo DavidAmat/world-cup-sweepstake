@@ -4,6 +4,7 @@ import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getMatchLockState, isFixtureLocked } from "@/lib/predictions/matchLock";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { Badge } from "@/components/ui/Badge";
+import { NavSubmitButton } from "@/components/ui/SubmitButton";
 
 type SearchParams = Promise<{ round?: string }>;
 
@@ -125,12 +126,9 @@ export default async function PublicMatchPredictionsPage({
             ))}
           </select>
         </label>
-        <button
-          type="submit"
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
-        >
+        <NavSubmitButton className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90">
           Ver
-        </button>
+        </NavSubmitButton>
       </form>
 
       <section className="mt-6 flex flex-col gap-4">

@@ -38,7 +38,6 @@
   --color-orange: #ff8b32;
   --color-orange-light: #ffc598;
   --color-orange-fg: #5a2800;
-
 }
 
 @theme inline {
@@ -81,4 +80,16 @@
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* While a server action / navigation is in flight (see BusyProvider), show a
+   wait cursor everywhere and stop the in-flight submit button reacting to
+   hover, on top of the click-blocking overlay. */
+body[data-busy="true"],
+body[data-busy="true"] * {
+  cursor: wait !important;
+}
+
+button[data-pending] {
+  opacity: 0.7;
 }

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/auth/actions";
 import { avatarUrlFor } from "@/lib/profiles/avatars";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { HeaderClient } from "./HeaderClient";
 
 export async function Header() {
@@ -25,12 +26,9 @@ export async function Header() {
 
   const signOutForm = (
     <form action={signOut}>
-      <button
-        type="submit"
-        className="hover:text-primary focus-visible:ring-primary rounded px-1 text-sm font-medium text-zinc-700 focus-visible:ring-2 focus-visible:outline-none"
-      >
+      <SubmitButton className="hover:text-primary focus-visible:ring-primary inline-flex items-center gap-1.5 rounded px-1 text-sm font-medium text-zinc-700 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-70">
         Cerrar sesión
-      </button>
+      </SubmitButton>
     </form>
   );
 

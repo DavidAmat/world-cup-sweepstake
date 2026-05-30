@@ -1,5 +1,6 @@
 import { signIn } from "@/lib/auth/actions";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 
 type SearchParams = Promise<{ error?: string }>;
 
@@ -38,12 +39,12 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
           />
         </label>
 
-        <button
-          type="submit"
-          className="mt-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
+        <SubmitButton
+          className="bg-primary text-primary-fg mt-2 flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-70"
+          pendingText="Entrando…"
         >
           Entrar
-        </button>
+        </SubmitButton>
       </form>
 
       <p className="mt-6 text-sm text-zinc-600">

@@ -7,6 +7,7 @@ import { clearAllMatchPredictions } from "./actions";
 // button below is commented out; re-import it here to re-enable.
 import { MatchesForm, type RoundVM } from "./MatchesForm";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import type { LockedEntry } from "./LockedFixturePanel";
 import { maxPointsForFixture } from "@/lib/scoring/maxPoints";
 import type { StageCode } from "@/lib/scoring/types";
@@ -291,13 +292,13 @@ export default async function MatchPredictionsPage({
       )}
 
       <form action={clearAllMatchPredictions} className="mt-4">
-        <button
-          type="submit"
-          className="border-danger/30 bg-danger/10 text-danger-fg hover:bg-danger/20 rounded-md border px-4 py-2 text-sm font-medium"
+        <SubmitButton
+          className="border-danger/30 bg-danger/10 text-danger-fg hover:bg-danger/20 inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-70"
           title="Borra todas tus predicciones de los partidos no bloqueados"
+          pendingText="Limpiando…"
         >
           Limpiar predicciones
-        </button>
+        </SubmitButton>
       </form>
 
       {/*

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/permissions/requireAdmin";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { createFixture } from "../actions";
 
 type SearchParams = Promise<{ error?: string }>;
@@ -221,12 +222,12 @@ export default async function NewFixturePage({ searchParams }: { searchParams: S
         </label>
 
         <div className="flex items-center gap-3">
-          <button
-            type="submit"
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
+          <SubmitButton
+            className="bg-primary text-primary-fg inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-70"
+            pendingText="Creando…"
           >
             Crear fixture
-          </button>
+          </SubmitButton>
           <Link
             href="/admin/fixtures"
             className="text-sm text-zinc-600 underline hover:text-zinc-900"

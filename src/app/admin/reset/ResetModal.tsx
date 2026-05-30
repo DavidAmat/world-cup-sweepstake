@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { Trash2, AlertTriangle, X } from "lucide-react";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { resetTournamentData } from "./actions";
 
 type Table = {
@@ -217,13 +218,13 @@ export function ResetModal({ tournamentId, tournamentName }: Props) {
               >
                 Cancelar
               </button>
-              <button
-                type="submit"
+              <SubmitButton
                 disabled={!canSubmit}
-                className="bg-danger focus-visible:ring-danger flex-1 rounded-md px-4 py-2 text-sm font-semibold text-white hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+                className="bg-danger focus-visible:ring-danger flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold text-white hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+                pendingText="Borrando…"
               >
                 Confirmar borrado
-              </button>
+              </SubmitButton>
             </form>
           </div>
         </div>

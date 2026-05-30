@@ -3,6 +3,7 @@ import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { loadLeaderboardData, buildByRound } from "@/lib/scoring/leaderboard";
 import { avatarUrlMapFor } from "@/lib/profiles/avatars";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { ClasificacionTabs } from "../Tabs";
 import { recalculateClasificacion } from "../actions";
 import { JornadaTable } from "./JornadaTable";
@@ -95,14 +96,14 @@ export default async function JornadaPage({ searchParams }: { searchParams: Sear
         </div>
         {isAdmin && (
           <form action={recalculateClasificacion}>
-            <button
-              type="submit"
-              className="border-special/30 bg-special-light/40 text-special-fg hover:bg-special-light/60 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors"
+            <SubmitButton
+              className="border-special/30 bg-special-light/40 text-special-fg hover:bg-special-light/60 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors disabled:opacity-70"
               title="Recalcula prediction_scores para todos los usuarios"
+              pendingText="Calculando…"
             >
               <RefreshCw className="h-3.5 w-3.5" aria-hidden />
               Calcular puntuación
-            </button>
+            </SubmitButton>
           </form>
         )}
       </div>

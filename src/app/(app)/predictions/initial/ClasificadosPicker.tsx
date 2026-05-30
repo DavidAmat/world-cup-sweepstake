@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { TeamName } from "@/components/ui/TeamName";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { BEST_THIRDS_ADVANCE } from "@/lib/scoring/scoreGroup";
 import { MIN_QUALIFIERS, MAX_QUALIFIERS } from "./schemas";
 
@@ -128,13 +129,13 @@ export function ClasificadosPicker({
       )}
 
       <div className="flex items-center gap-3">
-        <button
-          type="submit"
+        <SubmitButton
           disabled={!valid}
-          className="bg-primary text-primary-fg rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="bg-primary text-primary-fg inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          pendingText="Guardando…"
         >
           Guardar predicciones
-        </button>
+        </SubmitButton>
         <Link
           href="/predictions/initial/public"
           className="text-sm text-zinc-600 underline hover:text-zinc-900"

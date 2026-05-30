@@ -5,6 +5,7 @@ import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { formatMadridDateTime, utcIsoToMadridInput } from "@/lib/dates/madridTime";
 import { FixtureStatusBadge } from "@/components/ui/Badge";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { updateFixture } from "../actions";
 
 type RouteParams = Promise<{ id: string }>;
@@ -224,12 +225,12 @@ export default async function EditFixturePage({
         </label>
 
         <div className="flex items-center gap-3">
-          <button
-            type="submit"
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
+          <SubmitButton
+            className="bg-primary text-primary-fg inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-70"
+            pendingText="Guardando…"
           >
             Guardar cambios
-          </button>
+          </SubmitButton>
           <Link
             href="/admin/fixtures"
             className="text-sm text-zinc-600 underline hover:text-zinc-900"

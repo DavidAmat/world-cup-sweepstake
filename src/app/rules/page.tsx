@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { acceptTerms } from "./actions";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { CheckCircle2, ListChecks, ClipboardList, Lock, Check, X } from "lucide-react";
 
 type SearchParams = Promise<{ error?: string; ok?: string }>;
@@ -51,10 +52,10 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
           <div>
             <p className="text-sm font-semibold">Paso 1 — Predicciones iniciales</p>
             <p className="mt-1 text-xs leading-relaxed text-zinc-600">
-              Antes de que empiece el torneo: <strong>campeón</strong>,{" "}
-              <strong>subcampeón</strong>, <strong>pichichi</strong>,{" "}
-              <strong>mejor jugador</strong> y <strong>2 equipos que pasan por cada grupo</strong>.
-              Se bloquean al comenzar el primer partido.
+              Antes de que empiece el torneo: <strong>campeón</strong>, <strong>subcampeón</strong>,{" "}
+              <strong>pichichi</strong>, <strong>mejor jugador</strong> y{" "}
+              <strong>2 equipos que pasan por cada grupo</strong>. Se bloquean al comenzar el primer
+              partido.
             </p>
           </div>
         </div>
@@ -276,7 +277,7 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
           >
             <div className="overflow-hidden rounded-lg border border-zinc-100 bg-zinc-50 text-xs">
               <div className="flex items-center gap-1.5 px-2 py-1.5">
-                <span className="w-7 shrink-0 text-right text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+                <span className="w-7 shrink-0 text-right text-[9px] font-semibold tracking-wide text-zinc-400 uppercase">
                   Pred
                 </span>
                 <span>🥇 </span>
@@ -286,12 +287,10 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
                 <span className="font-medium text-zinc-700">🇦🇷 Argentina</span>
               </div>
               <div className="flex items-center gap-1.5 border-t border-zinc-100 px-2 py-1.5">
-                <span className="w-7 shrink-0 text-right text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+                <span className="w-7 shrink-0 text-right text-[9px] font-semibold tracking-wide text-zinc-400 uppercase">
                   Real
                 </span>
-                <span className="text-success-fg font-medium">
-                  🇧🇷 Brasil ✓ · 🇦🇷 Argentina ✓
-                </span>
+                <span className="text-success-fg font-medium">🇧🇷 Brasil ✓ · 🇦🇷 Argentina ✓</span>
               </div>
             </div>
           </ExCard>
@@ -308,13 +307,13 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
           >
             <div className="overflow-hidden rounded-lg border border-zinc-100 bg-zinc-50 text-xs">
               <div className="flex items-center gap-1.5 px-2 py-1.5">
-                <span className="w-7 shrink-0 text-right text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+                <span className="w-7 shrink-0 text-right text-[9px] font-semibold tracking-wide text-zinc-400 uppercase">
                   Pred
                 </span>
                 <span className="font-medium text-zinc-700">🇪🇸 España · 🇫🇷 Francia</span>
               </div>
               <div className="flex items-center gap-1.5 border-t border-zinc-100 px-2 py-1.5">
-                <span className="w-7 shrink-0 text-right text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+                <span className="w-7 shrink-0 text-right text-[9px] font-semibold tracking-wide text-zinc-400 uppercase">
                   Real
                 </span>
                 <span className="font-medium">
@@ -333,7 +332,7 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
       {/* ── Multiplier + initial predictions tables ───────────────────── */}
       <section className="mb-8 flex flex-col gap-4 sm:flex-row sm:gap-6">
         <div className="flex-1 rounded-xl border border-zinc-200 bg-white p-4">
-          <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+          <h3 className="mb-3 text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">
             Multiplicadores por fase
           </h3>
           <table className="w-full border-collapse text-xs">
@@ -356,7 +355,7 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
         </div>
 
         <div className="flex-1 rounded-xl border border-zinc-200 bg-white p-4">
-          <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+          <h3 className="mb-3 text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">
             Predicciones iniciales
           </h3>
           <table className="w-full border-collapse text-xs">
@@ -427,12 +426,12 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
                 predicciones y puntuación.
               </span>
             </label>
-            <button
-              type="submit"
-              className="bg-primary mt-4 rounded-xl px-6 py-2.5 text-sm font-semibold text-white shadow transition-opacity hover:opacity-90"
+            <SubmitButton
+              className="bg-primary mt-4 inline-flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold text-white shadow transition-opacity hover:opacity-90 disabled:opacity-70"
+              pendingText="Guardando…"
             >
               Acepto las normas y empiezo a jugar
-            </button>
+            </SubmitButton>
           </form>
         )}
       </section>
@@ -476,7 +475,7 @@ function MatchCmp({
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-100 bg-zinc-50 text-xs">
       <div className="flex items-center gap-1 px-2 py-1.5">
-        <span className="w-7 shrink-0 text-right text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+        <span className="w-7 shrink-0 text-right text-[9px] font-semibold tracking-wide text-zinc-400 uppercase">
           Real
         </span>
         <span className="shrink-0">{homeFlag}</span>
@@ -487,11 +486,9 @@ function MatchCmp({
         <span className="min-w-0 truncate font-medium text-zinc-700">{away}</span>
         <span className="shrink-0">{awayFlag}</span>
       </div>
-      {realExtra && (
-        <p className="pb-1 pl-10 pr-2 text-[10px] italic text-zinc-500">{realExtra}</p>
-      )}
+      {realExtra && <p className="pr-2 pb-1 pl-10 text-[10px] text-zinc-500 italic">{realExtra}</p>}
       <div className="flex items-center gap-1 border-t border-zinc-100 px-2 py-1.5">
-        <span className="text-primary/60 w-7 shrink-0 text-right text-[9px] font-semibold uppercase tracking-wide">
+        <span className="text-primary/60 w-7 shrink-0 text-right text-[9px] font-semibold tracking-wide uppercase">
           Pred
         </span>
         <span className="shrink-0">{homeFlag}</span>
@@ -503,7 +500,7 @@ function MatchCmp({
         <span className="shrink-0">{awayFlag}</span>
       </div>
       {predExtra && (
-        <p className="text-primary/60 pb-1 pl-10 pr-2 text-[10px] italic">{predExtra}</p>
+        <p className="text-primary/60 pr-2 pb-1 pl-10 text-[10px] italic">{predExtra}</p>
       )}
     </div>
   );
@@ -530,7 +527,7 @@ function ExCard({
   return (
     <div className="flex flex-col gap-2.5 rounded-xl border border-zinc-200 bg-white p-3">
       <div className="flex items-start justify-between gap-1">
-        <p className="text-[11px] font-semibold leading-tight text-zinc-800">{title}</p>
+        <p className="text-[11px] leading-tight font-semibold text-zinc-800">{title}</p>
         <span className="shrink-0 rounded-full bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-500">
           {phase}
         </span>
@@ -547,19 +544,15 @@ function ExCard({
             }`}
           >
             <span className="flex min-w-0 items-center gap-0.5">
-              {b.ok ? (
-                <Check className="h-3 w-3 shrink-0" />
-              ) : (
-                <X className="h-3 w-3 shrink-0" />
-              )}
+              {b.ok ? <Check className="h-3 w-3 shrink-0" /> : <X className="h-3 w-3 shrink-0" />}
               <span className="truncate">{b.label}</span>
             </span>
-            <span className={`shrink-0 font-oswald font-semibold ${b.ok ? "" : "opacity-40"}`}>
+            <span className={`font-oswald shrink-0 font-semibold ${b.ok ? "" : "opacity-40"}`}>
               {b.pts > 0 ? `+${b.pts}` : "—"}
             </span>
           </div>
         ))}
-        {note && <p className="mt-0.5 text-[10px] italic text-zinc-400">{note}</p>}
+        {note && <p className="mt-0.5 text-[10px] text-zinc-400 italic">{note}</p>}
       </div>
 
       <div className="text-right text-sm font-bold text-zinc-900">

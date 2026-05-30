@@ -4,8 +4,10 @@ import { useMemo, useState, useTransition } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { TeamName } from "@/components/ui/TeamName";
 import { NumberInput } from "@/components/ui/NumberInput";
+import { SubmitButton } from "@/components/ui/SubmitButton";
+import { useBusyWhile } from "@/components/ui/Busy";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
-import { Lock, Unlock, ChevronDown, Info } from "lucide-react";
+import { Lock, Unlock, ChevronDown, Info, Loader2 } from "lucide-react";
 import {
   saveAllMatchPredictions,
   lockRoundFromPredictions,
@@ -180,7 +182,10 @@ export function MatchesForm({
   const [bulkSignal, setBulkSignal] = useState<LockedBulkSignal>({ open: true, n: 0 });
   const toggleAll = () => setBulkSignal((s) => ({ open: !s.open, n: s.n + 1 }));
 
-  const [, startRoundTransition] = useTransition();
+  const [isRoundPending, startRoundTransition] = useTransition();
+  // Lock/unlock run as a server action via a transition (not a form submit), so
+  // bridge their pending flag into the global busy overlay manually.
+  useBusyWhile(isRoundPending);
   const handleLockRound = (roundCode: string) => {
     const fd = new FormData();
     fd.set("round", roundCode);
@@ -275,12 +280,12 @@ export function MatchesForm({
                   : "Mostrar todas las predicciones"}
               </button>
             )}
-            <button
-              type="submit"
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
+            <SubmitButton
+              className="bg-primary text-primary-fg inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-70"
+              pendingText="Guardando…"
             >
               Guardar predicciones
-            </button>
+            </SubmitButton>
           </div>
         </div>
         <nav className="mt-2 flex flex-wrap gap-1.5">
@@ -321,18 +326,28 @@ export function MatchesForm({
                   <button
                     type="button"
                     onClick={() => handleUnlockRound(r.code)}
-                    className="border-success/30 bg-success/10 text-success-fg hover:bg-success/20 flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
+                    disabled={isRoundPending}
+                    className="border-success/30 bg-success/10 text-success-fg hover:bg-success/20 flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-70"
                   >
-                    <Unlock className="h-3 w-3" aria-hidden />
+                    {isRoundPending ? (
+                      <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+                    ) : (
+                      <Unlock className="h-3 w-3" aria-hidden />
+                    )}
                     Desbloquear jornada
                   </button>
                 ) : (
                   <button
                     type="button"
                     onClick={() => handleLockRound(r.code)}
-                    className="border-danger/30 bg-danger/10 text-danger-fg hover:bg-danger/20 flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
+                    disabled={isRoundPending}
+                    className="border-danger/30 bg-danger/10 text-danger-fg hover:bg-danger/20 flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-70"
                   >
-                    <Lock className="h-3 w-3" aria-hidden />
+                    {isRoundPending ? (
+                      <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+                    ) : (
+                      <Lock className="h-3 w-3" aria-hidden />
+                    )}
                     Bloquear jornada
                   </button>
                 ))}
@@ -414,12 +429,12 @@ export function MatchesForm({
       </div>
 
       <div className="mt-8 flex items-center gap-3">
-        <button
-          type="submit"
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
+        <SubmitButton
+          className="bg-primary text-primary-fg inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-70"
+          pendingText="Guardando…"
         >
           Guardar predicciones
-        </button>
+        </SubmitButton>
         <span className="text-xs text-zinc-500">
           Guarda todas las jornadas a la vez. Cada partido editado vuelve a &ldquo;Sin
           guardar&rdquo; (amarillo) hasta que pulses Guardar.

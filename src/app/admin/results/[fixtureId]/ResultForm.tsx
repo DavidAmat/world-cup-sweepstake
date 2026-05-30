@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TeamName } from "@/components/ui/TeamName";
 import { NumberInput } from "@/components/ui/NumberInput";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { saveMatchResult, confirmMatchResult } from "../actions";
 import { GOAL_PERIODS, type GoalPeriod } from "../schemas";
 
@@ -109,7 +110,9 @@ export function ResultForm({
       <section className="rounded-md border border-zinc-200 bg-white p-5">
         <h2 className="text-sm font-semibold">Resultado a 90&apos;</h2>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
-          <span className="min-w-28 font-medium"><TeamName name={homeTeam.display_name} /></span>
+          <span className="min-w-28 font-medium">
+            <TeamName name={homeTeam.display_name} />
+          </span>
           <NumberInput
             name="home_goals_90"
             value={h90}
@@ -125,7 +128,9 @@ export function ResultForm({
             className={GOAL_NUM_CLS}
             required
           />
-          <span className="min-w-28 font-medium"><TeamName name={awayTeam.display_name} /></span>
+          <span className="min-w-28 font-medium">
+            <TeamName name={awayTeam.display_name} />
+          </span>
         </div>
       </section>
 
@@ -237,10 +242,8 @@ export function ResultForm({
                     <NumberInput
                       max={130}
                       value={g.minute === null || g.minute === undefined ? "" : String(g.minute)}
-                      onChange={(val) =>
-                        patchGoal(i, { minute: val === "" ? null : Number(val) })
-                      }
-                      className={`${INPUT_CLS} w-20 font-oswald`}
+                      onChange={(val) => patchGoal(i, { minute: val === "" ? null : Number(val) })}
+                      className={`${INPUT_CLS} font-oswald w-20`}
                     />
                   </label>
 
@@ -292,20 +295,20 @@ export function ResultForm({
       </section>
 
       <div className="flex flex-wrap gap-3">
-        <button
-          type="submit"
+        <SubmitButton
           formAction={saveMatchResult}
-          className="rounded-md border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-100"
+          className="inline-flex items-center gap-2 rounded-md border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-100 disabled:opacity-70"
+          pendingText="Guardando…"
         >
           Guardar borrador
-        </button>
-        <button
-          type="submit"
+        </SubmitButton>
+        <SubmitButton
           formAction={confirmMatchResult}
-          className="bg-success-light hover:bg-success-light rounded-md px-5 py-2.5 text-sm font-medium text-white"
+          className="bg-success-light hover:bg-success-light inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-medium text-white disabled:opacity-70"
+          pendingText="Recalculando…"
         >
           Confirmar y recalcular
-        </button>
+        </SubmitButton>
       </div>
     </form>
   );

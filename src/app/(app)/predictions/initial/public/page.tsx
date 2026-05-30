@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { TeamName } from "@/components/ui/TeamName";
+import { NavSubmitButton } from "@/components/ui/SubmitButton";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getInitialLockState } from "@/lib/predictions/initialLock";
@@ -112,12 +113,9 @@ export default async function PublicInitialPredictionsPage({
             ))}
           </select>
         </label>
-        <button
-          type="submit"
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
-        >
+        <NavSubmitButton className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90">
           Ver
-        </button>
+        </NavSubmitButton>
       </form>
 
       <section className="mt-6 flex flex-col gap-3">

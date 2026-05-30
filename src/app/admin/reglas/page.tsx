@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { DEFAULT_SCORING_RULES_V1 } from "@/lib/scoring/rules";
 import type { ScoringRulesV1 } from "@/lib/scoring/types";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { RulesEditor } from "./RulesEditor";
 import { duplicateScoringRules, activateScoringRules, recalculateScoringRules } from "./actions";
 
@@ -105,12 +106,12 @@ export default async function AdminReglasPage({ searchParams }: { searchParams: 
                   <div className="flex flex-wrap items-center gap-2">
                     <form action={duplicateScoringRules}>
                       <input type="hidden" name="source_id" value={r.id} />
-                      <button
-                        type="submit"
-                        className="focus-visible:ring-primary rounded-md border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:ring-2 focus-visible:outline-none"
+                      <SubmitButton
+                        className="focus-visible:ring-primary inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-70"
+                        pendingText="Duplicando…"
                       >
                         Duplicar y editar
-                      </button>
+                      </SubmitButton>
                     </form>
 
                     {!r.active && (
@@ -125,23 +126,23 @@ export default async function AdminReglasPage({ searchParams }: { searchParams: 
                     {!r.active && (
                       <form action={activateScoringRules}>
                         <input type="hidden" name="rule_id" value={r.id} />
-                        <button
-                          type="submit"
-                          className="bg-primary text-primary-fg focus-visible:ring-primary rounded-md px-3 py-1.5 text-xs font-semibold hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
+                        <SubmitButton
+                          className="bg-primary text-primary-fg focus-visible:ring-primary inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-70"
+                          pendingText="Activando…"
                         >
                           Activar esta versión
-                        </button>
+                        </SubmitButton>
                       </form>
                     )}
 
                     {r.active && (
                       <form action={recalculateScoringRules}>
-                        <button
-                          type="submit"
-                          className="border-special-light bg-special-light text-special focus-visible:ring-special rounded-md border px-3 py-1.5 text-xs font-semibold hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
+                        <SubmitButton
+                          className="border-special-light bg-special-light text-special focus-visible:ring-special inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-70"
+                          pendingText="Recalculando…"
                         >
                           Recalcular ahora
-                        </button>
+                        </SubmitButton>
                       </form>
                     )}
                   </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Geist_Mono, Oswald } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { BusyProvider } from "@/components/ui/Busy";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -38,9 +39,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col bg-white text-zinc-900">
-        <Header />
-        <div className="flex flex-1 flex-col pt-14">{children}</div>
-        <Footer />
+        <BusyProvider>
+          <Header />
+          <div className="flex flex-1 flex-col pt-14">{children}</div>
+          <Footer />
+        </BusyProvider>
       </body>
     </html>
   );

@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/permissions/requireAdmin";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { formatMadridDateTime } from "@/lib/dates/madridTime";
 import { Badge } from "@/components/ui/Badge";
+import { SubmitButton, NavSubmitButton } from "@/components/ui/SubmitButton";
 import { ROUNDS, type RoundCode } from "@/lib/fixtures/catalogs";
 import {
   generateKnockoutPairings,
@@ -169,17 +170,17 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
                 </div>
                 <form action={locked ? unlockRoundPredictions : lockRoundPredictions}>
                   <input type="hidden" name="round" value={r.code} />
-                  <button
-                    type="submit"
+                  <SubmitButton
                     className={
-                      "rounded-md px-3 py-1 text-xs font-medium " +
+                      "inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium disabled:opacity-70 " +
                       (locked
                         ? "border-warning text-warning-fg hover:bg-warning-light border bg-white"
                         : "bg-primary text-primary-fg hover:opacity-90")
                     }
+                    pendingText={locked ? "Desbloqueando…" : "Bloqueando…"}
                   >
                     {locked ? "Desbloquear" : "Bloquear"}
-                  </button>
+                  </SubmitButton>
                 </form>
               </li>
             );
@@ -205,36 +206,33 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
             ))}
           </select>
         </label>
-        <button
-          type="submit"
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:opacity-90"
-        >
+        <NavSubmitButton className="bg-primary text-primary-fg rounded-md px-4 py-2 text-sm font-medium hover:opacity-90">
           Ver jornada
-        </button>
+        </NavSubmitButton>
       </form>
 
       <div className="mt-4 flex flex-wrap gap-3">
         {isKnockoutRound && (
           <form action={generateKnockoutPairings}>
             <input type="hidden" name="round" value={roundCode} />
-            <button
-              type="submit"
-              className="border-info bg-info-light text-info-fg hover:bg-info-light rounded-md border px-4 py-2 text-sm font-medium"
+            <SubmitButton
+              className="border-info bg-info-light text-info-fg hover:bg-info-light inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-70"
               title="Empareja al azar los equipos del torneo para esta ronda. Borra predicciones, resultados y goles existentes de esta ronda."
+              pendingText="Generando cruces…"
             >
               🎲 Generar cruces (esta ronda)
-            </button>
+            </SubmitButton>
           </form>
         )}
         <form action={generateRandomResults}>
           <input type="hidden" name="round" value={roundCode} />
-          <button
-            type="submit"
-            className="border-warning bg-warning-light text-warning-fg hover:bg-warning-light rounded-md border px-4 py-2 text-sm font-medium"
+          <SubmitButton
+            className="border-warning bg-warning-light text-warning-fg hover:bg-warning-light inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-70"
             title="Genera y confirma resultados al azar para todos los partidos con equipos de esta jornada (ayuda de desarrollo)"
+            pendingText="Generando resultados…"
           >
             🎲 Generar resultados aleatorios (esta jornada)
-          </button>
+          </SubmitButton>
         </form>
       </div>
 
@@ -287,7 +285,7 @@ export default async function AdminResultsPage({ searchParams }: { searchParams:
                     <td className="py-2 pr-3 whitespace-nowrap">
                       {formatMadridDateTime(f.kickoff_at)}
                     </td>
-                    <td className="py-2 pr-3 font-oswald">{scoreLabel}</td>
+                    <td className="font-oswald py-2 pr-3">{scoreLabel}</td>
                     {isKnockoutRound && (
                       <td className="py-2 pr-3">
                         {result?.qualified_team_id ? (

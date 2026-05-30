@@ -1,4 +1,5 @@
 import { changePassword } from "@/app/cambiar-password/actions";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 
 type Props = {
   /** Path to return to on validation error (e.g. "/cambiar-password" or "/perfil"). */
@@ -49,13 +50,13 @@ export function ChangePasswordForm({
         />
       </label>
 
-      <button
-        type="submit"
+      <SubmitButton
         disabled={disabled}
-        className="bg-primary text-primary-fg mt-2 rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        className="bg-primary text-primary-fg mt-2 inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        pendingText="Guardando…"
       >
         {submitLabel}
-      </button>
+      </SubmitButton>
     </form>
   );
 }
