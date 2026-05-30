@@ -205,8 +205,9 @@ Las barras horizontales de la app comparan tus puntos contra el máximo **realis
 | Subcampeón del Mundial     | 150    |
 | Pichichi (máximo goleador) | 100    |
 | Mejor jugador del Mundial  | 100    |
+| Último de la porra (qué participante quedará el último) | 100 |
 
-El campeón y el subcampeón se asignan automáticamente cuando termine la final. El pichichi y el mejor jugador los asigna el administrador a mano al cierre del torneo, comparando lo que escribiste con el ganador oficial.
+El campeón y el subcampeón se asignan automáticamente cuando termine la final. El pichichi, el mejor jugador y el último de la porra los asigna el administrador a mano al cierre del torneo, comparando cada predicción con el resultado oficial (en el caso del último de la porra, con la clasificación final).
 
 ---
 

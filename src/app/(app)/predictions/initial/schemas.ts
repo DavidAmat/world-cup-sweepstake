@@ -29,6 +29,9 @@ export const InitialPredictionPayloadSchema = z.object({
   runner_up_team_id: UuidOrNull,
   top_scorer_text: FreeTextOrNull,
   best_player_text: FreeTextOrNull,
+  // "Último clasificado de la porra": the user (profile) this player bets will
+  // finish last in the sweepstake. Free pick from the dropdown of all users.
+  last_place_user_id: UuidOrNull,
   qualifiers: z.array(QualifierSchema).length(GROUP_CODES.length),
 });
 
@@ -49,6 +52,7 @@ export function readInitialPayload(formData: FormData): InitialPredictionPayload
     runner_up_team_id: field(formData, "runner_up_team_id"),
     top_scorer_text: field(formData, "top_scorer_text"),
     best_player_text: field(formData, "best_player_text"),
+    last_place_user_id: field(formData, "last_place_user_id"),
     qualifiers: GROUP_CODES.map((g) => ({
       group_code: g,
       team_ids: formData

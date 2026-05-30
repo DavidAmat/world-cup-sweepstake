@@ -366,6 +366,7 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
                   ["Subcampeón acertado", "150 pts"],
                   ["Pichichi acertado", "100 pts"],
                   ["Mejor jugador", "100 pts"],
+                  ["Último de la porra acertado", "100 pts"],
                   ["Equipo clasif. de grupo", "25 pts c/u"],
                 ] as [string, string][]
               ).map(([label, pts]) => (

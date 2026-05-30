@@ -47,6 +47,7 @@ function parseRulesFromFormData(formData: FormData): ScoringRulesV1 {
       runner_up: num("init_runner_up"),
       top_scorer: num("init_top_scorer"),
       best_player: num("init_best_player"),
+      last_place: num("init_last_place"),
     },
     group_qualification: {
       team_correct: num("gq_team_correct"),

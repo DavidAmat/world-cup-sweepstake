@@ -27,6 +27,7 @@ export type ScoringRulesV1 = {
     runner_up: number;
     top_scorer: number;
     best_player: number;
+    last_place: number;
   };
   group_qualification: {
     team_correct: number;

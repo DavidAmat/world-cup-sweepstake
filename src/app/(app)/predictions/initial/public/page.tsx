@@ -13,6 +13,7 @@ const CATEGORIES = [
   { value: "subcampeon", label: "Subcampeón" },
   { value: "pichichi", label: "Pichichi" },
   { value: "mejor_jugador", label: "Mejor jugador" },
+  { value: "ultimo", label: "Último de la porra" },
   { value: "clasificados", label: "Clasificados de grupo" },
 ] as const;
 
@@ -56,7 +57,9 @@ export default async function PublicInitialPredictionsPage({
     supabase.from("profiles").select("user_id, display_name, initials").order("display_name"),
     supabase
       .from("initial_predictions")
-      .select("user_id, champion_team_id, runner_up_team_id, top_scorer_text, best_player_text")
+      .select(
+        "user_id, champion_team_id, runner_up_team_id, top_scorer_text, best_player_text, last_place_user_id",
+      )
       .eq("tournament_id", tournament.id),
     supabase
       .from("group_qualification_predictions")
@@ -67,6 +70,9 @@ export default async function PublicInitialPredictionsPage({
 
   const teamName = (id: string | null | undefined) =>
     id ? (teams?.find((t) => t.id === id)?.display_name ?? "—") : "—";
+
+  const userName = (id: string | null | undefined) =>
+    id ? (profiles?.find((u) => u.user_id === id)?.display_name ?? "—") : "—";
 
   const predByUser = new Map((preds ?? []).map((p) => [p.user_id, p]));
   // user_id → group_code → Set(team_id) (order is not predicted)
@@ -85,6 +91,8 @@ export default async function PublicInitialPredictionsPage({
     if (category === "subcampeon") return <TeamName name={teamName(p?.runner_up_team_id)} />;
     if (category === "pichichi") return p?.top_scorer_text || "— sin predicción —";
     if (category === "mejor_jugador") return p?.best_player_text || "— sin predicción —";
+    if (category === "ultimo")
+      return p?.last_place_user_id ? userName(p.last_place_user_id) : "— sin predicción —";
     return null; // "clasificados" is rendered as a grid below, not a single value
   }
 

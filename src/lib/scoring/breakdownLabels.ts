@@ -30,6 +30,7 @@ export const BREAKDOWN_ENTRIES: BreakdownEntry[] = [
   { key: "runner_up", label: "Subcampeón", group: "initial" },
   { key: "top_scorer", label: "Pichichi", group: "initial" },
   { key: "best_player", label: "Mejor jugador", group: "initial" },
+  { key: "last_place", label: "Último de la porra", group: "initial" },
   { key: "team_correct", label: "Equipo clasificado del grupo", group: "group_qual" },
 ];
 
@@ -61,7 +62,7 @@ export const CATEGORY_DESCRIPTIONS: Record<CategoryBucket, string> = {
   knockout_extra:
     "Solo en eliminatorias: acertar si hay prórroga, si hay penaltis y qué equipo pasa de ronda. Aplica el multiplicador.",
   initial:
-    "Campeón (200), subcampeón (150), pichichi (100) y mejor jugador (100). Los dos últimos los asigna el admin al cerrar el torneo.",
+    "Campeón (200), subcampeón (150), pichichi (100), mejor jugador (100) y último de la porra (100). Los tres últimos los asigna el admin al cerrar el torneo.",
   group_qualification: "25 puntos por cada equipo acertado como clasificado de su grupo.",
 };
 
@@ -79,7 +80,7 @@ const KNOCKOUT_EXTRA_KEYS = new Set([
   "correct_qualified_team",
 ]);
 
-const INITIAL_KEYS = new Set(["champion", "runner_up", "top_scorer", "best_player"]);
+const INITIAL_KEYS = new Set(["champion", "runner_up", "top_scorer", "best_player", "last_place"]);
 
 const GQ_KEYS = new Set(["team_correct"]);
 

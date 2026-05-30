@@ -28,6 +28,7 @@ export const DEFAULT_SCORING_RULES_V1: ScoringRulesV1 = {
     runner_up: 150,
     top_scorer: 100,
     best_player: 100,
+    last_place: 100,
   },
   group_qualification: {
     team_correct: 25,

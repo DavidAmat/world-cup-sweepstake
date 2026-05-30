@@ -63,10 +63,21 @@ export default async function InitialPredictionsPage({
 
   const { data: pred } = await supabase
     .from("initial_predictions")
-    .select("champion_team_id, runner_up_team_id, top_scorer_text, best_player_text, submitted_at")
+    .select(
+      "champion_team_id, runner_up_team_id, top_scorer_text, best_player_text, last_place_user_id, submitted_at",
+    )
     .eq("tournament_id", tournament.id)
     .eq("user_id", userId)
     .maybeSingle();
+
+  // All participants, for the "último clasificado de la porra" dropdown.
+  const { data: allUsers } = await supabase
+    .from("profiles")
+    .select("user_id, display_name")
+    .order("display_name", { ascending: true });
+  const userList = allUsers ?? [];
+  const userName = (id: string | null | undefined) =>
+    id ? (userList.find((u) => u.user_id === id)?.display_name ?? "—") : "—";
 
   const { data: gqp } = await supabase
     .from("group_qualification_predictions")
@@ -172,7 +183,8 @@ export default async function InitialPredictionsPage({
         <div>
           <h1 className="text-2xl font-bold">Predicciones iniciales</h1>
           <p className="mt-1 text-sm text-zinc-600">
-            Campeón, subcampeón, pichichi, mejor jugador y clasificados de cada grupo.
+            Campeón, subcampeón, pichichi, mejor jugador, último de la porra y clasificados de cada
+            grupo.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -242,6 +254,7 @@ export default async function InitialPredictionsPage({
           runnerUpName={teamName(pred?.runner_up_team_id)}
           topScorer={pred?.top_scorer_text ?? "—"}
           bestPlayer={pred?.best_player_text ?? "—"}
+          lastPlaceName={userName(pred?.last_place_user_id)}
           qualByGroup={qualByGroup}
           teamName={teamName}
           qualifiedByGroup={qualifiedByGroup}
@@ -322,6 +335,31 @@ export default async function InitialPredictionsPage({
             </p>
           </fieldset>
 
+          <fieldset className="rounded-md border border-zinc-200 p-4">
+            <legend className="px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+              Último clasificado de la porra
+            </legend>
+            <label className="flex flex-col gap-1 text-sm sm:max-w-sm">
+              <span className="font-medium">¿Quién quedará último?</span>
+              <select
+                name="last_place_user_id"
+                defaultValue={pred?.last_place_user_id ?? ""}
+                className={INPUT_CLS}
+              >
+                <option value="">— Sin elegir —</option>
+                {userList.map((u) => (
+                  <option key={u.user_id} value={u.user_id}>
+                    {u.display_name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="mt-2 text-xs text-zinc-500">
+              Elige al participante que crees que quedará el último en la clasificación general. Si
+              aciertas, ganas 100 puntos (el administrador lo evalúa al final del torneo).
+            </p>
+          </fieldset>
+
           <ClasificadosPicker groups={pickerGroups} initialSelected={pickerInitial} />
         </form>
       )}
@@ -334,6 +372,7 @@ function ReadOnlyView({
   runnerUpName,
   topScorer,
   bestPlayer,
+  lastPlaceName,
   qualByGroup,
   teamName,
   qualifiedByGroup,
@@ -344,6 +383,7 @@ function ReadOnlyView({
   runnerUpName: string;
   topScorer: string;
   bestPlayer: string;
+  lastPlaceName: string;
   qualByGroup: Map<string, Set<string>>;
   teamName: (id: string | null | undefined) => string;
   qualifiedByGroup: Map<string, Set<string>>;
@@ -368,6 +408,7 @@ function ReadOnlyView({
         <Field label="Subcampeón" value={<TeamName name={runnerUpName} />} />
         <Field label="Pichichi" value={topScorer} />
         <Field label="Mejor jugador" value={bestPlayer} />
+        <Field label="Último de la porra" value={lastPlaceName} />
       </div>
       <div className="rounded-md border border-zinc-200 bg-white p-4">
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">

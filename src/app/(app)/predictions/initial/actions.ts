@@ -91,6 +91,16 @@ export async function saveInitialPredictions(formData: FormData) {
   ensureTeam(payload.champion_team_id, "Campeón");
   ensureTeam(payload.runner_up_team_id, "Subcampeón");
 
+  // Validate the "último de la porra" pick references a real participant.
+  if (payload.last_place_user_id) {
+    const { data: pickedUser } = await supabase
+      .from("profiles")
+      .select("user_id")
+      .eq("user_id", payload.last_place_user_id)
+      .maybeSingle();
+    if (!pickedUser) fail("Último de la porra: participante no válido.");
+  }
+
   // gqp rows to insert. Each group must have MIN..MAX (2..3) teams, no order
   // (predicted_position = null). WC2026 rule: exactly BEST_THIRDS_ADVANCE (8)
   // groups must have 3 teams (the bet that their third advances as a best
@@ -150,6 +160,7 @@ export async function saveInitialPredictions(formData: FormData) {
       runner_up_team_id: payload.runner_up_team_id,
       top_scorer_text: payload.top_scorer_text,
       best_player_text: payload.best_player_text,
+      last_place_user_id: payload.last_place_user_id,
       submitted_at: existing?.submitted_at ?? new Date().toISOString(),
     },
     { onConflict: "tournament_id,user_id" },

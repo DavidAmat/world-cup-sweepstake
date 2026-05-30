@@ -15,13 +15,16 @@ type Row = {
   initials: string | null;
   top_scorer_text: string | null;
   best_player_text: string | null;
+  last_place_name: string | null;
   top_scorer_correct: boolean | null;
   best_player_correct: boolean | null;
+  last_place_correct: boolean | null;
 };
 
 const FIELD_LABEL = {
   top_scorer_correct: "Pichichi",
   best_player_correct: "Mejor jugador",
+  last_place_correct: "Último de la porra",
 } as const;
 
 type Field = keyof typeof FIELD_LABEL;
@@ -121,7 +124,9 @@ export default async function AdminEvaluacionesPage({
     supabase.from("profiles").select("user_id, display_name, initials"),
     supabase
       .from("initial_predictions")
-      .select("user_id, top_scorer_text, best_player_text, top_scorer_correct, best_player_correct")
+      .select(
+        "user_id, top_scorer_text, best_player_text, last_place_user_id, top_scorer_correct, best_player_correct, last_place_correct",
+      )
       .eq("tournament_id", tournament.id),
     supabase
       .from("scoring_rules")
@@ -147,8 +152,12 @@ export default async function AdminEvaluacionesPage({
         initials: prof?.initials ?? null,
         top_scorer_text: p.top_scorer_text,
         best_player_text: p.best_player_text,
+        last_place_name: p.last_place_user_id
+          ? (profileByUser.get(p.last_place_user_id)?.display_name ?? null)
+          : null,
         top_scorer_correct: p.top_scorer_correct,
         best_player_correct: p.best_player_correct,
+        last_place_correct: p.last_place_correct,
       };
     })
     .sort((a, b) =>
@@ -159,6 +168,7 @@ export default async function AdminEvaluacionesPage({
     (rulesRes.data?.rules as ScoringRulesV1 | null) ?? DEFAULT_SCORING_RULES_V1;
   const pichichiPts = rules.initial_predictions.top_scorer;
   const mvpPts = rules.initial_predictions.best_player;
+  const lastPlacePts = rules.initial_predictions.last_place;
 
   return (
     <main className="mx-auto max-w-6xl p-10">
@@ -167,9 +177,10 @@ export default async function AdminEvaluacionesPage({
           <h1 className="text-2xl font-bold text-zinc-900">Evaluaciones subjetivas</h1>
           <p className="mt-1 text-sm text-zinc-500">
             Torneo: <strong className="text-zinc-700">{tournament.name}</strong>. Marca a mano qué
-            participantes acertaron el <strong>pichichi</strong> ({pichichiPts} pts) y el{" "}
-            <strong>mejor jugador</strong> ({mvpPts} pts). Cada cambio recalcula las puntuaciones
-            del torneo.
+            participantes acertaron el <strong>pichichi</strong> ({pichichiPts} pts), el{" "}
+            <strong>mejor jugador</strong> ({mvpPts} pts) y el{" "}
+            <strong>último de la porra</strong> ({lastPlacePts} pts). Cada cambio recalcula las
+            puntuaciones del torneo.
           </p>
         </div>
         <Link href="/admin" className="text-sm text-zinc-500 underline hover:text-zinc-900">
@@ -217,6 +228,10 @@ export default async function AdminEvaluacionesPage({
                 </th>
                 <th scope="col" className="px-3 py-2 font-semibold">
                   Mejor jugador <span className="font-normal normal-case">({mvpPts} pts)</span>
+                </th>
+                <th scope="col" className="px-3 py-2 font-semibold">
+                  Último de la porra{" "}
+                  <span className="font-normal normal-case">({lastPlacePts} pts)</span>
                 </th>
               </tr>
             </thead>
@@ -266,6 +281,25 @@ export default async function AdminEvaluacionesPage({
                           userId={r.user_id}
                           field="best_player_correct"
                           current={r.best_player_correct}
+                        />
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="font-medium text-zinc-900">
+                      {r.last_place_name?.trim() || (
+                        <span className="text-zinc-400 italic">Sin predicción</span>
+                      )}
+                    </div>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                      <StateBadge value={r.last_place_correct} />
+                    </div>
+                    {r.last_place_name?.trim() && (
+                      <div className="mt-2">
+                        <EvaluationButtons
+                          userId={r.user_id}
+                          field="last_place_correct"
+                          current={r.last_place_correct}
                         />
                       </div>
                     )}

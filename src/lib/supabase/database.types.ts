@@ -204,6 +204,8 @@ export type Database = {
           champion_team_id: string | null
           created_at: string
           id: string
+          last_place_correct: boolean | null
+          last_place_user_id: string | null
           locked_at: string | null
           runner_up_team_id: string | null
           submitted_at: string | null
@@ -219,6 +221,8 @@ export type Database = {
           champion_team_id?: string | null
           created_at?: string
           id?: string
+          last_place_correct?: boolean | null
+          last_place_user_id?: string | null
           locked_at?: string | null
           runner_up_team_id?: string | null
           submitted_at?: string | null
@@ -234,6 +238,8 @@ export type Database = {
           champion_team_id?: string | null
           created_at?: string
           id?: string
+          last_place_correct?: boolean | null
+          last_place_user_id?: string | null
           locked_at?: string | null
           runner_up_team_id?: string | null
           submitted_at?: string | null
@@ -250,6 +256,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "initial_predictions_last_place_user_id_fkey"
+            columns: ["last_place_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "initial_predictions_runner_up_team_id_fkey"

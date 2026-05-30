@@ -6,6 +6,7 @@ export type InitialPredictionInput = {
   runner_up_team_id: string | null;
   top_scorer_correct: boolean | null;
   best_player_correct: boolean | null;
+  last_place_correct: boolean | null;
 };
 
 export type TournamentFinalOutcome = {
@@ -34,6 +35,9 @@ export function scoreInitialPrediction(
   }
   if (p.best_player_correct === true) {
     breakdown.best_player = rules.initial_predictions.best_player;
+  }
+  if (p.last_place_correct === true) {
+    breakdown.last_place = rules.initial_predictions.last_place;
   }
 
   const subtotal = Object.values(breakdown).reduce((acc, v) => acc + v, 0);

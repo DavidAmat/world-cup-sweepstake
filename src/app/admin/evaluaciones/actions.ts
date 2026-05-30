@@ -8,7 +8,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { recalculateTournamentScores } from "@/lib/scoring/recalculate";
 
 const SELF = "/admin/evaluaciones";
-const VALID_FIELDS = new Set(["top_scorer_correct", "best_player_correct"]);
+const VALID_FIELDS = new Set([
+  "top_scorer_correct",
+  "best_player_correct",
+  "last_place_correct",
+]);
 const VALID_VALUES = new Set(["true", "false", "null"]);
 
 function fail(message: string): never {
@@ -32,7 +36,11 @@ export async function setSubjectiveEvaluation(formData: FormData) {
   const admin = createAdminClient();
 
   const patch =
-    field === "top_scorer_correct" ? { top_scorer_correct: value } : { best_player_correct: value };
+    field === "top_scorer_correct"
+      ? { top_scorer_correct: value }
+      : field === "best_player_correct"
+        ? { best_player_correct: value }
+        : { last_place_correct: value };
 
   const { error } = await admin
     .from("initial_predictions")
