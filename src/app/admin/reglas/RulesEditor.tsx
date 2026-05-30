@@ -170,6 +170,11 @@ export function RulesEditor({ ruleId, defaultValues: d }: Props) {
           name="init_best_player"
           defaultValue={d.initial_predictions.best_player}
         />
+        <NumInput
+          label="Último de la porra (MVP)"
+          name="init_last_place"
+          defaultValue={d.initial_predictions.last_place}
+        />
       </Section>
 
       <Section title="Clasificados de grupo">
