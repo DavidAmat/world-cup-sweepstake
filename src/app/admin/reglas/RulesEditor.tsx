@@ -171,7 +171,7 @@ export function RulesEditor({ ruleId, defaultValues: d }: Props) {
           defaultValue={d.initial_predictions.best_player}
         />
         <NumInput
-          label="Último de la porra (MVP)"
+          label="Último de la porra"
           name="init_last_place"
           defaultValue={d.initial_predictions.last_place}
         />
