@@ -53,8 +53,8 @@ export default async function RulesPage({ searchParams }: { searchParams: Search
             <p className="text-sm font-semibold">Paso 1 — Predicciones iniciales</p>
             <p className="mt-1 text-xs leading-relaxed text-zinc-600">
               Antes de que empiece el torneo: <strong>campeón</strong>, <strong>subcampeón</strong>,{" "}
-              <strong>pichichi</strong>, <strong>mejor jugador</strong> y{" "}
-              <strong>2 equipos que pasan por cada grupo</strong>. Se bloquean al comenzar el primer
+              <strong>pichichi</strong>, <strong>mejor jugador</strong>, <strong>que usuario quedará el último</strong> y{" "}
+              <strong>2 o 3 equipos que pasan por cada grupo</strong>. Se bloquean al comenzar el primer
               partido.
             </p>
           </div>
