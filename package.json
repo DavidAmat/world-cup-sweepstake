@@ -24,6 +24,8 @@
     "wc2026:clean:prod": "tsx --env-file=.env.prod scripts/wc2026/clean-slate.ts --confirm-prod",
     "wc2026:users": "tsx --env-file=.env.local scripts/wc2026/create-users.ts",
     "wc2026:users:prod": "tsx --env-file=.env.prod scripts/wc2026/create-users.ts --confirm-prod",
+    "wc2026:reset-pw": "tsx --env-file=.env.local scripts/wc2026/reset-user-password.ts",
+    "wc2026:reset-pw:prod": "tsx --env-file=.env.prod scripts/wc2026/reset-user-password.ts --confirm-prod",
     "scoring:smoke": "tsx --env-file=.env.local scripts/scoring/smoke-recalc.ts"
   },
   "dependencies": {
