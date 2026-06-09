@@ -32,6 +32,8 @@
     "wc2026:set-scam:prod": "tsx --env-file=.env.prod scripts/wc2026/set-scam-flag.ts --confirm-prod",
     "wc2026:user:del": "tsx --env-file=.env.local scripts/wc2026/delete-user.ts",
     "wc2026:user:del:prod": "tsx --env-file=.env.prod scripts/wc2026/delete-user.ts --confirm-prod",
+    "wc2026:fixture-date": "tsx --env-file=.env.local scripts/wc2026/update-fixture-date.ts",
+    "wc2026:fixture-date:prod": "tsx --env-file=.env.prod scripts/wc2026/update-fixture-date.ts --confirm-prod",
     "scoring:smoke": "tsx --env-file=.env.local scripts/scoring/smoke-recalc.ts"
   },
   "dependencies": {
