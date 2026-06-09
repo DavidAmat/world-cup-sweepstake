@@ -49,14 +49,14 @@ async function main() {
 
   // Report the footprint that will be removed, for the record.
   const { count: predCount } = await supabase
-    .from("predictions")
+    .from("match_predictions")
     .select("id", { count: "exact", head: true })
     .eq("user_id", userId);
   const { count: lastPlaceRefs } = await supabase
     .from("initial_predictions")
     .select("id", { count: "exact", head: true })
     .eq("last_place_user_id", userId);
-  info("predictions to remove", String(predCount ?? "unknown"));
+  info("match predictions to remove", String(predCount ?? "unknown"));
   info("other players' last_place pointing here (will be nulled)", String(lastPlaceRefs ?? "unknown"));
 
   step("Deleting auth user (cascades)");
