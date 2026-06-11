@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { TeamName } from "@/components/ui/TeamName";
 import { NavSubmitButton } from "@/components/ui/SubmitButton";
+import { Avatar } from "@/components/profiles/Avatar";
+import { avatarUrlMapFor } from "@/lib/profiles/avatars";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getInitialLockState } from "@/lib/predictions/initialLock";
@@ -74,6 +76,7 @@ export default async function PublicInitialPredictionsPage({
   const userName = (id: string | null | undefined) =>
     id ? (profiles?.find((u) => u.user_id === id)?.display_name ?? "—") : "—";
 
+  const avatarMap = avatarUrlMapFor(profiles ?? []);
   const predByUser = new Map((preds ?? []).map((p) => [p.user_id, p]));
   // user_id → group_code → Set(team_id) (order is not predicted)
   const gqpByUser = new Map<string, Map<string, Set<string>>>();
@@ -136,9 +139,12 @@ export default async function PublicInitialPredictionsPage({
               className="rounded-md border border-zinc-200 bg-white p-4"
             >
               <div className="flex items-center gap-2">
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-zinc-200 text-xs font-bold">
-                  {u.initials}
-                </span>
+                <Avatar
+                  displayName={u.display_name}
+                  initials={u.initials}
+                  avatarUrl={avatarMap[u.user_id]}
+                  size={28}
+                />
                 <span className="font-semibold">{u.display_name}</span>
               </div>
               {category === "clasificados" ? (

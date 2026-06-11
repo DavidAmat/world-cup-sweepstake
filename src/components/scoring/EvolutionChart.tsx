@@ -43,11 +43,32 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
     return <p className="text-sm text-zinc-600">Aún no hay puntuaciones para pintar el gráfico.</p>;
   }
 
-  const WIDTH = 720;
+  const BASE_WIDTH = 720;
   const HEIGHT = 540;
   const PAD = { top: 28, right: 90, bottom: 50, left: 50 };
-  const innerW = WIDTH - PAD.left - PAD.right;
+  const innerW = BASE_WIDTH - PAD.left - PAD.right;
   const innerH = HEIGHT - PAD.top - PAD.bottom;
+
+  // Final cumulative score per user, grouped so tied users can fan their
+  // end-of-line avatars out horizontally to the right instead of stacking
+  // on the same spot (where they'd overlap and hide each other).
+  const lastPoint = points[points.length - 1];
+  const finalScoreFor = (uid: string) => lastPoint.cumulativeByUser.get(uid) ?? 0;
+  const tieIndex = new Map<string, number>();
+  let maxTie = 1;
+  {
+    const seen = new Map<number, number>();
+    for (const u of users) {
+      const s = finalScoreFor(u.user_id);
+      const n = seen.get(s) ?? 0;
+      tieIndex.set(u.user_id, n);
+      seen.set(s, n + 1);
+      if (n + 1 > maxTie) maxTie = n + 1;
+    }
+  }
+  const avatarStep = AVATAR_R * 2 + 4; // horizontal spacing between tied avatars
+  // Extra room on the right so the widest tie cohort isn't clipped by the viewBox.
+  const WIDTH = BASE_WIDTH + (maxTie - 1) * avatarStep;
 
   // y-axis floor: min cumulative across users at the first round (J1).
   // Starting at 0 wastes vertical space when everyone already has 25+ pts
@@ -139,7 +160,10 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
           const last = points[points.length - 1];
           const lastY = yFor(last.cumulativeByUser.get(u.user_id) ?? 0);
           const lastX = xFor(points.length - 1);
-          const avatarCx = lastX + AVATAR_R + 4;
+          // Fan tied avatars rightward: first sits next to the dot, the rest
+          // step right by one avatar-width each so all photos stay visible.
+          const tIdx = tieIndex.get(u.user_id) ?? 0;
+          const avatarCx = lastX + AVATAR_R + 4 + tIdx * avatarStep;
           return (
             <g key={u.user_id}>
               <path d={seg} fill="none" stroke={color} strokeWidth={2} />
