@@ -3,6 +3,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { ChevronDown, ChevronUp, Flag } from "lucide-react";
 import { TeamName } from "@/components/ui/TeamName";
+import { Avatar } from "@/components/profiles/Avatar";
 import { BreakdownPopover } from "@/components/scoring/BreakdownPopover";
 import { BreakdownTable } from "@/components/scoring/BreakdownTable";
 import { PointsBar } from "@/components/scoring/PointsBar";
@@ -26,6 +27,8 @@ type Score = { points: number; breakdown: Record<string, unknown> };
 export type LockedEntry = {
   user_id: string;
   display_name: string;
+  initials: string;
+  avatarUrl?: string | null;
   prediction: Prediction | null;
   score: Score | null;
 };
@@ -226,6 +229,12 @@ function RankingRow({
               {position}
             </span>
             <span className="truncate">{entry.display_name}</span>
+            <Avatar
+              displayName={entry.display_name}
+              initials={entry.initials}
+              avatarUrl={entry.avatarUrl}
+              size={32}
+            />
             {isMe && (
               <span className="bg-info-light text-info-fg ml-0.5 rounded px-1 text-[10px] font-bold uppercase">
                 tú

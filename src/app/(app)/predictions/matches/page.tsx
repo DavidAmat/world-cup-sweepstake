@@ -6,6 +6,7 @@ import { clearAllMatchPredictions } from "./actions";
 // `generateRandomMatchPredictions` still lives in ./actions (logic kept). Its
 // button below is commented out; re-import it here to re-enable.
 import { MatchesForm, type RoundVM } from "./MatchesForm";
+import { avatarUrlMapFor } from "@/lib/profiles/avatars";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import type { LockedEntry } from "./LockedFixturePanel";
@@ -164,8 +165,11 @@ export default async function MatchPredictionsPage({
   );
 
   const profiles = profilesRaw ?? [];
+  const avatarMap = avatarUrlMapFor(profiles);
   const myProfile = profiles.find((p) => p.user_id === userId);
   const myDisplayName = myProfile?.display_name ?? "Yo";
+  const myInitials = myProfile?.initials ?? "";
+  const myAvatarUrl = avatarMap[userId] ?? null;
   const otherProfiles = profiles.filter((p) => p.user_id !== userId);
 
   const fixturesByRound = new Map<string, Fixture[]>();
@@ -206,6 +210,8 @@ export default async function MatchPredictionsPage({
             return {
               user_id: prof.user_id,
               display_name: prof.display_name,
+              initials: prof.initials,
+              avatarUrl: avatarMap[prof.user_id] ?? null,
               prediction: op
                 ? {
                     h90: op.home_goals_90,
@@ -325,6 +331,8 @@ export default async function MatchPredictionsPage({
         <MatchesForm
           rounds={roundVMs}
           myDisplayName={myDisplayName}
+          myInitials={myInitials}
+          myAvatarUrl={myAvatarUrl}
           isAdmin={isAdmin}
           allTeams={allTeams}
         />

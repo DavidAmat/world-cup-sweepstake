@@ -109,11 +109,15 @@ function isSaved(v: Values, s: SavedVM | null): boolean {
 export function MatchesForm({
   rounds,
   myDisplayName,
+  myInitials,
+  myAvatarUrl,
   isAdmin = false,
   allTeams = [],
 }: {
   rounds: RoundVM[];
   myDisplayName: string;
+  myInitials: string;
+  myAvatarUrl: string | null;
   isAdmin?: boolean;
   allTeams?: string[];
 }) {
@@ -411,6 +415,8 @@ export function MatchesForm({
                         myEntry={{
                           user_id: "me",
                           display_name: myDisplayName,
+                          initials: myInitials,
+                          avatarUrl: myAvatarUrl,
                           prediction: f.saved,
                           score: f.score,
                         }}
