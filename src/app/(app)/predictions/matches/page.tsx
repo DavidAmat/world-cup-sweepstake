@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { getMatchLockState, isFixtureLocked } from "@/lib/predictions/matchLock";
+import { fetchAllRows } from "@/lib/supabase/fetchAllRows";
 import { clearAllMatchPredictions } from "./actions";
 // `generateRandomMatchPredictions` still lives in ./actions (logic kept). Its
 // button below is commented out; re-import it here to re-enable.
@@ -73,7 +74,7 @@ export default async function MatchPredictionsPage({
   const [
     { data: rounds },
     { data: fxData },
-    { data: allPredsRaw },
+    allPredsRaw,
     { data: allScoresRaw },
     { data: resultsRaw },
     { data: profilesRaw },
@@ -93,12 +94,16 @@ export default async function MatchPredictionsPage({
       )
       .eq("tournament_id", tournament.id)
       .order("kickoff_at", { ascending: true }),
-    supabase
-      .from("match_predictions")
-      .select(
-        "user_id, fixture_id, home_goals_90, away_goals_90, predicts_extra_time, predicts_penalties, predicted_qualified_team_id",
-      )
-      .eq("tournament_id", tournament.id),
+    fetchAllRows((from, to) =>
+      supabase
+        .from("match_predictions")
+        .select(
+          "user_id, fixture_id, home_goals_90, away_goals_90, predicts_extra_time, predicts_penalties, predicted_qualified_team_id",
+        )
+        .eq("tournament_id", tournament.id)
+        .order("id")
+        .range(from, to),
+    ),
     supabase
       .from("prediction_scores")
       .select("user_id, fixture_id, points_total, points_breakdown")

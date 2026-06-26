@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
+import { fetchAllRows } from "@/lib/supabase/fetchAllRows";
 import { DEFAULT_SCORING_RULES_V1 } from "./rules";
 import { scoreGroupMatch, scoreKnockoutMatch } from "./scoreMatch";
 import { scoreInitialPrediction, type TournamentFinalOutcome } from "./scoreInitial";
@@ -171,14 +172,18 @@ export async function recalculateTournamentScoresCore(
 
   const rowsToInsert: PredictionScoreRow[] = [];
 
-  const { data: matchPreds } = await supabase
-    .from("match_predictions")
-    .select(
-      "user_id, fixture_id, home_goals_90, away_goals_90, predicts_extra_time, predicts_penalties, predicted_qualified_team_id",
-    )
-    .eq("tournament_id", tournamentId);
+  const matchPreds = await fetchAllRows((from, to) =>
+    supabase
+      .from("match_predictions")
+      .select(
+        "user_id, fixture_id, home_goals_90, away_goals_90, predicts_extra_time, predicts_penalties, predicted_qualified_team_id",
+      )
+      .eq("tournament_id", tournamentId)
+      .order("id")
+      .range(from, to),
+  );
 
-  for (const p of matchPreds ?? []) {
+  for (const p of matchPreds) {
     const r = resultByFixture.get(p.fixture_id);
     if (!r) continue;
     const fx = fixtureById.get(p.fixture_id);
