@@ -1,15 +1,10 @@
-import type { PostgrestFilterBuilder } from "@supabase/postgrest-js";
-
 const PAGE_SIZE = 1000;
 
 // PostgREST caps each response at 1,000 rows. Tournament-wide reads
 // (e.g. all match_predictions for ~15 users × 72 fixtures) exceed that,
 // so callers must page until the full set is loaded.
 export async function fetchAllRows<T>(
-  buildQuery: (
-    from: number,
-    to: number,
-  ) => PostgrestFilterBuilder<any, any, T[], unknown, unknown>,
+  buildQuery: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>,
 ): Promise<T[]> {
   const rows: T[] = [];
   let from = 0;
