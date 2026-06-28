@@ -75,7 +75,7 @@ export default async function MatchPredictionsPage({
     { data: rounds },
     { data: fxData },
     allPredsRaw,
-    { data: allScoresRaw },
+    allScoresRaw,
     { data: resultsRaw },
     { data: profilesRaw },
   ] = await Promise.all([
@@ -104,11 +104,15 @@ export default async function MatchPredictionsPage({
         .order("id")
         .range(from, to),
     ),
-    supabase
-      .from("prediction_scores")
-      .select("user_id, fixture_id, points_total, points_breakdown")
-      .eq("tournament_id", tournament.id)
-      .in("prediction_type", ["group_phase", "knockout"]),
+    fetchAllRows((from, to) =>
+      supabase
+        .from("prediction_scores")
+        .select("user_id, fixture_id, points_total, points_breakdown")
+        .eq("tournament_id", tournament.id)
+        .in("prediction_type", ["group_phase", "knockout"])
+        .order("id")
+        .range(from, to),
+    ),
     supabase
       .from("match_results")
       .select(

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
+import { fetchAllRows } from "@/lib/supabase/fetchAllRows";
 import { avatarUrlFor } from "@/lib/profiles/avatars";
 import { ClasificacionTabs } from "../../Tabs";
 import {
@@ -31,7 +32,7 @@ export default async function JornadaDetallePage({ params }: { params: RoutePara
     .single();
   if (!round) notFound();
 
-  const [{ data: fxData }, { data: scoresRaw }, { data: profiles }, { data: resultsRaw }] =
+  const [{ data: fxData }, scoresRaw, { data: profiles }, { data: resultsRaw }] =
     await Promise.all([
       supabase
         .from("fixtures")
@@ -43,11 +44,15 @@ export default async function JornadaDetallePage({ params }: { params: RoutePara
         .eq("tournament_id", tournament.id)
         .eq("round_id", round.id)
         .order("kickoff_at", { ascending: true }),
-      supabase
-        .from("prediction_scores")
-        .select("user_id, fixture_id, points_total")
-        .eq("tournament_id", tournament.id)
-        .in("prediction_type", ["group_phase", "knockout"]),
+      fetchAllRows((from, to) =>
+        supabase
+          .from("prediction_scores")
+          .select("user_id, fixture_id, points_total")
+          .eq("tournament_id", tournament.id)
+          .in("prediction_type", ["group_phase", "knockout"])
+          .order("id")
+          .range(from, to),
+      ),
       supabase.from("profiles").select("user_id, display_name, initials").order("display_name"),
       supabase
         .from("match_results")

@@ -50,13 +50,20 @@ WHERE mp.id IS NULL;
 -- Nona ×4, Laura ×1, David ×1, Carlota ×1, Orozco ×1, Mayol ×1
 ```
 
-## Fix (commit `66e249e`)
+## Fix (commits `66e249e`, follow-up for `prediction_scores`)
 
 1. Added `src/lib/supabase/fetchAllRows.ts` — pages through PostgREST with `.range(from, to)` in 1,000-row chunks until exhausted. Uses `.order("id")` for stable pagination.
 
 2. Updated `src/app/(app)/predictions/matches/page.tsx` to use `fetchAllRows` for the tournament-wide `match_predictions` read.
 
 3. Updated `src/lib/scoring/recalculateCore.ts` with the same pattern so recalc does not skip rows.
+
+4. **Follow-up (2026-06-28):** the same cap also applied to **`prediction_scores`**. With 1,008 match score rows (and 1,176 total including group qualification), the matches page loaded scores in one query — so up to 8 match rows were dropped and the UI showed `0 pts` even when SQL had the correct breakdown. Example: David × `wc2026_md3_l_cro_gha` (exact 2-1 → 15 pts in DB, 0 in UI). Fixed by paginating `prediction_scores` in:
+   - `src/app/(app)/predictions/matches/page.tsx`
+   - `src/lib/scoring/leaderboard.ts`
+   - `src/app/(app)/clasificacion/jornada/[roundCode]/page.tsx`
+
+   Scoring computation was never wrong; only tournament-wide reads in the UI were incomplete.
 
 ## Post-deploy check
 

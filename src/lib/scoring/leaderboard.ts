@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
+import { fetchAllRows } from "@/lib/supabase/fetchAllRows";
 import { bucketFromBreakdown, type CategoryBucket } from "./breakdownLabels";
 
 // View-models for /clasificacion. All aggregations happen in JS over
@@ -36,15 +37,19 @@ export type StageRef = {
 export async function loadLeaderboardData(tournamentId: string) {
   const supabase = await createClient();
 
-  const [profilesRes, scoresRes, fixturesRes, roundsRes, stagesRes] = await Promise.all([
+  const [profilesRes, scoresRaw, fixturesRes, roundsRes, stagesRes] = await Promise.all([
     supabase
       .from("profiles")
       .select("user_id, display_name, initials, role")
       .order("display_name", { ascending: true }),
-    supabase
-      .from("prediction_scores")
-      .select("user_id, fixture_id, prediction_type, points_total, points_breakdown")
-      .eq("tournament_id", tournamentId),
+    fetchAllRows((from, to) =>
+      supabase
+        .from("prediction_scores")
+        .select("user_id, fixture_id, prediction_type, points_total, points_breakdown")
+        .eq("tournament_id", tournamentId)
+        .order("id")
+        .range(from, to),
+    ),
     supabase.from("fixtures").select("id, round_id, stage_id").eq("tournament_id", tournamentId),
     supabase
       .from("rounds")
@@ -59,7 +64,7 @@ export async function loadLeaderboardData(tournamentId: string) {
   ]);
 
   const profiles = (profilesRes.data ?? []) as ProfileRef[];
-  const rawScores = scoresRes.data ?? [];
+  const rawScores = scoresRaw ?? [];
   const fixtures = fixturesRes.data ?? [];
   const rawRounds = (roundsRes.data ?? []) as Array<{
     id: string;
