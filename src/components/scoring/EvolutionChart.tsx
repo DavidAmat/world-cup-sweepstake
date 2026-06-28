@@ -1,17 +1,5 @@
 import type { EvolutionPoint } from "@/lib/scoring/leaderboard";
 
-const ROUND_SHORT_LABEL: Record<string, string> = {
-  group_md1: "J1",
-  group_md2: "J2",
-  group_md3: "J3",
-  r32: "16avos",
-  r16: "8avos",
-  qf: "4tos",
-  sf: "Semis",
-  third: "3.º",
-  final: "Final",
-};
-
 const COLORS = [
   "#3cdcb4", // success green
   "#4681ff", // primary blue
@@ -32,10 +20,9 @@ type UserMeta = {
   avatarUrl?: string | null;
 };
 
-// Avatar disc that lives at the end of every user's evolution line.
-// Bigger than the old initials badge (R) and renders the user's photo
-// when available, falling back to the colored initials disc otherwise.
-const AVATAR_R = 18;
+// Avatar disc that lives at the end of every user's evolution line. Kept
+// deliberately small — with ~12 users a bigger disc crowds the right margin.
+const AVATAR_R = 13;
 const AVATAR_STROKE = 2;
 
 export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; users: UserMeta[] }) {
@@ -43,11 +30,14 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
     return <p className="text-sm text-zinc-600">Aún no hay puntuaciones para pintar el gráfico.</p>;
   }
 
-  const BASE_WIDTH = 720;
-  const HEIGHT = 540;
-  const PAD = { top: 28, right: 90, bottom: 50, left: 50 };
-  const innerW = BASE_WIDTH - PAD.left - PAD.right;
+  // Horizontal spacing per day; the chart scrolls (overflow-x-auto) when the
+  // tournament has more dates than fit at this density.
+  const COL = 44;
+  const HEIGHT = 520;
+  const PAD = { top: 24, right: 80, bottom: 64, left: 46 };
+  const innerW = Math.max(360, (points.length - 1) * COL);
   const innerH = HEIGHT - PAD.top - PAD.bottom;
+  const BASE_WIDTH = PAD.left + PAD.right + innerW;
 
   // Final cumulative score per user, grouped so tied users can fan their
   // end-of-line avatars out horizontally to the right instead of stacking
@@ -66,19 +56,16 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
       if (n + 1 > maxTie) maxTie = n + 1;
     }
   }
-  const avatarStep = AVATAR_R * 2 + 4; // horizontal spacing between tied avatars
+  const avatarStep = AVATAR_R * 2 + 3; // horizontal spacing between tied avatars
   // Extra room on the right so the widest tie cohort isn't clipped by the viewBox.
   const WIDTH = BASE_WIDTH + (maxTie - 1) * avatarStep;
 
-  // y-axis floor: min cumulative across users at the first round (J1).
-  // Starting at 0 wastes vertical space when everyone already has 25+ pts
-  // by the end of jornada 1 — clipping the bottom makes deltas readable
-  // and spreads avatars at the last x position so they don't overlap.
+  // y-axis floor: min cumulative across users at the first date. Starting at 0
+  // wastes vertical space when everyone already has 25+ pts on day one — clipping
+  // the bottom makes the deltas between users readable.
   let minYFirst = Infinity;
-  if (points.length > 0) {
-    for (const v of points[0].cumulativeByUser.values()) {
-      if (v < minYFirst) minYFirst = v;
-    }
+  for (const v of points[0].cumulativeByUser.values()) {
+    if (v < minYFirst) minYFirst = v;
   }
   if (!Number.isFinite(minYFirst)) minYFirst = 0;
 
@@ -101,6 +88,7 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
   const stepX = points.length > 1 ? innerW / (points.length - 1) : 0;
   const xFor = (i: number) => PAD.left + i * stepX;
   const yFor = (v: number) => PAD.top + innerH - ((v - yMin) / yRange) * innerH;
+  const axisY = HEIGHT - PAD.bottom;
 
   const yTicks = [0, 0.25, 0.5, 0.75, 1].map((p) => yMin + p * yRange);
 
@@ -109,7 +97,7 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
       <svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         role="img"
-        aria-label="Evolución acumulada de puntos por jornada"
+        aria-label="Evolución acumulada de puntos por día"
         className="block w-full text-zinc-700"
       >
         {yTicks.map((t, i) => {
@@ -130,16 +118,17 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
             </g>
           );
         })}
+        {/* Date labels, rotated 90° (vertical) so dozens of days fit. */}
         {points.map((pt, i) => (
           <text
-            key={pt.roundCode}
-            x={xFor(i)}
-            y={HEIGHT - PAD.bottom + 18}
-            textAnchor="middle"
+            key={pt.dateKey}
+            transform={`translate(${xFor(i)}, ${axisY + 8}) rotate(-90)`}
+            textAnchor="end"
+            dy="0.32em"
             fontSize={10}
             fill="#9C9C9C"
           >
-            {ROUND_SHORT_LABEL[pt.roundCode] ?? pt.roundName}
+            {pt.label}
           </text>
         ))}
         <defs>
@@ -171,18 +160,14 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
                 const v = pt.cumulativeByUser.get(u.user_id) ?? 0;
                 const cy = yFor(v);
                 return (
-                  <g key={`${u.user_id}-${pt.roundCode}`}>
-                    <circle cx={xFor(i)} cy={cy} r={3} fill={color} />
-                    <text
-                      x={xFor(i)}
-                      y={cy - 7}
-                      textAnchor="middle"
-                      fontSize={10}
-                      fontWeight="bold"
-                      fill={color}
-                    >
-                      {Math.round(v)}
-                    </text>
+                  <g key={`${u.user_id}-${pt.dateKey}`}>
+                    {/* Small visible dot, no inline value text (too many users). */}
+                    <circle cx={xFor(i)} cy={cy} r={2.5} fill={color} />
+                    {/* Wider transparent hit area so the native tooltip is easy
+                        to trigger; <title> shows the value on hover. */}
+                    <circle cx={xFor(i)} cy={cy} r={7} fill="transparent">
+                      <title>{`${u.display_name} · ${pt.label}: ${Math.round(v)} pts`}</title>
+                    </circle>
                   </g>
                 );
               })}
@@ -205,21 +190,23 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
                     stroke={color}
                     strokeWidth={AVATAR_STROKE}
                   />
+                  <title>{`${u.display_name}: ${Math.round(finalScoreFor(u.user_id))} pts`}</title>
                 </g>
               ) : (
-                <>
-                  <circle cx={avatarCx} cy={lastY} r={AVATAR_R} fill={color} />
+                <g transform={`translate(${avatarCx}, ${lastY})`}>
+                  <circle cx={0} cy={0} r={AVATAR_R} fill={color} />
                   <text
-                    x={avatarCx}
-                    y={lastY + 4}
+                    x={0}
+                    y={4}
                     textAnchor="middle"
-                    fontSize={13}
+                    fontSize={11}
                     fontWeight="bold"
                     fill="#ffffff"
                   >
                     {u.initials.slice(0, 2).toUpperCase()}
                   </text>
-                </>
+                  <title>{`${u.display_name}: ${Math.round(finalScoreFor(u.user_id))} pts`}</title>
+                </g>
               )}
             </g>
           );

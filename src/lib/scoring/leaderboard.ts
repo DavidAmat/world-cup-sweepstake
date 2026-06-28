@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { fetchAllRows } from "@/lib/supabase/fetchAllRows";
+import { madridDateKey, formatDayMonthEs } from "@/lib/dates/madridTime";
 import { bucketFromBreakdown, type CategoryBucket } from "./breakdownLabels";
 
 // View-models for /clasificacion. All aggregations happen in JS over
@@ -50,7 +51,10 @@ export async function loadLeaderboardData(tournamentId: string) {
         .order("id")
         .range(from, to),
     ),
-    supabase.from("fixtures").select("id, round_id, stage_id").eq("tournament_id", tournamentId),
+    supabase
+      .from("fixtures")
+      .select("id, round_id, stage_id, kickoff_at")
+      .eq("tournament_id", tournamentId),
     supabase
       .from("rounds")
       .select("id, code, name, sort_order, stage:stages ( code )")
@@ -103,10 +107,14 @@ export async function loadLeaderboardData(tournamentId: string) {
 
   const fixtureToRound = new Map<string, string>();
   const fixtureToStage = new Map<string, string>();
+  // Madrid calendar day each fixture is played on ("YYYY-MM-DD"). Drives the
+  // date-based X axis of the evolution chart.
+  const fixtureToDate = new Map<string, string>();
   const stageByRound = new Map<string, string>(rounds.map((r) => [r.id, r.stage_code]));
   for (const f of fixtures) {
     fixtureToRound.set(f.id, f.round_id);
     fixtureToStage.set(f.id, stageByRound.get(f.round_id) ?? "group_stage");
+    if (f.kickoff_at) fixtureToDate.set(f.id, madridDateKey(f.kickoff_at as string));
   }
 
   return {
@@ -116,6 +124,7 @@ export async function loadLeaderboardData(tournamentId: string) {
     stages,
     fixtureToRound,
     fixtureToStage,
+    fixtureToDate,
   };
 }
 
@@ -309,55 +318,72 @@ export function buildByCategory(data: LeaderboardData): ByCategoryRow[] {
 // --- Evolution -------------------------------------------------------
 
 export type EvolutionPoint = {
-  roundCode: string;
-  roundName: string;
-  sort_order: number;
+  dateKey: string; // Madrid calendar day, "YYYY-MM-DD"
+  label: string; // "01-Jun"
   cumulativeByUser: Map<string, number>;
 };
 
+// Daily cumulative evolution. For each distinct fixture date we sum every
+// match point each user earned up to and including that day. A fixture only
+// has a `prediction_scores` row once its result is confirmed, so unplayed
+// matches contribute nothing and the cumulative simply stays flat.
+//
+// The X axis runs from the first fixture date up to the LAST date that has any
+// results — future dates with no results are dropped so the chart doesn't
+// trail off into a flat horizontal line. As new results are entered the axis
+// automatically extends.
 export function buildEvolution(data: LeaderboardData): EvolutionPoint[] {
-  const { rounds } = buildByRound(data);
-  if (rounds.length === 0) return [];
+  // Per-day, per-user match-point increments, and the set of days with results.
+  const incByDate = new Map<string, Map<string, number>>();
+  const datesWithScores = new Set<string>();
+  for (const s of data.scores) {
+    if (s.prediction_type !== "group_phase" && s.prediction_type !== "knockout") continue;
+    if (!s.fixture_id) continue;
+    const dateKey = data.fixtureToDate.get(s.fixture_id);
+    if (!dateKey) continue;
+    datesWithScores.add(dateKey);
+    let bucket = incByDate.get(dateKey);
+    if (!bucket) {
+      bucket = new Map();
+      incByDate.set(dateKey, bucket);
+    }
+    bucket.set(s.user_id, (bucket.get(s.user_id) ?? 0) + s.points_total);
+  }
 
-  const sorted = [...rounds].sort((a, b) => a.sort_order - b.sort_order);
+  if (datesWithScores.size === 0) return [];
 
-  // initial / group_qualification land entirely on the first scored round
+  // ISO "YYYY-MM-DD" strings sort correctly lexicographically.
+  const lastDate = [...datesWithScores].sort().at(-1)!;
+
+  const axisDates = [...new Set(data.fixtureToDate.values())]
+    .filter((d) => d <= lastDate)
+    .sort();
+
+  // initial / group_qualification have no fixture date; apply them entirely on
+  // the first day so each line starts from a realistic baseline.
   const baseExtras = new Map<string, number>();
   for (const s of data.scores) {
     if (s.prediction_type !== "initial" && s.prediction_type !== "group_qualification") continue;
     baseExtras.set(s.user_id, (baseExtras.get(s.user_id) ?? 0) + s.points_total);
   }
 
-  // sum per (user, roundCode)
-  const perRound = new Map<string, Map<string, number>>();
-  for (const r of sorted) perRound.set(r.code, new Map());
-  for (const s of data.scores) {
-    if (s.prediction_type !== "group_phase" && s.prediction_type !== "knockout") continue;
-    if (!s.fixture_id) continue;
-    const rId = data.fixtureToRound.get(s.fixture_id);
-    if (!rId) continue;
-    const round = sorted.find((r) => r.id === rId);
-    if (!round) continue;
-    const bucket = perRound.get(round.code)!;
-    bucket.set(s.user_id, (bucket.get(s.user_id) ?? 0) + s.points_total);
-  }
-
   const points: EvolutionPoint[] = [];
   const cumulative = new Map<string, number>(baseExtras);
-  for (const r of sorted) {
-    const inc = perRound.get(r.code) ?? new Map();
-    for (const [user, pts] of inc) {
-      cumulative.set(user, (cumulative.get(user) ?? 0) + pts);
+  for (const dateKey of axisDates) {
+    const inc = incByDate.get(dateKey);
+    if (inc) {
+      for (const [user, pts] of inc) {
+        cumulative.set(user, (cumulative.get(user) ?? 0) + pts);
+      }
     }
     points.push({
-      roundCode: r.code,
-      roundName: r.name,
-      sort_order: r.sort_order,
+      dateKey,
+      label: formatDayMonthEs(dateKey),
       cumulativeByUser: new Map(cumulative),
     });
   }
 
-  // Make sure every profile is represented (with 0 if no scores yet)
+  // Make sure every profile is represented (baseline if no match scores yet)
   for (const p of data.profiles) {
     for (const pt of points) {
       if (!pt.cumulativeByUser.has(p.user_id)) {

@@ -15,8 +15,10 @@ export default async function EvolucionPage() {
     <main className="mx-auto max-w-7xl p-10">
       <h1 className="text-2xl font-bold">Evolución de puntos</h1>
       <p className="mt-1 text-sm text-zinc-600">
-        Puntos acumulados de cada participante a lo largo del torneo. Las predicciones iniciales y
-        los clasificados de grupo se aplican en la primera jornada con resultados.
+        Puntos acumulados de cada participante día a día. Cada fecha suma los puntos de los partidos
+        jugados hasta ese momento; el gráfico llega hasta el último día con resultados. Las
+        predicciones iniciales y los clasificados de grupo se aplican el primer día. Pasa el cursor
+        por un punto para ver su valor.
       </p>
 
       <ClasificacionTabs active="evolucion" />

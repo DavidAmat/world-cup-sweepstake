@@ -148,6 +148,24 @@ export function formatMadridDateTime(utcIso: string): string {
   return `${parseInt(p.day, 10)}-${month} ${p.hour}h${p.minute}`;
 }
 
+// Madrid calendar day for a UTC instant, as "YYYY-MM-DD". Used to bucket
+// fixtures by the day they are actually played in Spain (a 04:00 kickoff
+// belongs to that morning, not the previous UTC day).
+export function madridDateKey(utcIso: string): string {
+  const date = new Date(utcIso);
+  if (Number.isNaN(date.getTime())) return "";
+  const p = readMadridParts(date);
+  return `${p.year}-${p.month}-${p.day}`;
+}
+
+// "2026-06-01" → "01-Jun" (zero-padded day + Spanish 3-letter month).
+export function formatDayMonthEs(dateKey: string): string {
+  const m = dateKey.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return dateKey;
+  const month = MONTHS_ES[parseInt(m[2], 10) - 1] ?? m[2];
+  return `${m[3]}-${month}`;
+}
+
 // Full Madrid timestamp incl. year + seconds, e.g. "29-May-2026 17:30:05".
 // Used for the login audit log so each access is fully identifiable.
 export function formatMadridDateTimeFull(utcIso: string): string {

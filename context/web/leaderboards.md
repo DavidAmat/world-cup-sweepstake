@@ -69,9 +69,9 @@ Static stage ceilings (`MAX_POINTS_BY_STAGE`: 15 / 66 / 99 / 165) remain for ref
 
 ## Evolution chart
 
-`buildEvolution()` accumulates match points jornada-by-jornada. Initial predictions and group-qualification scores are applied entirely on the **first jornada that has confirmed match scores**, so the chart starts at a realistic baseline rather than zero.
+`buildEvolution()` accumulates match points **day by day**. The X axis is the distinct Madrid calendar dates of fixtures (from `fixtures.kickoff_at` → `madridDateKey`), sorted ascending; each date holds the cumulative points each user earned from matches played up to that day. Unplayed matches have no `prediction_scores` row, so they add nothing and lines stay flat. The axis is trimmed to the **last date that has any results** (future empty dates are dropped and re-appear automatically as results are entered). Initial predictions and group-qualification scores apply entirely on the **first date**, so lines start at a realistic baseline.
 
-Rendered as inline SVG (`EvolutionChart`) — no chart library. One polyline per user; avatar or initials disc at the last data point.
+Rendered as inline SVG (`EvolutionChart`) — no chart library. One polyline per user; small markers with no inline value (value shown on hover via SVG `<title>`); date labels rotated 90° (`01-Jun`); avatar or initials disc at the last data point. Y-axis is zoomed (floor = min cumulative on day one, ceiling = max) to make per-user deltas readable.
 
 ## Breakdown UI
 
