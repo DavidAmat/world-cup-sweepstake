@@ -10,6 +10,7 @@
  * It does NOT change role or is_scam.
  *
  * Pick the target with --email=<addr> (matched against the JSON file).
+ * Optional --password=<value> overrides the JSON password (min 6 chars).
  *
  *   Local:  npm run wc2026:reset-pw -- --email=cesc@porra.com
  *   Prod:   npm run wc2026:reset-pw:prod -- --email=cesc@porra.com
@@ -27,7 +28,7 @@ const UsersSchema = z.array(
   z.object({
     username: z.string().min(1),
     email: z.string().email(),
-    password: z.string().min(8),
+    password: z.string().min(6),
     scam: z.boolean().optional(),
   }),
 );
@@ -41,14 +42,25 @@ function parseEmailArg(): string {
   return email;
 }
 
+function parsePasswordOverride(): string | undefined {
+  const arg = process.argv.find((a) => a.startsWith("--password="));
+  const password = arg?.slice("--password=".length);
+  if (password != null && password.length < 6) {
+    fatal("Password override must be at least 6 characters.");
+  }
+  return password;
+}
+
 async function main() {
   const target = detectTarget();
   assertSafeTarget(target, { writes: true });
 
   const wantedEmail = parseEmailArg();
+  const passwordOverride = parsePasswordOverride();
   const users = UsersSchema.parse(JSON.parse(readFileSync(USERS_JSON, "utf8")));
   const entry = users.find((u) => u.email.toLowerCase() === wantedEmail);
   if (!entry) fatal(`No entry for ${wantedEmail} in ${USERS_JSON}`);
+  const password = passwordOverride ?? entry.password;
 
   const supabase = createScriptAdminClient();
 
@@ -72,7 +84,7 @@ async function main() {
 
   step("Resetting password");
   const { error: authErr } = await supabase.auth.admin.updateUserById(userId, {
-    password: entry.password,
+    password,
     email_confirm: true,
   });
   if (authErr) fatal(`Failed updating auth user ${wantedEmail}`, authErr);

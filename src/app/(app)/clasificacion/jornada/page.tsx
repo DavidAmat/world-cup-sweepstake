@@ -59,24 +59,30 @@ export default async function JornadaPage({ searchParams }: { searchParams: Sear
     }
   }
 
-  const rows = matchRows.map((r) => {
-    const e = extraByUser.get(r.profile.user_id) ?? {
-      pichichi: 0,
-      mejor_jug: 0,
-      clasificados: 0,
-      otros_initial: 0,
-    };
-    return {
-      profile: r.profile,
-      matchesTotal: r.total,
-      pichichi: e.pichichi,
-      mejor_jug: e.mejor_jug,
-      clasificados: e.clasificados,
-      otros_initial: e.otros_initial,
-      grandTotal: r.total + e.pichichi + e.mejor_jug + e.clasificados + e.otros_initial,
-      byRound: Object.fromEntries(r.byRound),
-    };
-  });
+  const rows = matchRows
+    .map((r) => {
+      const e = extraByUser.get(r.profile.user_id) ?? {
+        pichichi: 0,
+        mejor_jug: 0,
+        clasificados: 0,
+        otros_initial: 0,
+      };
+      return {
+        profile: r.profile,
+        matchesTotal: r.total,
+        pichichi: e.pichichi,
+        mejor_jug: e.mejor_jug,
+        clasificados: e.clasificados,
+        otros_initial: e.otros_initial,
+        grandTotal: r.total + e.pichichi + e.mejor_jug + e.clasificados + e.otros_initial,
+        byRound: Object.fromEntries(r.byRound),
+      };
+    })
+    .sort(
+      (a, b) =>
+        b.grandTotal - a.grandTotal ||
+        a.profile.display_name.localeCompare(b.profile.display_name),
+    );
 
   const totalsByExtra = {
     pichichi: rows.reduce((sum, r) => sum + r.pichichi, 0),
