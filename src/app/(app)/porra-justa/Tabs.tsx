@@ -2,11 +2,12 @@ import Link from "next/link";
 
 // Static tab bar for "La Porra Justa" (mirrors ClasificacionTabs).
 
-export type FairTabKey = "predicciones" | "clasificacion";
+export type FairTabKey = "predicciones" | "clasificacion" | "perjudicados";
 
 const TABS: { key: FairTabKey; href: string; label: string }[] = [
   { key: "predicciones", href: "/porra-justa/predicciones", label: "Predicciones Partidos Justos" },
   { key: "clasificacion", href: "/porra-justa/clasificacion", label: "Clasificación Justa" },
+  { key: "perjudicados", href: "/porra-justa/perjudicados", label: "Perjudicados" },
 ];
 
 export function PorraJustaTabs({ active }: { active: FairTabKey }) {

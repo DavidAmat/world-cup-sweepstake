@@ -57,6 +57,7 @@ const CLASIFICACION_ITEMS = [
 const PORRA_JUSTA_ITEMS = [
   { href: "/porra-justa/predicciones", label: "Predicciones Partidos Justos" },
   { href: "/porra-justa/clasificacion", label: "Clasificación Justa" },
+  { href: "/porra-justa/perjudicados", label: "Perjudicados" },
 ];
 
 function isActive(pathname: string, href: string, exact: boolean) {
