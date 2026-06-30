@@ -2,7 +2,8 @@ import { requireAuth } from "@/lib/permissions/requireAuth";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { loadLeaderboardData, buildEvolution } from "@/lib/scoring/leaderboard";
 import { avatarUrlFor } from "@/lib/profiles/avatars";
-import { EvolutionChart } from "@/components/scoring/EvolutionChart";
+import { EVOLUTION_COLORS } from "@/components/scoring/EvolutionChart";
+import { EvolutionExplorer } from "@/components/scoring/EvolutionExplorer";
 import { ClasificacionTabs } from "../Tabs";
 
 export default async function EvolucionPage() {
@@ -10,6 +11,16 @@ export default async function EvolucionPage() {
   const tournament = await getDefaultTournament();
   const data = await loadLeaderboardData(tournament.id);
   const points = buildEvolution(data);
+
+  // Assign each participant a stable colour from the full roster so the line
+  // colour stays the same no matter which subset the viewer plots.
+  const users = data.profiles.map((p, i) => ({
+    user_id: p.user_id,
+    display_name: p.display_name,
+    initials: p.initials,
+    avatarUrl: avatarUrlFor(p.display_name),
+    color: EVOLUTION_COLORS[i % EVOLUTION_COLORS.length],
+  }));
 
   return (
     <main className="mx-auto max-w-7xl p-10">
@@ -24,15 +35,7 @@ export default async function EvolucionPage() {
       <ClasificacionTabs active="evolucion" />
 
       <section className="mt-6 rounded-md border border-zinc-200 bg-white p-4">
-        <EvolutionChart
-          points={points}
-          users={data.profiles.map((p) => ({
-            user_id: p.user_id,
-            display_name: p.display_name,
-            initials: p.initials,
-            avatarUrl: avatarUrlFor(p.display_name),
-          }))}
-        />
+        <EvolutionExplorer points={points} users={users} />
       </section>
     </main>
   );

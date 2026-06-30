@@ -1,6 +1,6 @@
 import type { EvolutionPoint } from "@/lib/scoring/leaderboard";
 
-const COLORS = [
+export const EVOLUTION_COLORS = [
   "#3cdcb4", // success green
   "#4681ff", // primary blue
   "#ffc83c", // warning yellow
@@ -18,6 +18,9 @@ type UserMeta = {
   display_name: string;
   initials: string;
   avatarUrl?: string | null;
+  // Stable per-user line colour, assigned by the caller from the full roster
+  // so a user keeps the same colour regardless of which subset is plotted.
+  color?: string;
 };
 
 // Avatar disc that lives at the end of every user's evolution line. Kept
@@ -60,18 +63,22 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
   // Extra room on the right so the widest tie cohort isn't clipped by the viewBox.
   const WIDTH = BASE_WIDTH + (maxTie - 1) * avatarStep;
 
-  // y-axis floor: min cumulative across users at the first date. Starting at 0
-  // wastes vertical space when everyone already has 25+ pts on day one — clipping
-  // the bottom makes the deltas between users readable.
+  // y-axis floor: min cumulative across the plotted users at the first date.
+  // Starting at 0 wastes vertical space when everyone already has 25+ pts on
+  // day one — clipping the bottom makes the deltas between users readable.
+  // Scoped to `users` (the selected subset) so the axis rescales to fit the
+  // current selection rather than the whole roster.
   let minYFirst = Infinity;
-  for (const v of points[0].cumulativeByUser.values()) {
+  for (const u of users) {
+    const v = points[0].cumulativeByUser.get(u.user_id) ?? 0;
     if (v < minYFirst) minYFirst = v;
   }
   if (!Number.isFinite(minYFirst)) minYFirst = 0;
 
   let maxY = 0;
   for (const pt of points) {
-    for (const v of pt.cumulativeByUser.values()) {
+    for (const u of users) {
+      const v = pt.cumulativeByUser.get(u.user_id) ?? 0;
       if (v > maxY) maxY = v;
     }
   }
@@ -139,7 +146,7 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
           ))}
         </defs>
         {users.map((u, idx) => {
-          const color = COLORS[idx % COLORS.length];
+          const color = u.color ?? EVOLUTION_COLORS[idx % EVOLUTION_COLORS.length];
           const seg = points
             .map(
               (pt, i) =>
@@ -212,23 +219,6 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
           );
         })}
       </svg>
-      <ul className="mt-3 flex flex-wrap gap-3 text-xs">
-        {users.map((u, idx) => {
-          const color = COLORS[idx % COLORS.length];
-          return (
-            <li key={u.user_id} className="flex items-center gap-2">
-              <span
-                className="inline-block h-3 w-3 rounded-full"
-                style={{ backgroundColor: color }}
-                aria-hidden="true"
-              />
-              <span>
-                <strong>{u.initials.slice(0, 2).toUpperCase()}</strong> · {u.display_name}
-              </span>
-            </li>
-          );
-        })}
-      </ul>
     </div>
   );
 }
