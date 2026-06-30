@@ -35,6 +35,7 @@ type Props = {
   awayPlayers: PlayerLite[];
   existingResult: ExistingResult | null;
   existingGoals: GoalEntry[];
+  existingAddedTime: { home: number; away: number };
 };
 
 const INPUT_CLS = "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm";
@@ -58,6 +59,7 @@ export function ResultForm({
   awayPlayers,
   existingResult,
   existingGoals,
+  existingAddedTime,
 }: Props) {
   const r = existingResult;
   const [h90, setH90] = useState(r ? String(r.home_goals_90) : "");
@@ -65,6 +67,20 @@ export function ResultForm({
   const [wentPen, setWentPen] = useState(r?.went_penalties ?? false);
   const [qual, setQual] = useState(r?.qualified_team_id ?? "");
   const [goals, setGoals] = useState<GoalEntry[]>(existingGoals);
+  const [addHome, setAddHome] = useState(
+    existingAddedTime.home > 0 ? String(existingAddedTime.home) : "",
+  );
+  const [addAway, setAddAway] = useState(
+    existingAddedTime.away > 0 ? String(existingAddedTime.away) : "",
+  );
+
+  // "Resultado Justo" = 90' score minus the stoppage-time ("al 90") goals.
+  // Mirrors deriveFairResult on the server for a live preview.
+  const addH = addHome === "" ? 0 : Number(addHome);
+  const addA = addAway === "" ? 0 : Number(addAway);
+  const fairH = h90 !== "" ? Math.max(0, Number(h90) - addH) : null;
+  const fairA = a90 !== "" ? Math.max(0, Number(a90) - addA) : null;
+  const hasAdded = addH > 0 || addA > 0;
 
   // Extra time and the winner are derived from the 90' score, mirroring the
   // server (deriveResult): a knockout drawn at 90' goes to extra time and the
@@ -106,6 +122,8 @@ export function ResultForm({
       <input type="hidden" name="goals_json" value={JSON.stringify(goals)} />
       {knockoutDraw && wentPen && <input type="hidden" name="went_penalties" value="1" />}
       {knockoutDraw && <input type="hidden" name="qualified_team_id" value={qual} />}
+      <input type="hidden" name="fair_added_home" value={addHome} />
+      <input type="hidden" name="fair_added_away" value={addAway} />
 
       <section className="rounded-md border border-zinc-200 bg-white p-5">
         <h2 className="text-sm font-semibold">Resultado a 90&apos;</h2>
@@ -183,6 +201,55 @@ export function ResultForm({
           )}
         </section>
       )}
+
+      <section className="border-special/30 bg-special-light/20 rounded-md border p-5">
+        <h2 className="text-sm font-semibold">Goles al 90&apos; (La Porra Justa)</h2>
+        <p className="mt-1 text-xs text-zinc-600">
+          Goles marcados del minuto 90 en adelante (tiempo añadido), que se restan del marcador para
+          calcular el <strong>Resultado Justo</strong>. Déjalo en blanco si no hubo (equivale a 0).
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
+          <span className="min-w-28 font-medium">
+            <TeamName name={homeTeam.display_name} />
+          </span>
+          <NumberInput
+            name="fair_added_home_display"
+            value={addHome}
+            onChange={setAddHome}
+            className={GOAL_NUM_CLS}
+          />
+          <span className="text-zinc-400">–</span>
+          <NumberInput
+            name="fair_added_away_display"
+            value={addAway}
+            onChange={setAddAway}
+            className={GOAL_NUM_CLS}
+          />
+          <span className="min-w-28 font-medium">
+            <TeamName name={awayTeam.display_name} />
+          </span>
+        </div>
+        {hasAdded && fairH !== null && fairA !== null && (
+          <p className="mt-3 text-sm text-zinc-700">
+            Resultado Justo:{" "}
+            <strong className="font-oswald text-base">
+              {homeTeam.display_name} {fairH} – {fairA} {awayTeam.display_name}
+            </strong>
+            {isKnockout && fairH === fairA && (
+              <span className="text-zinc-600">
+                {" "}
+                · empate → prórroga (pasa el equipo que pasó en realidad)
+              </span>
+            )}
+            {isKnockout && fairH !== fairA && (
+              <span className="text-zinc-600">
+                {" "}
+                · pasa <strong>{fairH > fairA ? homeTeam.display_name : awayTeam.display_name}</strong>
+              </span>
+            )}
+          </p>
+        )}
+      </section>
 
       <section className="rounded-md border border-zinc-200 bg-white p-5">
         <div className="flex items-center justify-between">

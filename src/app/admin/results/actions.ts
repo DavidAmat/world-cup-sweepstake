@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/permissions/requireAdmin";
 import { getDefaultTournament } from "@/lib/tournament/getDefaultTournament";
 import { recalculateTournamentScores } from "@/lib/scoring/recalculate";
+import { recalculateFairTournamentScores } from "@/lib/scoring/fair/recalculateFair";
 import { ROUNDS, type RoundCode } from "@/lib/fixtures/catalogs";
 import { readResultPayload, deriveResult, type MatchResultPayload } from "./schemas";
 
@@ -100,8 +101,61 @@ async function persistResult(formData: FormData, status: "draft" | "confirmed") 
     }
   }
 
+  // ── La Porra Justa: stoppage-time ("al 90") goals ───────────────────────────
+  // Purely additive — the real match_results write above is untouched. We store
+  // the goals to subtract per team into fair_added_time_goals (replace all rows
+  // for this fixture), then on confirm recompute the fair pipeline AFTER the
+  // real one (so the copied initial / group_qualification rows are up to date).
+  const parseAdded = (v: FormDataEntryValue | null): number => {
+    const s = String(v ?? "").trim();
+    if (s === "") return 0;
+    const n = Number(s);
+    return Number.isInteger(n) && n >= 0 ? n : NaN;
+  };
+  const addedHome = parseAdded(formData.get("fair_added_home"));
+  const addedAway = parseAdded(formData.get("fair_added_away"));
+  if (
+    Number.isNaN(addedHome) ||
+    Number.isNaN(addedAway) ||
+    addedHome > r.home_goals_90 ||
+    addedAway > r.away_goals_90
+  ) {
+    redirect(
+      `${SELF(fixtureId)}?error=${encodeURIComponent(
+        "Los goles al 90' deben ser enteros ≥ 0 y no superar el marcador de cada equipo.",
+      )}`,
+    );
+  }
+
+  await supabase.from("fair_added_time_goals").delete().eq("fixture_id", fixtureId);
+  const addedRows = [
+    addedHome > 0
+      ? {
+          tournament_id: tournament.id,
+          fixture_id: fixture.id,
+          team_id: fixture.home_team_id,
+          goals: addedHome,
+        }
+      : null,
+    addedAway > 0
+      ? {
+          tournament_id: tournament.id,
+          fixture_id: fixture.id,
+          team_id: fixture.away_team_id,
+          goals: addedAway,
+        }
+      : null,
+  ].filter((x): x is NonNullable<typeof x> => x !== null);
+  if (addedRows.length > 0) {
+    const { error: addErr } = await supabase.from("fair_added_time_goals").insert(addedRows);
+    if (addErr) {
+      redirect(`${SELF(fixtureId)}?error=${encodeURIComponent(addErr.message)}`);
+    }
+  }
+
   if (status === "confirmed") {
     await recalculateTournamentScores(tournament.id);
+    await recalculateFairTournamentScores(tournament.id);
   }
 
   revalidatePath("/admin/results");

@@ -129,6 +129,17 @@ export default async function ResultEntryPage({
     .eq("fixture_id", fixtureId)
     .maybeSingle<ResultRow>();
 
+  // "Goles al 90'" already recorded for this fixture (La Porra Justa). Keyed by
+  // team so we can prefill the home / away inputs.
+  const { data: addedTimeData } = await supabase
+    .from("fair_added_time_goals")
+    .select("team_id, goals")
+    .eq("fixture_id", fixtureId);
+  const existingAddedTime = {
+    home: (addedTimeData ?? []).find((a) => a.team_id === homeTeam.id)?.goals ?? 0,
+    away: (addedTimeData ?? []).find((a) => a.team_id === awayTeam.id)?.goals ?? 0,
+  };
+
   const { data: goalsData } = await supabase
     .from("match_goals")
     .select("team_id, player_id, minute, period, own_goal, penalty_goal")
@@ -277,6 +288,7 @@ export default async function ResultEntryPage({
             : null
         }
         existingGoals={existingGoals}
+        existingAddedTime={existingAddedTime}
       />
     </main>
   );

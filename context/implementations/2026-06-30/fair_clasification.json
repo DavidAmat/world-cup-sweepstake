@@ -1,0 +1,212 @@
+[
+  {
+    "external_id": "wc2026_md1_b_qat_sui",
+    "goles_en_90": [
+      {
+        "equipo": "Catar",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md1_d_usa_par",
+    "goles_en_90": [
+      {
+        "equipo": "Estados Unidos",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md1_e_civ_ecu",
+    "goles_en_90": [
+      {
+        "equipo": "Costa de Marfil",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md1_f_swe_tun",
+    "goles_en_90": [
+      {
+        "equipo": "Suecia",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md1_i_fra_sen",
+    "goles_en_90": [
+      {
+        "equipo": "Senegal",
+        "goles": 1
+      },
+      {
+        "equipo": "Francia",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md1_j_aut_jor",
+    "goles_en_90": [
+      {
+        "equipo": "Austria",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md1_i_irq_nor",
+    "goles_en_90": [
+      {
+        "equipo": "Noruega",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md1_l_gha_pan",
+    "goles_en_90": [
+      {
+        "equipo": "Ghana",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md2_b_sui_bih",
+    "goles_en_90": [
+      {
+        "equipo": "Suiza",
+        "goles": 2
+      },
+      {
+        "equipo": "Bosnia y Herzegovina",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md1_k_uzb_col",
+    "goles_en_90": [
+      {
+        "equipo": "Colombia",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md2_b_can_qat",
+    "goles_en_90": [
+      {
+        "equipo": "Canadá",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md2_e_ger_civ",
+    "goles_en_90": [
+      {
+        "equipo": "Alemania",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md2_j_arg_aut",
+    "goles_en_90": [
+      {
+        "equipo": "Argentina",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md2_i_nor_sen",
+    "goles_en_90": [
+      {
+        "equipo": "Senegal",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md3_a_cze_mex",
+    "goles_en_90": [
+      {
+        "equipo": "México",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md3_i_nor_fra",
+    "goles_en_90": [
+      {
+        "equipo": "Francia",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md3_j_alg_aut",
+    "goles_en_90": [
+      {
+        "equipo": "Argelia",
+        "goles": 1
+      },
+      {
+        "equipo": "Austria",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md3_k_cod_uzb",
+    "goles_en_90": [
+      {
+        "equipo": "RD Congo",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_md3_d_tur_usa",
+    "goles_en_90": [
+      {
+        "equipo": "Turquía",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_r32_04",
+    "goles_en_90": [
+      {
+        "equipo": "Marruecos",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_r32_02",
+    "goles_en_90": [
+      {
+        "equipo": "Brasil",
+        "goles": 1
+      }
+    ]
+  },
+  {
+    "external_id": "wc2026_r32_01",
+    "goles_en_90": [
+      {
+        "equipo": "Canadá",
+        "goles": 1
+      }
+    ]
+  }
+]

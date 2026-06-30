@@ -52,6 +52,184 @@ export type Database = {
         }
         Relationships: []
       }
+      fair_added_time_goals: {
+        Row: {
+          created_at: string
+          fixture_id: string
+          goals: number
+          id: string
+          team_id: string
+          tournament_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fixture_id: string
+          goals: number
+          id?: string
+          team_id: string
+          tournament_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fixture_id?: string
+          goals?: number
+          id?: string
+          team_id?: string
+          tournament_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fair_added_time_goals_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: false
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fair_added_time_goals_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fair_added_time_goals_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fair_match_results: {
+        Row: {
+          away_goals_90: number
+          computed_at: string
+          fixture_id: string
+          home_goals_90: number
+          id: string
+          qualified_team_id: string | null
+          tournament_id: string
+          went_extra_time: boolean
+          went_penalties: boolean
+          winner_team_id: string | null
+        }
+        Insert: {
+          away_goals_90: number
+          computed_at?: string
+          fixture_id: string
+          home_goals_90: number
+          id?: string
+          qualified_team_id?: string | null
+          tournament_id: string
+          went_extra_time?: boolean
+          went_penalties?: boolean
+          winner_team_id?: string | null
+        }
+        Update: {
+          away_goals_90?: number
+          computed_at?: string
+          fixture_id?: string
+          home_goals_90?: number
+          id?: string
+          qualified_team_id?: string | null
+          tournament_id?: string
+          went_extra_time?: boolean
+          went_penalties?: boolean
+          winner_team_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fair_match_results_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: true
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fair_match_results_qualified_team_id_fkey"
+            columns: ["qualified_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fair_match_results_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fair_match_results_winner_team_id_fkey"
+            columns: ["winner_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fair_prediction_scores: {
+        Row: {
+          calculated_at: string
+          fixture_id: string | null
+          id: string
+          points_breakdown: Json
+          points_total: number
+          prediction_type: string
+          scoring_rules_version: number
+          tournament_id: string
+          user_id: string
+        }
+        Insert: {
+          calculated_at?: string
+          fixture_id?: string | null
+          id?: string
+          points_breakdown: Json
+          points_total: number
+          prediction_type: string
+          scoring_rules_version: number
+          tournament_id: string
+          user_id: string
+        }
+        Update: {
+          calculated_at?: string
+          fixture_id?: string | null
+          id?: string
+          points_breakdown?: Json
+          points_total?: number
+          prediction_type?: string
+          scoring_rules_version?: number
+          tournament_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fair_prediction_scores_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: false
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fair_prediction_scores_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fair_prediction_scores_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       fixtures: {
         Row: {
           away_placeholder: string | null

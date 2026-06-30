@@ -12,6 +12,7 @@ import {
   ListChecks,
   ClipboardList,
   BarChart2,
+  Scale,
   User,
 } from "lucide-react";
 import { Avatar } from "@/components/profiles/Avatar";
@@ -53,6 +54,11 @@ const CLASIFICACION_ITEMS = [
   { href: "/my-scores", label: "Mis Predicciones" },
 ];
 
+const PORRA_JUSTA_ITEMS = [
+  { href: "/porra-justa/predicciones", label: "Predicciones Partidos Justos" },
+  { href: "/porra-justa/clasificacion", label: "Clasificación Justa" },
+];
+
 function isActive(pathname: string, href: string, exact: boolean) {
   if (exact) return pathname === href;
   return pathname.startsWith(href);
@@ -60,6 +66,10 @@ function isActive(pathname: string, href: string, exact: boolean) {
 
 function isClasificacionActive(pathname: string) {
   return pathname.startsWith("/clasificacion") || pathname.startsWith("/my-scores");
+}
+
+function isPorraJustaActive(pathname: string) {
+  return pathname.startsWith("/porra-justa");
 }
 
 const LINK_BASE =
@@ -73,10 +83,23 @@ function ActiveDot() {
   );
 }
 
-function ClasificacionDropdown({ pathname, onClose }: { pathname: string; onClose?: () => void }) {
+function NavDropdown({
+  label,
+  icon: Icon,
+  items,
+  active,
+  pathname,
+  onClose,
+}: {
+  label: string;
+  icon: typeof BarChart2;
+  items: { href: string; label: string }[];
+  active: boolean;
+  pathname: string;
+  onClose?: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const active = isClasificacionActive(pathname);
 
   useEffect(() => {
     function handler(e: MouseEvent) {
@@ -95,8 +118,8 @@ function ClasificacionDropdown({ pathname, onClose }: { pathname: string; onClos
         aria-expanded={open}
         aria-haspopup="true"
       >
-        <BarChart2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
-        Clasificación
+        <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+        {label}
         <ChevronDown
           className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`}
           aria-hidden
@@ -106,10 +129,8 @@ function ClasificacionDropdown({ pathname, onClose }: { pathname: string; onClos
 
       {open && (
         <div className="absolute top-full left-0 mt-1.5 min-w-[180px] rounded-xl border border-white/40 bg-white/90 p-1.5 shadow-lg backdrop-blur-md">
-          {CLASIFICACION_ITEMS.map((item) => {
-            const a =
-              pathname === item.href ||
-              (item.href !== "/clasificacion" && pathname.startsWith(item.href));
+          {items.map((item) => {
+            const a = pathname === item.href || pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}
@@ -172,7 +193,21 @@ function DesktopNav({
         );
       })}
 
-      <ClasificacionDropdown pathname={pathname} />
+      <NavDropdown
+        label="Clasificación"
+        icon={BarChart2}
+        items={CLASIFICACION_ITEMS}
+        active={isClasificacionActive(pathname)}
+        pathname={pathname}
+      />
+
+      <NavDropdown
+        label="La Porra Justa"
+        icon={Scale}
+        items={PORRA_JUSTA_ITEMS}
+        active={isPorraJustaActive(pathname)}
+        pathname={pathname}
+      />
 
       {isAdmin && (
         <Link
@@ -247,6 +282,12 @@ function MobileNav({
       label,
       icon: BarChart2,
       active: pathname === href || (pathname.startsWith(href) && href !== "/clasificacion"),
+    })),
+    ...PORRA_JUSTA_ITEMS.map(({ href, label }) => ({
+      href,
+      label,
+      icon: Scale,
+      active: pathname === href || pathname.startsWith(href),
     })),
     ...(isAdmin
       ? [
