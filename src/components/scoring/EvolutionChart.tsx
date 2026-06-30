@@ -21,7 +21,14 @@ type UserMeta = {
   // Stable per-user line colour, assigned by the caller from the full roster
   // so a user keeps the same colour regardless of which subset is plotted.
   color?: string;
+  // When true the line is drawn as a faint gray reference (no dots/avatar)
+  // instead of in the user's colour — used for de-selected participants.
+  dimmed?: boolean;
 };
+
+// Faint gray used for de-selected reference lines.
+const DIMMED_STROKE = "#a1a1aa"; // zinc-400
+const DIMMED_OPACITY = 0.28;
 
 // Avatar disc that lives at the end of every user's evolution line. Kept
 // deliberately small — with ~12 users a bigger disc crowds the right margin.
@@ -51,7 +58,10 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
   let maxTie = 1;
   {
     const seen = new Map<number, number>();
+    // Only highlighted users get an end-of-line avatar, so only they take part
+    // in the tie-fanning layout.
     for (const u of users) {
+      if (u.dimmed) continue;
       const s = finalScoreFor(u.user_id);
       const n = seen.get(s) ?? 0;
       tieIndex.set(u.user_id, n);
@@ -66,8 +76,8 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
   // y-axis floor: min cumulative across the plotted users at the first date.
   // Starting at 0 wastes vertical space when everyone already has 25+ pts on
   // day one — clipping the bottom makes the deltas between users readable.
-  // Scoped to `users` (the selected subset) so the axis rescales to fit the
-  // current selection rather than the whole roster.
+  // Scoped to every plotted user (highlighted + dimmed reference lines) so the
+  // axis stays stable as the viewer toggles the selection.
   let minYFirst = Infinity;
   for (const u of users) {
     const v = points[0].cumulativeByUser.get(u.user_id) ?? 0;
@@ -145,79 +155,99 @@ export function EvolutionChart({ points, users }: { points: EvolutionPoint[]; us
             </clipPath>
           ))}
         </defs>
-        {users.map((u, idx) => {
-          const color = u.color ?? EVOLUTION_COLORS[idx % EVOLUTION_COLORS.length];
-          const seg = points
-            .map(
-              (pt, i) =>
-                `${i === 0 ? "M" : "L"}${xFor(i)},${yFor(pt.cumulativeByUser.get(u.user_id) ?? 0)}`,
-            )
-            .join(" ");
-          const last = points[points.length - 1];
-          const lastY = yFor(last.cumulativeByUser.get(u.user_id) ?? 0);
-          const lastX = xFor(points.length - 1);
-          // Fan tied avatars rightward: first sits next to the dot, the rest
-          // step right by one avatar-width each so all photos stay visible.
-          const tIdx = tieIndex.get(u.user_id) ?? 0;
-          const avatarCx = lastX + AVATAR_R + 4 + tIdx * avatarStep;
-          return (
-            <g key={u.user_id}>
-              <path d={seg} fill="none" stroke={color} strokeWidth={2} />
-              {points.map((pt, i) => {
-                const v = pt.cumulativeByUser.get(u.user_id) ?? 0;
-                const cy = yFor(v);
-                return (
-                  <g key={`${u.user_id}-${pt.dateKey}`}>
-                    {/* Small visible dot, no inline value text (too many users). */}
-                    <circle cx={xFor(i)} cy={cy} r={2.5} fill={color} />
-                    {/* Wider transparent hit area so the native tooltip is easy
+        {/* Draw dimmed (de-selected) reference lines first so the highlighted
+            colour lines and avatars sit on top of them. */}
+        {[...users]
+          .sort((a, b) => Number(b.dimmed ?? false) - Number(a.dimmed ?? false))
+          .map((u, idx) => {
+            const color = u.color ?? EVOLUTION_COLORS[idx % EVOLUTION_COLORS.length];
+            const seg = points
+              .map(
+                (pt, i) =>
+                  `${i === 0 ? "M" : "L"}${xFor(i)},${yFor(pt.cumulativeByUser.get(u.user_id) ?? 0)}`,
+              )
+              .join(" ");
+
+            // De-selected participants: a single faint gray line, no markers or
+            // avatar — just enough to keep their trajectory as a reference.
+            if (u.dimmed) {
+              return (
+                <path
+                  key={u.user_id}
+                  d={seg}
+                  fill="none"
+                  stroke={DIMMED_STROKE}
+                  strokeOpacity={DIMMED_OPACITY}
+                  strokeWidth={1.5}
+                />
+              );
+            }
+
+            const last = points[points.length - 1];
+            const lastY = yFor(last.cumulativeByUser.get(u.user_id) ?? 0);
+            const lastX = xFor(points.length - 1);
+            // Fan tied avatars rightward: first sits next to the dot, the rest
+            // step right by one avatar-width each so all photos stay visible.
+            const tIdx = tieIndex.get(u.user_id) ?? 0;
+            const avatarCx = lastX + AVATAR_R + 4 + tIdx * avatarStep;
+            return (
+              <g key={u.user_id}>
+                <path d={seg} fill="none" stroke={color} strokeWidth={2} />
+                {points.map((pt, i) => {
+                  const v = pt.cumulativeByUser.get(u.user_id) ?? 0;
+                  const cy = yFor(v);
+                  return (
+                    <g key={`${u.user_id}-${pt.dateKey}`}>
+                      {/* Small visible dot, no inline value text (too many users). */}
+                      <circle cx={xFor(i)} cy={cy} r={2.5} fill={color} />
+                      {/* Wider transparent hit area so the native tooltip is easy
                         to trigger; <title> shows the value on hover. */}
-                    <circle cx={xFor(i)} cy={cy} r={7} fill="transparent">
-                      <title>{`${u.display_name} · ${pt.label}: ${Math.round(v)} pts`}</title>
-                    </circle>
+                      <circle cx={xFor(i)} cy={cy} r={7} fill="transparent">
+                        <title>{`${u.display_name} · ${pt.label}: ${Math.round(v)} pts`}</title>
+                      </circle>
+                    </g>
+                  );
+                })}
+                {u.avatarUrl ? (
+                  <g transform={`translate(${avatarCx}, ${lastY})`}>
+                    <image
+                      href={u.avatarUrl}
+                      x={-(AVATAR_R - AVATAR_STROKE)}
+                      y={-(AVATAR_R - AVATAR_STROKE)}
+                      width={(AVATAR_R - AVATAR_STROKE) * 2}
+                      height={(AVATAR_R - AVATAR_STROKE) * 2}
+                      preserveAspectRatio="xMidYMid slice"
+                      clipPath={`url(#avatar-clip-${u.user_id})`}
+                    />
+                    <circle
+                      cx={0}
+                      cy={0}
+                      r={AVATAR_R - AVATAR_STROKE / 2}
+                      fill="none"
+                      stroke={color}
+                      strokeWidth={AVATAR_STROKE}
+                    />
+                    <title>{`${u.display_name}: ${Math.round(finalScoreFor(u.user_id))} pts`}</title>
                   </g>
-                );
-              })}
-              {u.avatarUrl ? (
-                <g transform={`translate(${avatarCx}, ${lastY})`}>
-                  <image
-                    href={u.avatarUrl}
-                    x={-(AVATAR_R - AVATAR_STROKE)}
-                    y={-(AVATAR_R - AVATAR_STROKE)}
-                    width={(AVATAR_R - AVATAR_STROKE) * 2}
-                    height={(AVATAR_R - AVATAR_STROKE) * 2}
-                    preserveAspectRatio="xMidYMid slice"
-                    clipPath={`url(#avatar-clip-${u.user_id})`}
-                  />
-                  <circle
-                    cx={0}
-                    cy={0}
-                    r={AVATAR_R - AVATAR_STROKE / 2}
-                    fill="none"
-                    stroke={color}
-                    strokeWidth={AVATAR_STROKE}
-                  />
-                  <title>{`${u.display_name}: ${Math.round(finalScoreFor(u.user_id))} pts`}</title>
-                </g>
-              ) : (
-                <g transform={`translate(${avatarCx}, ${lastY})`}>
-                  <circle cx={0} cy={0} r={AVATAR_R} fill={color} />
-                  <text
-                    x={0}
-                    y={4}
-                    textAnchor="middle"
-                    fontSize={11}
-                    fontWeight="bold"
-                    fill="#ffffff"
-                  >
-                    {u.initials.slice(0, 2).toUpperCase()}
-                  </text>
-                  <title>{`${u.display_name}: ${Math.round(finalScoreFor(u.user_id))} pts`}</title>
-                </g>
-              )}
-            </g>
-          );
-        })}
+                ) : (
+                  <g transform={`translate(${avatarCx}, ${lastY})`}>
+                    <circle cx={0} cy={0} r={AVATAR_R} fill={color} />
+                    <text
+                      x={0}
+                      y={4}
+                      textAnchor="middle"
+                      fontSize={11}
+                      fontWeight="bold"
+                      fill="#ffffff"
+                    >
+                      {u.initials.slice(0, 2).toUpperCase()}
+                    </text>
+                    <title>{`${u.display_name}: ${Math.round(finalScoreFor(u.user_id))} pts`}</title>
+                  </g>
+                )}
+              </g>
+            );
+          })}
       </svg>
     </div>
   );

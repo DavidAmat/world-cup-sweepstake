@@ -23,12 +23,12 @@ export function EvolutionExplorer({
   points: EvolutionPoint[];
   users: UserMeta[];
 }) {
-  const [selected, setSelected] = useState<Set<string>>(
-    () => new Set(users.map((u) => u.user_id)),
-  );
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(users.map((u) => u.user_id)));
 
-  const visibleUsers = useMemo(
-    () => users.filter((u) => selected.has(u.user_id)),
+  // Every participant is still plotted; de-selected ones are flagged `dimmed`
+  // so the chart draws them as a faint gray reference line.
+  const chartUsers = useMemo(
+    () => users.map((u) => ({ ...u, dimmed: !selected.has(u.user_id) })),
     [users, selected],
   );
 
@@ -75,7 +75,7 @@ export function EvolutionExplorer({
           type="button"
           onClick={() => setSelected(new Set(users.map((u) => u.user_id)))}
           disabled={allSelected}
-          className="rounded-full px-3 py-1 text-xs font-medium text-primary hover:underline disabled:text-zinc-300 disabled:no-underline"
+          className="text-primary rounded-full px-3 py-1 text-xs font-medium hover:underline disabled:text-zinc-300 disabled:no-underline"
         >
           Todos
         </button>
@@ -89,13 +89,7 @@ export function EvolutionExplorer({
         </button>
       </div>
 
-      {visibleUsers.length === 0 ? (
-        <p className="text-sm text-zinc-600">
-          Selecciona al menos un participante para ver el gráfico.
-        </p>
-      ) : (
-        <EvolutionChart points={points} users={visibleUsers} />
-      )}
+      <EvolutionChart points={points} users={chartUsers} />
     </div>
   );
 }
