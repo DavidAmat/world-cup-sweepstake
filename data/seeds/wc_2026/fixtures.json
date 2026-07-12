@@ -885,9 +885,9 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
-    "fecha": "2026-07-05 08:00:00"
+    "equipo_1": "Canadá",
+    "equipo_2": "Marruecos",
+    "fecha": "2026-07-04 19:00:00"
   },
   {
     "external_id": "wc2026_r16_02",
@@ -895,9 +895,9 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
-    "fecha": "2026-07-05 08:00:00"
+    "equipo_1": "Paraguay",
+    "equipo_2": "Francia",
+    "fecha": "2026-07-04 23:00:00"
   },
   {
     "external_id": "wc2026_r16_03",
@@ -905,9 +905,9 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
-    "fecha": "2026-07-05 08:00:00"
+    "equipo_1": "Brasil",
+    "equipo_2": "Noruega",
+    "fecha": "2026-07-05 22:00:00"
   },
   {
     "external_id": "wc2026_r16_04",
@@ -915,9 +915,9 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
-    "fecha": "2026-07-05 08:00:00"
+    "equipo_1": "México",
+    "equipo_2": "Inglaterra",
+    "fecha": "2026-07-06 02:00:00"
   },
   {
     "external_id": "wc2026_r16_05",
@@ -925,9 +925,9 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
-    "fecha": "2026-07-05 08:00:00"
+    "equipo_1": "Portugal",
+    "equipo_2": "España",
+    "fecha": "2026-07-06 20:00:00"
   },
   {
     "external_id": "wc2026_r16_06",
@@ -935,9 +935,9 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
-    "fecha": "2026-07-05 08:00:00"
+    "equipo_1": "Estados Unidos",
+    "equipo_2": "Bélgica",
+    "fecha": "2026-07-07 01:00:00"
   },
   {
     "external_id": "wc2026_r16_07",
@@ -947,7 +947,7 @@
     "grupo": null,
     "equipo_1": "TBD",
     "equipo_2": "TBD",
-    "fecha": "2026-07-05 08:00:00"
+    "fecha": "2026-07-07 21:00:00"
   },
   {
     "external_id": "wc2026_r16_08",
@@ -957,7 +957,7 @@
     "grupo": null,
     "equipo_1": "TBD",
     "equipo_2": "TBD",
-    "fecha": "2026-07-05 08:00:00"
+    "fecha": "2026-07-08 01:00:00"
   },
   {
     "external_id": "wc2026_qf_01",
@@ -965,8 +965,8 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
+    "equipo_1": "Francia",
+    "equipo_2": "Marruecos",
     "fecha": "2026-07-05 08:00:00"
   },
   {
@@ -975,8 +975,8 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
+    "equipo_1": "España",
+    "equipo_2": "Bélgica",
     "fecha": "2026-07-05 08:00:00"
   },
   {
@@ -985,8 +985,8 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
+    "equipo_1": "Noruega",
+    "equipo_2": "Inglaterra",
     "fecha": "2026-07-05 08:00:00"
   },
   {
@@ -995,8 +995,8 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
+    "equipo_1": "Argentina",
+    "equipo_2": "Suiza",
     "fecha": "2026-07-05 08:00:00"
   },
   {
@@ -1005,8 +1005,8 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
+    "equipo_1": "Francia",
+    "equipo_2": "España",
     "fecha": "2026-07-05 08:00:00"
   },
   {
@@ -1015,8 +1015,8 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
+    "equipo_1": "Inglaterra",
+    "equipo_2": "Argentina",
     "fecha": "2026-07-05 08:00:00"
   },
   {
@@ -1035,8 +1035,8 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
+    "equipo_1": "Francia",
+    "equipo_2": "Inglaterra",
     "fecha": "2026-07-05 08:00:00"
   }
 ]
