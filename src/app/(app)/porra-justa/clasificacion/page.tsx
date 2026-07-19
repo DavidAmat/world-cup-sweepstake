@@ -33,18 +33,20 @@ export default async function ClasificacionJustaPage({
   const isAdmin = profileData?.role === "admin";
 
   type ExtraScore = {
+    campeon: number;
+    subcampeon: number;
     pichichi: number;
     mejor_jug: number;
     clasificados: number;
-    otros_initial: number;
   };
   const extraByUser = new Map<string, ExtraScore>();
   const ensure = (uid: string): ExtraScore => {
     const cur = extraByUser.get(uid) ?? {
+      campeon: 0,
+      subcampeon: 0,
       pichichi: 0,
       mejor_jug: 0,
       clasificados: 0,
-      otros_initial: 0,
     };
     extraByUser.set(uid, cur);
     return cur;
@@ -54,9 +56,10 @@ export default async function ClasificacionJustaPage({
       const bd = s.points_breakdown as Record<string, unknown>;
       const num = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0) || 0);
       const e = ensure(s.user_id);
+      e.campeon += num(bd.champion);
+      e.subcampeon += num(bd.runner_up);
       e.pichichi += num(bd.top_scorer);
       e.mejor_jug += num(bd.best_player);
-      e.otros_initial += num(bd.champion) + num(bd.runner_up);
     } else if (s.prediction_type === "group_qualification") {
       ensure(s.user_id).clasificados += s.points_total;
     }
@@ -65,19 +68,22 @@ export default async function ClasificacionJustaPage({
   const rows = matchRows
     .map((r) => {
       const e = extraByUser.get(r.profile.user_id) ?? {
+        campeon: 0,
+        subcampeon: 0,
         pichichi: 0,
         mejor_jug: 0,
         clasificados: 0,
-        otros_initial: 0,
       };
       return {
         profile: r.profile,
         matchesTotal: r.total,
+        campeon: e.campeon,
+        subcampeon: e.subcampeon,
         pichichi: e.pichichi,
         mejor_jug: e.mejor_jug,
         clasificados: e.clasificados,
-        otros_initial: e.otros_initial,
-        grandTotal: r.total + e.pichichi + e.mejor_jug + e.clasificados + e.otros_initial,
+        grandTotal:
+          r.total + e.campeon + e.subcampeon + e.pichichi + e.mejor_jug + e.clasificados,
         byRound: Object.fromEntries(r.byRound),
       };
     })
@@ -88,6 +94,8 @@ export default async function ClasificacionJustaPage({
     );
 
   const totalsByExtra = {
+    campeon: rows.reduce((sum, r) => sum + r.campeon, 0),
+    subcampeon: rows.reduce((sum, r) => sum + r.subcampeon, 0),
     pichichi: rows.reduce((sum, r) => sum + r.pichichi, 0),
     mejor_jug: rows.reduce((sum, r) => sum + r.mejor_jug, 0),
     clasificados: rows.reduce((sum, r) => sum + r.clasificados, 0),

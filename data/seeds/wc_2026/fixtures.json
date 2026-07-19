@@ -1025,9 +1025,9 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "TBD",
-    "equipo_2": "TBD",
-    "fecha": "2026-07-05 08:00:00"
+    "equipo_1": "Francia",
+    "equipo_2": "Inglaterra",
+    "fecha": "2026-07-18 23:00:00"
   },
   {
     "external_id": "wc2026_final_01",
@@ -1035,8 +1035,8 @@
     "tipo_partido": "eliminatoria",
     "jornada": null,
     "grupo": null,
-    "equipo_1": "Francia",
-    "equipo_2": "Inglaterra",
-    "fecha": "2026-07-05 08:00:00"
+    "equipo_1": "España",
+    "equipo_2": "Argentina",
+    "fecha": "2026-07-19 21:00:00"
   }
 ]

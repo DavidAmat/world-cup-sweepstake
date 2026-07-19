@@ -141,8 +141,9 @@ Server component. After `buildByRound`, enriches rows with extra columns from no
 | Pichichi | `initial` row → `top_scorer` breakdown key |
 | Mejor Jug. | `initial` row → `best_player` |
 | Clasificados | sum of `group_qualification` `points_total` |
-| (hidden) `otros_initial` | `champion` + `runner_up` from initial breakdown |
-| Total | matches + pichichi + mejor_jug + clasificados + otros_initial |
+| Campeón | `champion` from initial breakdown (200 if correct) |
+| Subcampeón | `runner_up` from initial breakdown (150 if correct) |
+| Total | matches + campeón + subcampeón + pichichi + mejor_jug + clasificados |
 
 `JornadaTable` (client) uses `SortableTable`. Round column headers link to `/clasificacion/jornada/[roundCode]`. Footer row **Pts totales** sums columns.
 

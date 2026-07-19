@@ -5,19 +5,17 @@ import { SortableTable, type SortableColumn } from "@/components/ui/SortableTabl
 import { Avatar } from "@/components/profiles/Avatar";
 import type { ProfileRef, RoundRef } from "@/lib/scoring/leaderboard";
 
-// Per-user initial-prediction breakdown. `pichichi` / `mejor_jug` come
-// from the `top_scorer` / `best_player` keys of the `initial` prediction
-// score row; `clasificados` is the sum of `group_qualification` rows.
-// `otros_initial` covers champion + runner_up — not surfaced as a column
-// but rolled into the grand total so it stays consistent with what other
-// Clasificación tabs show.
+// Per-user initial-prediction breakdown. `campeon` / `subcampeon` /
+// `pichichi` / `mejor_jug` come from the `initial` prediction score row;
+// `clasificados` is the sum of `group_qualification` rows.
 export type JornadaTableRow = {
   profile: ProfileRef;
   matchesTotal: number;
+  campeon: number;
+  subcampeon: number;
   pichichi: number;
   mejor_jug: number;
   clasificados: number;
-  otros_initial: number;
   grandTotal: number;
   byRound: Record<string, number>;
 };
@@ -26,7 +24,13 @@ type Props = {
   rows: JornadaTableRow[];
   rounds: RoundRef[];
   totalsByRound: Record<string, number>;
-  totalsByExtra: { pichichi: number; mejor_jug: number; clasificados: number };
+  totalsByExtra: {
+    campeon: number;
+    subcampeon: number;
+    pichichi: number;
+    mejor_jug: number;
+    clasificados: number;
+  };
   userId: string;
   avatarUrlByUser: Record<string, string | null>;
 };
@@ -89,6 +93,20 @@ export function JornadaTable({
       getValue: (row) => row.byRound[r.code] ?? 0,
     })),
     {
+      key: "campeon",
+      label: "Campeón",
+      align: "right",
+      tdClassName: "font-oswald text-zinc-700",
+      getValue: (r) => r.campeon,
+    },
+    {
+      key: "subcampeon",
+      label: "Subcampeón",
+      align: "right",
+      tdClassName: "font-oswald text-zinc-700",
+      getValue: (r) => r.subcampeon,
+    },
+    {
       key: "pichichi",
       label: "Pichichi",
       align: "right",
@@ -128,6 +146,12 @@ export function JornadaTable({
           {totalsByRound[r.code] ?? 0}
         </td>
       ))}
+      <td className="font-oswald px-3 py-2 text-right text-xs text-zinc-500">
+        {totalsByExtra.campeon}
+      </td>
+      <td className="font-oswald px-3 py-2 text-right text-xs text-zinc-500">
+        {totalsByExtra.subcampeon}
+      </td>
       <td className="font-oswald px-3 py-2 text-right text-xs text-zinc-500">
         {totalsByExtra.pichichi}
       </td>
