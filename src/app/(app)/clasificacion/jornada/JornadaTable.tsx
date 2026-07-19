@@ -6,8 +6,8 @@ import { Avatar } from "@/components/profiles/Avatar";
 import type { ProfileRef, RoundRef } from "@/lib/scoring/leaderboard";
 
 // Per-user initial-prediction breakdown. `campeon` / `subcampeon` /
-// `pichichi` / `mejor_jug` come from the `initial` prediction score row;
-// `clasificados` is the sum of `group_qualification` rows.
+// `pichichi` / `mejor_jug` / `ultimo` come from the `initial` prediction
+// score row; `clasificados` is the sum of `group_qualification` rows.
 export type JornadaTableRow = {
   profile: ProfileRef;
   matchesTotal: number;
@@ -15,6 +15,7 @@ export type JornadaTableRow = {
   subcampeon: number;
   pichichi: number;
   mejor_jug: number;
+  ultimo: number;
   clasificados: number;
   grandTotal: number;
   byRound: Record<string, number>;
@@ -29,6 +30,7 @@ type Props = {
     subcampeon: number;
     pichichi: number;
     mejor_jug: number;
+    ultimo: number;
     clasificados: number;
   };
   userId: string;
@@ -121,6 +123,13 @@ export function JornadaTable({
       getValue: (r) => r.mejor_jug,
     },
     {
+      key: "ultimo",
+      label: "Último",
+      align: "right",
+      tdClassName: "font-oswald text-zinc-700",
+      getValue: (r) => r.ultimo,
+    },
+    {
       key: "clasificados",
       label: "Clasificados",
       align: "right",
@@ -157,6 +166,9 @@ export function JornadaTable({
       </td>
       <td className="font-oswald px-3 py-2 text-right text-xs text-zinc-500">
         {totalsByExtra.mejor_jug}
+      </td>
+      <td className="font-oswald px-3 py-2 text-right text-xs text-zinc-500">
+        {totalsByExtra.ultimo}
       </td>
       <td className="font-oswald px-3 py-2 text-right text-xs text-zinc-500">
         {totalsByExtra.clasificados}
