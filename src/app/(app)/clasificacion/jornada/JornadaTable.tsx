@@ -172,6 +172,7 @@ export function JornadaTable({
         rows={rows}
         getRowKey={(r) => r.profile.user_id}
         footer={footer}
+        tableClassName="w-full border-collapse text-sm"
       />
     </div>
   );

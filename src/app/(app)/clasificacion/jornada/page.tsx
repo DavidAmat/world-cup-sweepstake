@@ -97,7 +97,7 @@ export default async function JornadaPage({ searchParams }: { searchParams: Sear
   };
 
   return (
-    <main className="mx-auto max-w-7xl p-10">
+    <main className="mx-auto w-full max-w-[100rem] px-4 py-10 sm:px-6 lg:px-8">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Clasificación por jornada</h1>
